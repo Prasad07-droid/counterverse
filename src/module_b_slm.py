@@ -87,6 +87,75 @@ Now analyze the following news headline and output ONLY the JSON object.
 """
 
 
+FAST_NODE_MAPPING = {
+    "port": "Port/Logistics",
+    "shipping": "Port/Logistics",
+    "factory": "Tier-1 Supplier",
+    "plant": "Tier-1 Supplier",
+    "fab": "Semiconductor Fab",
+    "foundry": "Semiconductor Fab",
+    "mine": "Raw Material Supplier",
+    "gallium": "Raw Material Supplier",
+    "germanium": "Raw Material Supplier",
+    "lithium": "Raw Material Supplier",
+    "rare earth": "Raw Material Supplier",
+    "battery": "Tier-2 Supplier",
+    "chip": "Semiconductor Fab",
+    "semiconductor": "Semiconductor Fab",
+    "wafer": "Semiconductor Fab",
+}
+
+FAST_EVENT_MAPPING = {
+    "closure": "Port closure",
+    "closed": "Port closure",
+    "ban": "Export ban/restriction",
+    "restrict": "Export ban/restriction",
+    "sanction": "Geopolitical sanction",
+    "earthquake": "Natural disaster",
+    "flood": "Natural disaster",
+    "shutdown": "Factory shutdown",
+    "halt": "Factory shutdown",
+    "shortage": "Raw material shortage",
+    "delay": "Logistics delay",
+}
+
+SEVERITY_TO_PCT = {
+    "CRITICAL": 90, "HIGH": 70, "MEDIUM": 45, "LOW": 20
+}
+
+SEVERITY_TO_DAYS = {
+    "CRITICAL": 75, "HIGH": 45, "MEDIUM": 21, "LOW": 10
+}
+
+def _map_fast_params(headline: str, severity: str) -> dict:
+    headline_lower = headline.lower()
+    
+    node = "Tier-1 Supplier"  # default
+    for keyword, mapped_node in FAST_NODE_MAPPING.items():
+        if re.search(r'\b' + re.escape(keyword), headline_lower):
+            node = mapped_node
+            break
+    
+    event = "Supply Disruption"  # default
+    for keyword, mapped_event in FAST_EVENT_MAPPING.items():
+        if re.search(r'\b' + re.escape(keyword), headline_lower):
+            event = mapped_event
+            break
+            
+    if isinstance(severity, int):
+        sev_str = {3: "CRITICAL", 2: "HIGH", 1: "MEDIUM", 0: "LOW"}.get(severity, "HIGH")
+    elif isinstance(severity, str):
+        sev_str = severity.upper()
+    else:
+        sev_str = "HIGH"
+    
+    return {
+        "affected_node": node,
+        "event_type": event,
+        "severity_pct": SEVERITY_TO_PCT.get(sev_str, 70),
+        "duration_days": SEVERITY_TO_DAYS.get(sev_str, 30)
+    }
+
 # ════════════════════════════════════════════════════════════════
 # LOCAL SLM MODEL SINGLETON (Qwen2.5-0.5B-Instruct on GPU)
 # ════════════════════════════════════════════════════════════════
@@ -176,6 +245,10 @@ Output ONLY a valid JSON object with these keys:
 {{
   "is_disruption": true or false,
   "disruption_type": "Geopolitical" or "Trade Policy" or "Natural Disaster" or "Labour Strike" or "Raw Material Shortage" or "Logistics Disruption" or "None",
+  "affected_node": "<one of: Raw Material Supplier / Port/Logistics / Tier-1 Supplier / Tier-2 Supplier / Semiconductor Fab / Assembly Hub>",
+  "event_type": "<one of: Port closure / Export ban/restriction / Factory shutdown / Natural disaster / Geopolitical sanction / Raw material shortage / Logistics delay / Demand shock>",
+  "severity_pct": <integer 0-100>,
+  "duration_days": <integer 1-90>,
   "affected_regions": ["<country or region mentioned>"],
   "companies": ["<company mentioned, or empty>"],
   "impacted_industries": ["Automotive", "Semiconductors"],
@@ -266,10 +339,31 @@ JSON:"""
         confidence = int(raw_conf) if raw_conf is not None else 88
     except (ValueError, TypeError):
         confidence = 88
+
+    fast_fallback = _map_fast_params(headline, severity)
+    affected_node = parsed.get("affected_node") or fast_fallback["affected_node"]
+    event_type = parsed.get("event_type") or fast_fallback["event_type"]
+    try:
+        raw_pct = parsed.get("severity_pct")
+        severity_pct = int(raw_pct) if raw_pct is not None else fast_fallback["severity_pct"]
+    except (ValueError, TypeError):
+        severity_pct = fast_fallback["severity_pct"]
+    severity_pct = max(0, min(100, severity_pct))
+
+    try:
+        raw_dur = parsed.get("duration_days")
+        duration_days = int(raw_dur) if raw_dur is not None else fast_fallback["duration_days"]
+    except (ValueError, TypeError):
+        duration_days = fast_fallback["duration_days"]
+    duration_days = max(1, min(90, duration_days))
     
     result = {
         "is_disruption": is_disruption,
         "disruption_type": disruption_type if is_disruption else "None",
+        "affected_node": affected_node,
+        "event_type": event_type,
+        "severity_pct": severity_pct,
+        "duration_days": duration_days,
         "event": headline[:80] + ("..." if len(headline) > 80 else ""),
         "affected_regions": regions,
         "region": regions[0] if regions else "Global",
@@ -298,6 +392,8 @@ JSON:"""
     return result
 
 
+from src.data_sources import sanitize_headline
+
 def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fast") -> Dict[str, Any]:
     """
     Extracts structured disruption signal from a news headline.
@@ -314,6 +410,16 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     Returns:
         Structured dictionary adhering strictly to the Appendix A2 JSON schema.
     """
+    # SECURITY: Sanitize before any SLM processing
+    sanitized_headline, was_flagged = sanitize_headline(headline)
+    if was_flagged:
+        import logging
+        logging.getLogger(__name__).warning(
+            f"Potential prompt injection detected in headline. "
+            f"Original length: {len(headline)}. Sanitized."
+        )
+    headline = sanitized_headline  # use sanitized from here on
+
     if engine.lower() == "slm":
         return extract_signal_qwen(headline)
 
@@ -343,6 +449,10 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
             "is_disruption": False,
             "disruption_type": "None",
             "event": "Routine Operations / Non-Disruptive",
+            "affected_node": "None",
+            "event_type": "None",
+            "severity_pct": 0,
+            "duration_days": 0,
             "affected_regions": ["None"],
             "impacted_industries": ["Automotive"],
             "component": "none",
@@ -470,9 +580,15 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         f"Prepare counterfactual sourcing alternatives for critical {component} inputs."
     ]
 
+    fast_params = _map_fast_params(headline, severity)
+
     result = {
         "is_disruption": True,
         "disruption_type": disruption_type,
+        "affected_node": fast_params["affected_node"],
+        "event_type": fast_params["event_type"],
+        "severity_pct": fast_params["severity_pct"],
+        "duration_days": fast_params["duration_days"],
         "event": headline[:80] + ("..." if len(headline) > 80 else ""),
         "affected_regions": [region],
         "region": region,  # backward compatibility with existing dashboard code
@@ -498,7 +614,10 @@ def extract_signal_fast(headline: str) -> Dict[str, Any]:
     Fast deterministic rule-based signal extraction without SLM/GPU.
     Conforms strictly to the Appendix A2 JSON schema.
     """
-    return extract_signal(headline, simulate_delay=False, engine="fast")
+    res = extract_signal(headline, simulate_delay=False, engine="fast")
+    if "affected_node" not in res:
+        res.update(_map_fast_params(headline, res.get("severity", 2)))
+    return res
 
 
 

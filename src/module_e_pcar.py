@@ -14,6 +14,18 @@ logger = logging.getLogger(__name__)
 # Sourced from UN Comtrade (India Imports HS 8542, 2022 Full Year: $16.12B USD @ 83.0 INR/USD = ₹1,33,814.34 Crore)
 DEFAULT_COMTRADE_HS8542_BASELINE_CRORE = 133814.34
 
+# OEM Revenue Realization Assumptions (FY2023-24 Baseline)
+# NOTE: These values are assumed industry-average realizations based on 
+# publicly reported FY23-24 revenue and vehicle volume data from annual reports.
+# They are modeled estimates for academic demonstration, not certified audited figures.
+OEM_REALIZATION_LAKH_PER_UNIT = {
+    "Maruti Suzuki": 6.2,    # Mass-market PV segment blend
+    "Tata Motors": 8.8,      # Commercial vehicle + PV blend
+    "Mahindra": 11.4,        # SUV / higher ASP vehicle blend
+    "Hyundai India": 7.9,    # Mid-market PV segment blend
+    "Industry Average": 7.5  # Weighted industry average (default)
+}
+
 def calculate_pcar(mc_samples: np.ndarray, baseline_revenue_crore: float = DEFAULT_COMTRADE_HS8542_BASELINE_CRORE) -> dict:
     """
     Calculates Procurement Cost-at-Risk (PCaR) metrics based on simulated production drop samples

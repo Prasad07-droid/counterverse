@@ -46,7 +46,11 @@ else:
     except (ImportError, RuntimeError, OSError):
         SLM_AVAILABLE = False
 
-from src.module_c_causal import simulate_causal_impact, calculate_deterministic_risk_score
+from src.module_c_causal import (
+    simulate_causal_impact,
+    calculate_deterministic_risk_score,
+    compute_cost_adjusted_recommendation,
+)
 from src.module_d_mc import run_monte_carlo
 from src.module_e_pcar import calculate_pcar
 from src.grounding_graph import get_graph_summary, get_grounding_graph
@@ -93,6 +97,9 @@ def cached_extract_signal_grounded(headline: str, engine: str = "fast") -> dict:
 @st.cache_data
 def cached_simulate_causal_impact(signal: dict) -> dict:
     return simulate_causal_impact(signal)
+
+st.session_state.setdefault("auto_params_extracted", False)
+st.session_state.setdefault("last_signal_result", None)
 
 # --- Helper Functions ---
 def format_inr(number):
@@ -1846,11 +1853,11 @@ def render_results(signal, probs, mc_samples, pcar_metrics):
 > | Metric Name | Mathematical Domain | Thresholds & Boundaries | Operational Meaning |
 > | :--- | :--- | :--- | :--- |
 > | **1. Supplier Structural Exposure** | Multi-factor index [0.0, 1.0] | **Low** &lt;0.45 · **Med** 0.45–0.59 · **High** ≥0.60 | Static topological concentration & single-source vulnerability (AlMahri §3.2.5) |
-> | **2. Causal State Probabilities** | Discrete posterior mass [0%, 100%] | **Low** &lt;5% · **Med** 5–15% · **High** &gt;15% | Likelihood of entering discrete network shock states in Bayesian causal network |
+> | **2. Output State Probabilities (Monte Carlo)** | Discrete posterior mass [0%, 100%] | **Low** &lt;5% · **Med** 5–15% · **High** &gt;15% | Likelihood of entering discrete network shock states in Bayesian causal network |
 > | **3. Network Output Impact** | Continuous assembly drop [0%, 40%] | **Minor** &lt;5% · **Moderate** 5–15% · **Severe** &gt;15% | Simulated downstream vehicle assembly curtailment across 10,000 Monte Carlo runs |
 
-**Risk Manager Agent Deterministic Formula (Section 3.2.5):**  
-$$\\text{Structural Exposure Score} = 0.35 \\cdot \\text{EB} + 0.25 \\cdot \\text{DR} + 0.20 \\cdot \\text{DC} + 0.10 \\cdot \\text{TC} + 0.10 \\cdot \\text{ED}$$
+**Structural Risk Formula (Causal-Informed) (Section 3.2.5):**  
+$$\text{Structural Exposure Score} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR} + 0.20 \cdot \text{DC} + 0.10 \cdot \text{TC} + 0.10 \cdot \text{ED}$$
 
 *All calculations executed via deterministic functions — zero LLM hallucination in quantitative scoring.*
 """)
@@ -1887,6 +1894,23 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
 - **Semiconductors (HS 8542) from South Korea**: Korea direct $14.0\%$ ($S_{\\text{direct}}=0.140$), Memory/automotive IC concentration $C_{\\text{upstream}}=0.450$, $W=0.75$ $\\rightarrow$ **$DR = 0.430$** *(was 0.454 with back-solved weight)*
             """)
 
+        with st.expander("💼 Cost-Adjusted Recommendation (Decision Support)", expanded=False):
+            cost_rec = compute_cost_adjusted_recommendation(
+                risk_score=r_score,
+                pcar_mean_crore=pcar_metrics.get("mean_loss_crore", 0.0)
+            )
+            st.markdown(f"**Cost-Adjusted Best Action:** `{cost_rec['cost_adjusted_best']}` *(Threshold-only: `{cost_rec['threshold_only_rec']}` — Agreement: {'✅ Yes' if cost_rec['agreement'] else '⚠️ Diverges'})*")
+            opt_table_rows = [
+                f"| {'**' if opt['action'] == cost_rec['cost_adjusted_best'] else ''}{opt['action']}{' (Recommended)**' if opt['action'] == cost_rec['cost_adjusted_best'] else ''} | ₹{opt['impl_cost_crore']:.1f} Cr | ₹{opt['avoided_loss_crore']:.2f} Cr | **₹{opt['net_benefit_crore']:.2f} Cr** | {opt['lead_time_weeks']} wks |"
+                for opt in cost_rec["options_ranked"]
+            ]
+            st.markdown(
+                "| Action | Impl Cost | Avoided Loss | Net Benefit | Lead Time |\n"
+                "| :--- | :---: | :---: | :---: | :---: |\n" +
+                "\n".join(opt_table_rows) +
+                "\n\n*Note: Implementation costs are assumed illustrative values for decision support demonstration.*"
+            )
+
     # ── UN Comtrade Real Trade Data Panel ──
     render_comtrade_trade_baseline(expanded=False)
 
@@ -1910,11 +1934,27 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
         st.plotly_chart(gauge_fig, use_container_width=True, config={'displayModeBar': False})
         st.caption("ℹ️ Measures simulated network-level vehicle assembly loss via Bayesian causal inference & 10,000 Monte Carlo iterations (Minor <5%, Moderate 5-15%, Severe >15%).")
 
+        with st.expander("ℹ️ Formula Reliability Note", expanded=False):
+            st.markdown("""
+            **Weight Provenance:** 75% of this score's weight rests on 
+            domain-asserted constants (EB, DC, TC, ED). Only 25% (Dependency 
+            Ratio) is computed from empirically measured UN Comtrade bilateral 
+            trade data.
+            
+            **Sensitivity:** A ±20% perturbation on any single asserted 
+            constant does not flip the HIGH/MEDIUM/LOW classification for the 
+            current scenario (all perturbed scores remain ≥ 0.693, solidly maintaining HIGH classification).
+            
+            **Implication:** The score direction is reliable; the precise 
+            numerical value should be treated as an order-of-magnitude 
+            estimate, not a precise probability.
+            """)
+
     with col_probs:
         st.markdown("""
         <div class="reveal-step-2">
             <div class="section-header">
-                <h3>📈 Causal State Probabilities</h3>
+                <h3>📈 Output State Probabilities (Monte Carlo)</h3>
                 <span class="section-badge">Posterior Marginals on Output Loss</span>
             </div>
         </div>
@@ -2012,65 +2052,129 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
     st.caption("ℹ️ **Data Scope Lock**: Analysis is strictly restricted to Gallium/Germanium (HS 8112) → Semiconductor/ICs (HS 8542) → Indian Automotive ECU → OEM vehicle production. Generic / non-chain components are deliberately excluded.")
 
 
-# ── Locked Scope Header Banner ──
+# ── Compact Scope & Sourced Baseline Metadata Bar ──
 st.markdown(f"""
-<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb; border-radius: 8px; padding: 12px 18px; margin-bottom: 20px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-        <div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-weight: 700; color: #1e40af; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                    🔒 Locked Component Chain Scope
-                </span>
-                <span style="background: #dbeafe; color: #1e40af; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;">HS 8112 ➔ HS 8542</span>
-            </div>
-            <div style="font-size: 0.92rem; color: #1e293b; font-weight: 600; margin-top: 3px;">
-                Gallium/Germanium (Raw Material) ➔ Semiconductor / ICs ➔ Indian Automotive ECU / Sensor Mfg ➔ OEM Vehicle Assembly
-            </div>
-            <div style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">
-                Non-chain components (batteries, wiring harnesses, generic chassis) are deliberately excluded per project data boundary.
-            </div>
-        </div>
-        <div style="text-align: right; background: #ffffff; padding: 6px 14px; border-radius: 6px; border: 1px solid #e2e8f0;">
-            <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">UN Comtrade Sourced Baseline (2022)</div>
-            <div style="font-size: 1.1rem; font-weight: 800; color: #2563eb;">₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr <span style="font-size:0.75rem; font-weight:500; color:#64748b;">($16.12B USD)</span></div>
-        </div>
+<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px; padding:6px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:0.78rem;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="font-weight:700; color:#1e40af; text-transform:uppercase; letter-spacing:0.04em;">🔒 Scope</span>
+        <span style="background:#dbeafe; color:#1e40af; font-size:0.72rem; padding:1px 6px; border-radius:4px; font-weight:600;">HS 8112 ➔ HS 8542</span>
+        <span style="color:#475569;">Gallium/Germanium ➔ Semiconductor/ICs ➔ Indian Automotive ECU ➔ OEM</span>
+    </div>
+    <div style="color:#64748b; font-size:0.75rem;">
+        Sourced Baseline: <strong style="color:#2563eb;">₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr</strong> (UN Comtrade 2022)
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════════
-# MAIN LAYOUT — Disruption Injector + Causal Graph
+# MAIN LAYOUT — Auto-Prediction Engine + Causal Graph
 # ════════════════════════════════════════════════════════════════
 
-# ── Injector + Graph side by side ──
+# ── Headline Ingestion / Signal Ingest ──
+if "selected_headline" not in st.session_state:
+    st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+
+headline_text = st.text_area(
+    "📰 Ingest Disruption Headline / Signal:",
+    value=st.session_state["selected_headline"],
+    height=75,
+    key="main_headline_input",
+    help="AI automatically extracts disruption parameters from this headline."
+)
+
+if headline_text and headline_text.strip():
+    signal_result = cached_extract_signal_grounded(headline_text.strip(), engine="fast" if not SLM_AVAILABLE else "slm")
+    st.session_state["auto_params_extracted"] = True
+    st.session_state["last_signal_result"] = signal_result
+else:
+    signal_result = None
+    st.session_state["auto_params_extracted"] = False
+    st.session_state["last_signal_result"] = None
+
+# ── Auto-Prediction Engine + Graph side by side ──
 col_injector, col_graph = st.columns([1, 2.2])
 
 with col_injector:
-    st.markdown("""
-    <div class="section-header">
-        <h3>⚡ Disruption Injector</h3>
-        <span class="section-badge">Parameters</span>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("### ⚡ Auto-Prediction Engine")
+    st.caption(
+        "AI automatically extracts disruption parameters from the "
+        "ingested headline. No manual configuration required."
+    )
 
-    node_options = [
-        "Shanghai Port", "Busan Port", "Tier-1 Supplier A",
-        "Tier-1 Supplier B", "Tier-2 Component Mfg",
-        "Assembly Hub", "Distribution Center", "OE Retailer"
-    ]
-    disrupted_node = st.selectbox("Disrupted Node", node_options, index=1, label_visibility="visible")
+    # Show what the AI extracted — read only, not editable
+    if signal_result and signal_result.get("is_disruption"):
+        
+        with st.container():
+            st.markdown("**🤖 AI-Extracted Parameters**")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric(
+                    "Detected Node", 
+                    signal_result.get("affected_node", "Auto-detected")
+                )
+                st.metric(
+                    "Event Type",
+                    signal_result.get("event_type", "Supply Disruption")
+                )
+            with col2:
+                st.metric(
+                    "AI Severity Estimate",
+                    f"{signal_result.get('severity_pct', 75)}%"
+                )
+                st.metric(
+                    "Estimated Duration",
+                    f"{signal_result.get('duration_days', 30)} days"
+                )
+            
+            st.metric(
+                "Counterfactual Scenarios",
+                "10,000 (fixed — Monte Carlo standard)"
+            )
+            
+            # Confidence indicator
+            raw_conf = signal_result.get("confidence", 0.0)
+            confidence = (raw_conf / 100.0) if raw_conf > 1.0 else float(raw_conf)
+            st.progress(confidence, text=f"Extraction Confidence: {confidence:.0%}")
 
-    event_types = ["Port closure", "Factory fire", "Natural disaster", "Sanctions", "Cyber attack", "Labour strike"]
-    event_type = st.selectbox("Event Type", event_types, index=0)
+        with st.expander("🔍 How did AI extract these parameters?"):
+            st.markdown("""
+    **Extraction Method:** """ + 
+    ("Local SLM (Qwen2.5-0.5B)" if SLM_AVAILABLE else 
+     "Fast Deterministic Parser") + """
+    
+    **Node Detection:** Keyword-to-node mapping against 
+    locked component chain (Semiconductor → ECU → OEM, 
+    Battery → EV Powertrain, Rare Earth → EV Motor)
+    
+    **Severity Mapping:** 
+    - CRITICAL → 85-95% severity, 60-90 day duration
+    - HIGH → 60-80% severity, 30-60 day duration  
+    - MEDIUM → 35-55% severity, 14-30 day duration
+    - LOW → 10-30% severity, 7-14 day duration
+    
+    **Counterfactual Scenarios:** Fixed at 10,000 
+    (Monte Carlo statistical standard — not user-adjustable)
+    
+    **Override:** Parameters are AI-suggested. If the 
+    extracted values seem wrong for a specific headline, 
+    refine the headline text and re-analyze.
+    """)
+        
+        # Single action button
+        analyze_clicked = st.button(
+            "▶ Run Full Prediction",
+            type="primary",
+            use_container_width=True,
+            help="AI runs complete causal simulation using auto-extracted parameters"
+        )
 
-    severity_pct = st.slider("Severity", min_value=0, max_value=100, value=75, format="%d%%")
-    severity_level = 3 if severity_pct >= 60 else (2 if severity_pct >= 30 else 1)
-
-    duration_days = st.slider("Duration", min_value=1, max_value=90, value=21, format="%d days")
-
-    counterfactual_n = st.number_input("Counterfactual Scenarios", min_value=1, max_value=20, value=8, step=1)
-
-    run_sim = st.button("▶ Run Simulation", type="primary", use_container_width=True, key="btn_sim")
+    else:
+        st.info(
+            "📰 Enter a headline above to begin. "
+            "The AI will automatically detect disruption parameters."
+        )
+        analyze_clicked = False
 
 with col_graph:
     col_hdr_left, col_hdr_right = st.columns([0.55, 0.45])
@@ -2090,53 +2194,43 @@ with col_graph:
             key="graph_view_mode"
         )
 
+    NODE_TO_UI_GRAPH = {
+        "Raw Material Supplier": "Shanghai Port",
+        "Port/Logistics": "Busan Port",
+        "Tier-1 Supplier": "Tier-1 Supplier A",
+        "Tier-2 Supplier": "Tier-2 Component Mfg",
+        "Semiconductor Fab": "Tier-1 Supplier A",
+        "Assembly Hub": "Assembly Hub",
+    }
+    raw_node = signal_result.get("affected_node", "Tier-1 Supplier") if signal_result else "Tier-1 Supplier A"
+    ui_node = NODE_TO_UI_GRAPH.get(raw_node, raw_node if raw_node in ["Shanghai Port", "Busan Port", "Tier-1 Supplier A", "Tier-1 Supplier B", "Tier-2 Component Mfg", "Assembly Hub", "Distribution Center", "OE Retailer"] else "Tier-1 Supplier A")
+    sev_pct = signal_result.get("severity_pct", 75) if signal_result else 75
+    evt_type = signal_result.get("event_type", "Supply Disruption") if signal_result else "Supply Disruption"
+
     if graph_view_mode == "🌊 Animated Flow Simulation":
         render_animated_flow_graph(
-            disrupted_node=disrupted_node,
-            severity_pct=severity_pct,
-            event_type=event_type,
-            auto_shock=run_sim
+            disrupted_node=ui_node,
+            severity_pct=sev_pct,
+            event_type=evt_type,
+            auto_shock=analyze_clicked
         )
     else:
-        graph_fig = build_supply_chain_graph(disrupted_node)
+        graph_fig = build_supply_chain_graph(ui_node)
         st.plotly_chart(graph_fig, use_container_width=True, config={'displayModeBar': False})
         st.caption("ℹ️ **Static Topology Legend**: Node colors encode tier entities (Navy: Ports, Indigo: Tier-1, Teal: Mfg, Emerald: Assembly, Cyan: Logistics, Violet: Retail). Crimson Red is reserved exclusively for the disrupted node.")
 
-# ── Run Simulation Logic ──
-if run_sim:
-    # Map injector controls to locked component chain
-    component_map = {
-        "Shanghai Port": "semiconductor maritime transit", "Busan Port": "semiconductor maritime transit",
-        "Tier-1 Supplier A": "semiconductor", "Tier-1 Supplier B": "semiconductor",
-        "Tier-2 Component Mfg": "gallium and germanium",
-        "Assembly Hub": "automotive ECU manufacturing",
-        "Distribution Center": "automotive ECU logistics", "OE Retailer": "OEM vehicle assembly",
-    }
-    region_map = {
-        "Shanghai Port": "China", "Busan Port": "South Korea",
-        "Tier-1 Supplier A": "Asia", "Tier-1 Supplier B": "Asia",
-        "Tier-2 Component Mfg": "Global", "Assembly Hub": "India (Local)",
-        "Distribution Center": "Global", "OE Retailer": "India (Local)",
-    }
-    lead_time_from_severity = {1: 2, 2: 4, 3: 8}
-
-    mock_signal = {
-        "component": component_map.get(disrupted_node, "semiconductor"),
-        "region": region_map.get(disrupted_node, "Global"),
-        "severity": severity_level,
-        "lead_time_weeks": lead_time_from_severity.get(severity_level, 4),
-    }
-
+# ── Run Full Prediction Logic ──
+if analyze_clicked and signal_result and signal_result.get("is_disruption"):
     with st.status("⚡ Running causal simulation pipeline...", expanded=False) as status:
-        st.write("Propagating disruption across nodes via BFS...")
-        probs = cached_simulate_causal_impact(mock_signal)
+        st.write(f"Propagating disruption across nodes (Affected: {signal_result.get('affected_node', 'Tier-1 Supplier')}, Severity: {signal_result.get('severity_pct', 75)}%)...")
+        probs = cached_simulate_causal_impact(signal_result)
         st.write("Sampling 10,000 Monte Carlo counterfactual scenarios...")
-        mc_samples = run_monte_carlo(probs)
+        mc_samples = run_monte_carlo(probs, n_samples=10000)
         st.write("Computing Procurement Cost-at-Risk (PCaR)...")
         pcar_metrics = calculate_pcar(mc_samples)
-        status.update(label="✅ Simulation complete (10,000 scenarios)", state="complete", expanded=False)
+        status.update(label="✅ Prediction complete (10,000 scenarios)", state="complete", expanded=False)
 
-    render_results(mock_signal, probs, mc_samples, pcar_metrics)
+    render_results(signal_result, probs, mc_samples, pcar_metrics)
 
 
 # ════════════════════════════════════════════════════════════════
@@ -2153,7 +2247,7 @@ st.markdown("""
 tab1, tab2, tab3, tab4 = st.tabs([
     "📰 Headline Analysis (Live GDELT)",
     "🎯 Scenario Selector",
-    "📈 Model Validation (SIAM 2021)",
+    "📈 Model Calibration (SIAM 2021)",
     "🔬 Pipeline Benchmark (Table 5)"
 ])
 
@@ -2289,7 +2383,7 @@ with tab1:
                     "⚡ Running in Fast Mode — Local GPU/SLM unavailable in this "
                     "environment. Results use deterministic rule-based extraction."
                 )
-            st.write("Computing causal state probabilities...")
+            st.write("Computing output state probabilities (Monte Carlo)...")
             probs = cached_simulate_causal_impact(signal)
             st.write("Executing 10,000 Monte Carlo runs...")
             mc_samples = run_monte_carlo(probs)
@@ -2409,6 +2503,15 @@ with tab1:
 
 # ── TAB 2: Predefined Scenarios ──
 with tab2:
+    st.info(
+        "📅 Grounding Graph Vintage: Current as of 2023–2024 corporate "
+        "annual report disclosures and verified supply chain filings. "
+        "Node/edge topology reflects: TSMC, Renesas, Bosch, Infineon, NXP, "
+        "Samsung Foundry, China Minmetals, Maruti Suzuki, Tata Motors, "
+        "Mahindra, Hyundai India disclosures through FY2024. "
+        "Graph is static — real-time supplier relationship changes are "
+        "not automatically reflected."
+    )
     st.markdown("Run the simulation for predefined historical or hypothetical scenarios within our locked scope.")
 
     scenario = st.selectbox(
@@ -2442,14 +2545,24 @@ with tab2:
 
         render_results(mock_signal, probs, mc_samples, pcar_metrics)
 
-# ── TAB 3: Model Validation — 2021 Chip Shortage Historical Benchmark (SIAM Ground Truth) ──
+# ── TAB 3: Model Calibration Case Study — 2021 Chip Shortage Historical Benchmark (SIAM Ground Truth) ──
 with tab3:
     # Clean up animation particles session state on tab navigation (Fix 6)
     if "animation_particles" in st.session_state:
         del st.session_state["animation_particles"]
 
-    st.markdown("### 📈 Model Validation — 2021 Chip Shortage Historical Benchmark")
-    st.caption("Empirical backtesting against publicly reported Society of Indian Automobile Manufacturers (SIAM) production drop data during the 2021 global semiconductor shortage.")
+    st.markdown("### 📈 Model Calibration Case Study — 2021 Chip Shortage Historical Benchmark")
+    st.caption("Calibration case study against SIAM 2021 data. Note: disruption parameters were configured with reference to the documented historical conditions of this event. This constitutes a calibration exercise demonstrating parameter plausibility, not an independent validation against a held-out event. A genuine held-out validation would require a second, independently occurring disruption event with no parameter adjustment.")
+
+    st.warning(
+        "⚠️ Calibration Disclosure: The simulation parameters for this "
+        "scenario (severity, duration, node selection) were configured "
+        "with reference to the known outcome of the September 2021 "
+        "semiconductor shortage. The -2.8pp gap between model output "
+        "(38.4%) and SIAM ground truth (41.2%) demonstrates parameter "
+        "plausibility but does not constitute independent model validation. "
+        "This is standard practice for a single-domain calibration study."
+    )
 
     # SIAM Ground Truth KPI Cards
     kpi_s1, kpi_s2, kpi_s3 = st.columns(3)

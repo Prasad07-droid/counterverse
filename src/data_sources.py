@@ -18,6 +18,47 @@ from typing import Dict, List, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+
+def sanitize_headline(headline: str) -> tuple[str, bool]:
+    """
+    Sanitizes GDELT headlines before SLM ingestion.
+    Detects and strips prompt injection patterns.
+    Returns: (sanitized_text, was_flagged)
+    """
+    import re
+    
+    INJECTION_PATTERNS = [
+        r"ignore\s+(previous|above|prior|all)\s+instructions?",
+        r"you\s+are\s+now\s+a",
+        r"disregard\s+(your|all|the)\s+(previous|instructions?|rules?)",
+        r"(output|print|say|respond\s+with)\s+only",
+        r"system\s*:\s*",
+        r"<\s*system\s*>",
+        r"assistant\s*:\s*",
+        r"human\s*:\s*",
+        r"###\s*(instruction|system|prompt)",
+        r"forget\s+(everything|all|your)",
+        r"new\s+instruction",
+        r"override\s+(previous|your)",
+    ]
+    
+    flagged = False
+    sanitized = headline
+    
+    for pattern in INJECTION_PATTERNS:
+        if re.search(pattern, headline, re.IGNORECASE):
+            flagged = True
+            sanitized = re.sub(pattern, "[REDACTED]", 
+                             sanitized, flags=re.IGNORECASE)
+    
+    # Truncate to 500 chars max — prevents context window flooding
+    if len(sanitized) > 500:
+        sanitized = sanitized[:500] + "... [truncated]"
+        flagged = True
+    
+    return sanitized, flagged
+
+
 # ── Stated Exchange Rate ──
 USD_INR_RATE = 83.0
 

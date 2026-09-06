@@ -103,3 +103,55 @@ $$\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}, \quad \text{Recall
 - **False Positives (FP)**: 4 (SCEN-04, SCEN-10, SCEN-11, SCEN-15; all 4 are conservative over-classifications of MEDIUM ground-truth severity to HIGH risk)
 - **False Negatives (FN)**: **0** (Zero dropped disruptions; previously 9 disruptions were falsely dropped to LOW)
 - **Control Scenario Re-check (SCEN-12)**: Correctly scored **0.000 / LOW** (eliminated the previous 0.654 / HIGH false alarm)
+
+---
+
+## Terminology Clarification: Causal-Informed vs. Causal Discovery
+
+The risk scoring component in `src/module_c_causal.py` implements a **deterministic, domain-informed weighted equation** — not a statistically-discovered causal structure with confounder control or do-calculus interventions.
+
+Specifically:
+- The formula `0.35·EB + 0.25·DR + 0.20·DC + 0.10·TC + 0.10·ED` is a weighted additive index, not a structural causal model (SCM).
+- The DAG in `docs/assumptions_and_dag.md` represents assumed domain knowledge about supply chain dependencies, not a discovered causal graph from observational data.
+- The term "causal" is used in the sense of AlMahri et al. (2026) §3.2: causal-informed domain knowledge encoded into a deterministic risk formula, consistent with the reference paper's own methodology.
+- This implementation does NOT claim: Granger causality, Pearl do-calculus interventions, or counterfactual identification from observational data.
+
+This distinction is explicitly labeled in the dashboard UI as "Structural Risk Formula (Causal-Informed)."
+
+---
+
+## GraphRAG vs. Static Graph Lookup — Terminology Clarification
+
+The component labeled "GraphRAG grounding" in this project 
+(`src/grounding_graph.py`) implements:
+
+**What it IS:**
+- A deterministic entity-verification lookup against a 
+  static, hand-built NetworkX knowledge graph (30 nodes, 69 edges)
+- Given an extracted entity name, it performs exact/fuzzy string 
+  matching against the graph's node list
+- Returns: graph-verified status, HS code, tier, and supply path
+
+**What it is NOT:**
+- A vector store (no FAISS, no Chroma, no embedding index)
+- Embedding-based semantic retrieval (no sentence-transformers)
+- Dynamic chunk retrieval feeding the SLM's context window
+- A generative retrieval-augmented generation pipeline in the 
+  standard LangChain/LlamaIndex sense
+
+**Why "GraphRAG" is used:**
+The term follows AlMahri et al. (2026)'s own framing — using a 
+knowledge graph as a structured retrieval mechanism to ground 
+LLM outputs. This is consistent with the reference paper's 
+methodology, which also uses a static enterprise knowledge graph 
+(Neo4j) for entity verification, not a vector retrieval system.
+
+**Genuine RAG (Future Work):**
+A full RAG implementation would embed the GDELT headline corpus 
+into a vector store (FAISS/Chroma), retrieve top-k relevant 
+passages per disruption query, and inject them into the SLM 
+prompt context. This would enable evidence-grounded severity 
+judgments. This is not implemented in the current version — 
+doing so is deferred as future work due to scope constraints.
+
+

@@ -143,3 +143,19 @@ Model load:    1323.5s
 ### Colab smoke-test log
 
 _Pending._
+
+---
+
+## Data Freshness Matrix
+
+| Data Source | Current Vintage | Update Frequency | Staleness Risk |
+|---|---|---|---|
+| GDELT Live Feed | Real-time (~15 min rolling) | Continuous | Low — auto-refreshes |
+| UN Comtrade Baseline (HS 8542) | 2022 calendar year | Annual (12-18 month lag) | Medium — 2023-24 not reflected |
+| UN Comtrade Baseline (HS 8112) | 2022 calendar year | Annual (12-18 month lag) | Medium — China gallium ban (Aug 2023) post-dates baseline |
+| Grounding Graph (NetworkX) | 2023–2024 disclosures | Manual update required | Medium — static snapshot |
+| SIAM Benchmark | FY2021-22 (Sep 2021 peak) | N/A — historical fixed point | Low — historical reference, not live |
+| SLM Model Weights | Qwen2.5-0.5B-Instruct (2024) | Manual retrain required | Low for current scope |
+
+**Critical Note:** The China Gallium/Germanium export restriction (August 2023) post-dates the 2022 UN Comtrade baseline. The DR formula for HS 8112 therefore uses pre-restriction trade shares. This underestimates current Chinese dependency for gallium. This limitation is acknowledged and documented.
+

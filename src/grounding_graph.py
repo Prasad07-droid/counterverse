@@ -50,9 +50,40 @@ References:
 
 import networkx as nx
 import logging
+import hashlib
+import json
 from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
+
+def _compute_graph_hash(G) -> str:
+    """Compute deterministic hash of graph structure."""
+    graph_data = {
+        "nodes": sorted([str(n) for n in G.nodes()]),
+        "edges": sorted([str(e) for e in G.edges()])
+    }
+    graph_str = json.dumps(graph_data, sort_keys=True)
+    return hashlib.sha256(graph_str.encode()).hexdigest()[:16]
+
+EXPECTED_GRAPH_HASH = "31f67108669b9208"  # Set to actual hash after first run
+
+def verify_graph_integrity(G) -> bool:
+    """Verify graph hasn't been accidentally modified."""
+    current_hash = _compute_graph_hash(G)
+    if EXPECTED_GRAPH_HASH is None:
+        import logging
+        logging.getLogger(__name__).info(
+            f"Graph hash (set this as EXPECTED_GRAPH_HASH): {current_hash}"
+        )
+        return True  # First run — just log it
+    if current_hash != EXPECTED_GRAPH_HASH:
+        import logging
+        logging.getLogger(__name__).error(
+            f"GRAPH INTEGRITY VIOLATION: Expected {EXPECTED_GRAPH_HASH}, "
+            f"got {current_hash}. Graph may have been modified."
+        )
+        return False
+    return True
 
 # ════════════════════════════════════════════════════════════════
 # KNOWLEDGE GRAPH CONSTRUCTION
@@ -216,6 +247,7 @@ def build_grounding_graph() -> nx.DiGraph:
         G.add_edge(src, dst, relationship="imports_from")
 
     logger.info(f"Grounding graph built: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
+    verify_graph_integrity(G)
     return G
 
 

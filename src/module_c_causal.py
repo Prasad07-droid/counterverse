@@ -31,6 +31,15 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
+NODE_TO_GRAPH_ID = {
+    "Raw Material Supplier": "gallium_supplier",
+    "Port/Logistics": "busan_port",
+    "Tier-1 Supplier": "tier1_supplier_a",
+    "Tier-2 Supplier": "tier2_component_mfg",
+    "Semiconductor Fab": "tsmc_fab",
+    "Assembly Hub": "assembly_hub_india",
+}
+
 
 def compute_dependency_ratio(
     direct_import_share: float,
@@ -341,6 +350,8 @@ def simulate_causal_impact(signal: dict) -> dict:
 
     # Compute deterministic risk score
     risk_meta = calculate_deterministic_risk_score(signal)
+    if "affected_node" in signal:
+        risk_meta["graph_node_id"] = NODE_TO_GRAPH_ID.get(signal["affected_node"], "tier1_supplier_a")
     r = risk_meta["risk_score"]
 
     # Ground Bayesian posterior marginals directly in the deterministic risk score
@@ -377,4 +388,78 @@ def simulate_causal_impact(signal: dict) -> dict:
 
     logger.info(f"Deterministic risk score = {r} ({risk_meta['risk_level']}), Probs = {probs}")
     return probs
+
+
+def compute_cost_adjusted_recommendation(
+    risk_score: float,
+    pcar_mean_crore: float,
+    mitigation_options: list = None
+) -> dict:
+    """
+    Computes cost-benefit adjusted recommendation.
+    Threshold-only recommendation (AlMahri): 
+      risk >= 0.60 -> Dual Source
+      risk >= 0.45 -> Buffer
+      risk < 0.45  -> Monitor
+    
+    Cost-adjusted recommendation factors in implementation cost:
+      - Monitor: ₹0 Cr implementation cost, leaves 100% PCaR at risk
+      - Buffer Inventory: ~₹15 Cr holding cost, reduces PCaR by ~40%
+      - Qualify Dual Source: ~₹45 Cr qualification cost, reduces PCaR by ~70%
+    
+    Net benefit = (PCaR * risk_reduction) - implementation_cost
+    Best action = argmax(net_benefit)
+    
+    NOTE: All cost estimates are illustrative assumptions for decision 
+    support demonstration. Not empirically calibrated to specific OEM financials.
+    """
+    costs = {
+        "Monitor & Maintain": {
+            "impl_cost_crore": 0.0,
+            "risk_reduction": 0.0,
+            "lead_time_weeks": 0
+        },
+        "Buffer Inventory": {
+            "impl_cost_crore": 15.0,
+            "risk_reduction": 0.40,
+            "lead_time_weeks": 4
+        },
+        "Qualify Dual Source": {
+            "impl_cost_crore": 45.0,
+            "risk_reduction": 0.70,
+            "lead_time_weeks": 12
+        }
+    }
+    
+    analysis = []
+    for action, params in costs.items():
+        avoided_loss = pcar_mean_crore * params["risk_reduction"]
+        net_benefit = avoided_loss - params["impl_cost_crore"]
+        analysis.append({
+            "action": action,
+            "impl_cost_crore": params["impl_cost_crore"],
+            "avoided_loss_crore": round(avoided_loss, 2),
+            "net_benefit_crore": round(net_benefit, 2),
+            "lead_time_weeks": params["lead_time_weeks"]
+        })
+    
+    # Sort by net benefit descending
+    analysis.sort(key=lambda x: x["net_benefit_crore"], reverse=True)
+    best = analysis[0]
+    
+    # Threshold-only recommendation for comparison
+    threshold_rec = (
+        "Qualify Dual Source" if risk_score >= 0.60
+        else "Buffer Inventory" if risk_score >= 0.45
+        else "Monitor & Maintain"
+    )
+    
+    return {
+        "cost_adjusted_best": best["action"],
+        "threshold_only_rec": threshold_rec,
+        "agreement": best["action"] == threshold_rec,
+        "options_ranked": analysis,
+        "note": "Implementation costs are assumed illustrative estimates."
+    }
+
 
