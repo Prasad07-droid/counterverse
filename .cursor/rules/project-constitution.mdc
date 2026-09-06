@@ -1,0 +1,25 @@
+---
+description: Binding identity, honesty, hardware, architecture, and stop-and-ask rules
+alwaysApply: true
+---
+
+# Project constitution
+
+Full spec lives in `.cursorrules`. Do not contradict it.
+
+## Identity
+BE mini project: scenario-based causal simulation for Indian auto-component sourcing. Not a real-time trained forecast. Cost numbers are calibrated assumptions. Never claim company databases or ground-truth PCaR.
+
+## Hardware
+RTX 3050 Ti 4 GB. `torch.bfloat16`. 0.5B cap (1.5B only 4-bit QLoRA). `gradient_checkpointing=True`. batch <= 4, seq <= 256. No flash-attn on Windows. pathlib only. GPU scripts print CUDA + VRAM. Catch `torch.cuda.OutOfMemoryError`. pgmpy / Monte Carlo / Streamlit on CPU.
+
+## Architecture (do not redesign)
+A data -> B SLM (GPU) -> C pgmpy BN (CPU) -> D Monte Carlo (CPU) -> E PCaR (CPU) -> F Streamlit.
+
+Fixed DAG. Do not change nodes/edges without explicit user approval.
+
+## Build order
+Phase -1 sources before Phase 0 GPU. Phase 1 dummy pipeline before any real data/SLM/causal work.
+
+## Stop and ask
+VRAM >4 GB one pass; paid runtime API; forecasting claims; no public data+fallback; unverified schema; architecture change; SLM parse fail >15%; Kappa <0.6; MC scenario >2 min CPU.

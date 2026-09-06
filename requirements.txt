@@ -1,0 +1,18 @@
+# CounterVerse — Cloud Deployment Requirements
+# For local GPU execution use: requirements-local.txt
+# For Google Colab use: requirements-colab.txt
+# torch excluded intentionally — dashboard auto-falls back to Fast Mode
+
+streamlit==1.39.0
+pandas==2.2.3
+numpy>=1.26.0,<2.0.0
+plotly==5.24.1
+networkx==3.2.1
+scipy==1.13.1
+pgmpy==0.1.25
+transformers==4.46.3
+huggingface-hub>=0.24.0
+accelerate>=0.26.0
+requests>=2.31.0
+# torch is intentionally excluded from cloud deploy
+# SLM runs in Fast Mode fallback when torch is unavailable

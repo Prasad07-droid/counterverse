@@ -1,0 +1,319 @@
+# ============================================================
+# PROJECT MASTER CONTEXT — CURSOR READS THIS EVERY TIME
+# (v2 — hardened against the failure points found in v1 review)
+# ============================================================
+
+## PROJECT IDENTITY
+Title: Causal AI and Small Language Models for Supply Chain
+Disruption Forecasting and Procurement Cost at Risk Estimation
+for Indian Automotive Component Sourcing
+
+Type: BE Final Year Mini Project (Academic)
+Team: 4 students, intermediate Python
+Department: Computer Science & Engineering (Data Science)
+College: Vidyavardhini's College of Engineering & Technology, Vasai
+
+## WHAT THIS SYSTEM ACTUALLY DOES (be honest, never overclaim)
+This is a SCENARIO-BASED CAUSAL SIMULATION SYSTEM, not a
+real-time trained forecasting model.
+
+It does:
+- Extracts structured disruption signals from news headlines
+  using a Small Language Model
+- Runs those signals through a domain-expert-defined Structural
+  Causal Model (Bayesian Network) to simulate impact
+- Estimates Procurement Cost at Risk (PCaR) using Monte Carlo
+  over the causal simulation output
+- Displays everything in a Streamlit dashboard
+
+It does NOT do:
+- Learn to predict future from historical time-series
+  (we have ~65-80 monthly rows, not enough)
+- Access real company procurement databases
+- Provide ground-truth validated financial numbers
+  (cost parameters are calibrated assumptions, always labeled as such)
+
+If any task makes the system claim something from the
+"does NOT" list, STOP and tell me before proceeding.
+
+## HARDWARE (BINDING CONSTRAINTS)
+Primary Machine:
+- OS: Windows, ASUS TUF F15
+- GPU: NVIDIA RTX 3050 Ti Laptop GPU — 4 GB VRAM ONLY
+- Always use torch.bfloat16 (Ampere architecture, bf16 > fp16)
+- Model size hard cap: 0.5B in bf16, 1.5B ONLY via 4-bit QLoRA
+- gradient_checkpointing=True always during training
+- per_device_train_batch_size <= 4, max_seq_length <= 256
+- Use gradient_accumulation_steps to reach effective batch 16
+- NO flash-attn on Windows — use default scaled_dot_product_attention
+- Use pathlib everywhere, no symlinks
+- Every GPU script must print CUDA status + VRAM on startup
+- Catch torch.cuda.OutOfMemoryError explicitly with fix instructions
+
+Fallback: Google Colab free T4 (only if step needs >4 GB)
+- Write scripts so same .py runs on both without code change
+
+Non-GPU modules (pgmpy, Monte Carlo, Streamlit) run on CPU only.
+
+### NEW — Environment pinning (fixes silent version-mismatch failures)
+- torch version MUST match the CUDA version reported by `nvidia-smi`
+  on the laptop. Before installing anything, run `nvidia-smi` and
+  `nvcc --version`, record both in `docs/environment.md`.
+- Pin exact versions in requirements.txt (no `>=`, only `==`).
+- Maintain TWO requirement files:
+  - `requirements-local.txt` (Windows + RTX 3050 Ti, CUDA-specific torch wheel)
+  - `requirements-colab.txt` (Colab-provided CUDA, different torch wheel)
+- pgmpy on Windows: known pip install issues with some versions —
+  pin a version team has actually tested (`pip install pgmpy==<tested_version>`),
+  and if install fails, fall back to Colab for Module C/D dev, not local.
+
+## FIXED PIPELINE ARCHITECTURE
+Do not redesign this without my explicit approval.
+
+DATA LAYER (Module A)
+      ↓
+SLM SIGNAL EXTRACTOR (Module B) — GPU
+      ↓
+STRUCTURAL CAUSAL MODEL / BAYESIAN NETWORK (Module C) — CPU
+      ↓
+MONTE CARLO SCENARIO ENGINE (Module D) — CPU
+      ↓
+PROCUREMENT COST-AT-RISK ENGINE (Module E) — CPU
+      ↓
+STREAMLIT DASHBOARD (Module F) — CPU
+
+## MODULE A — DATA LAYER
+Real public sources only. No invented data.
+Each dataset gets its own data/raw/<name>/SOURCE.md with:
+URL, download date, filters applied, units, known issues.
+
+### NEW RULE — every source below has a PRIMARY and a FALLBACK.
+If PRIMARY fails verification in Phase -1, switch to FALLBACK
+immediately and log the switch in SOURCE.md. Do not silently
+substitute a source without logging it.
+
+1. MoSPI IIP — NIC 29 Motor Vehicles + NIC 26 Electronics
+   PRIMARY: esankhyiki.mospi.gov.in
+   FALLBACK: data.gov.in (IIP dataset mirror) — VERIFY schema match
+   Frequency: Monthly, April 2012 onwards (~165 rows)
+   Role: PRIMARY OUTCOME VARIABLE Y (Production_Drop node)
+
+2. OEM Monthly Production (Maruti, Tata, M&M)
+   PRIMARY: BSE filings + company press releases
+   FALLBACK: moneycontrol.com / screener.in company pages (secondary
+   aggregators — cite as secondary, cross-check one data point against
+   the original BSE filing before trusting the series)
+   Frequency: Monthly 2019 onwards
+   Role: Case-study calibration + precedent library
+
+3. SIAM Monthly Segment Production/Sales
+   PRIMARY: siam.in press releases
+   FALLBACK: manually transcribe from monthly PDF press releases into
+   a CSV if no bulk download exists (assume this WILL be needed —
+   budget 2-3 hours of manual entry, do not wait to discover this)
+   Role: Secondary outcome cross-check
+
+4. India Semiconductor Imports HS 8542 + HS 8541
+    PRIMARY: tradestat.commerce.gov.in (web form, no bulk CSV)
+    DEFAULT BULK: comtradeplus.un.org (free registration, API key OK
+    — confirmed acceptable for data scripts only, NOT dashboard
+    runtime dependency)
+    Role: Semiconductor_Shortage node input
+
+5. WSTS Historical Billings (global chip sales)
+   PRIMARY: wsts.org — Historical Billings Report
+   FALLBACK: if WSTS requires paid membership for full history, use
+   only their free monthly press release PDFs (partial series is fine
+   — this is a supporting proxy, not the target variable)
+   Frequency: Monthly
+   Role: Global semiconductor supply proxy
+
+6. NY Fed GSCPI (Global Supply Chain Pressure Index)
+   URL: newyorkfed.org/research/policy/gscpi
+   Frequency: Monthly, 1997 onwards
+   Role: TREATMENT VARIABLE PROXY for causal model
+   (no fallback needed — this is a stable, confirmed free CSV download)
+
+7. World Bank Pink Sheet (commodity prices)
+   URL: worldbank.org/en/research/commodity-markets
+   Frequency: Monthly
+   Role: Confounder (copper, aluminium, rubber)
+   (no fallback needed — confirmed stable source)
+
+8. USD/INR Exchange Rate
+   URL: fred.stlouisfed.org/series/DEXINUS
+   Frequency: Daily → resample to monthly mean
+   Role: Confounder + cost engine input
+   (no fallback needed — confirmed stable source)
+
+9. ACMA Annual Industry Performance Review
+   PRIMARY: acma.in/publications
+   FALLBACK: if exact page/PDF is not locatable, use SIAM's annual
+   report instead for the same calibration constants (electronics
+   import share, China dependency %) — cite whichever source is
+   actually used, do not average across both without saying so
+   Frequency: Annual PDF
+   Role: Calibration constants ONLY
+   NOT a time series, do not treat as one
+
+10. Supplier Concentration / HHI
+    Source: UDYAM Pune + Thane (data.gov.in) + ACMA member directory
+    FALLBACK: if ACMA member directory access is blocked, compute
+    HHI using UDYAM data alone and note in SOURCE.md that the
+    concentration measure is a lower-bound proxy, not exhaustive
+    Role: Supplier_HHI confounder node in causal DAG
+
+11. News Headlines via GDELT DOC 2.0 API (RESOLVED: Option C)
+     URL: api.gdeltproject.org/api/v2/doc/doc
+     Free, no API key needed.
+     DECISION (2026-09-04): DOC 2.0 ArtList is a ~90-day rolling
+     window, NOT a 2017–present archive. We use Option C:
+       Part 1: ArtList for the last ~90 days (200–400 recent headlines)
+       Part 2: Hand-collected ~20–40 headlines per calendar event
+               (7 events × ~20–30 = ~140–210 historical headlines)
+     Total target corpus: 400–600 headlines. Honest about sample size.
+     Query filters: semiconductor shortage + india + automotive
+     Save: title, url, seendate, domain to data/raw/gdelt_headlines/
+     Historical set: data/raw/gdelt_headlines/historical_manual.csv
+     Add sleep(2) between calls; retry 2s/4s/8s max 3;
+     failures → data/logs/gdelt_failures.jsonl
+     Role: SLM training + testing input
+
+12. Policy Texts
+    Source: DGFT notifications, CBIC customs circulars,
+    OEM annual report excerpts, concall transcripts
+    Role: SLM test corpus (policy signal type)
+
+13. Disruption Event Calendar (hand-built)
+    File: data/processed/events.csv
+    Columns: event_name, start_date, end_date,
+    affected_component, severity, source_url
+    Events to include:
+    - COVID-19 manufacturing shutdown (Mar-Jun 2020)
+    - Global chip shortage peak (Q3 2021 - Q2 2022)
+    - Shanghai lockdown (Apr-May 2022)
+    - China Ga/Ge export controls (Aug 2023)
+    - Red Sea shipping crisis (Dec 2023 - Mar 2024)
+    - China rare-earth magnet restrictions (Apr 2025)
+    - Russia-Ukraine neon/palladium shock (Mar 2022)
+    Role: Treatment indicator + precedent library backbone
+
+## MODULE B — SLM SIGNAL EXTRACTOR
+Model: Qwen/Qwen2.5-0.5B-Instruct
+Precision: torch.bfloat16
+Device: cuda (local RTX 3050 Ti)
+
+Task: headline (string) → strict JSON:
+{
+  "component": string,
+  "region": string,
+  "severity": int,
+  "lead_time_weeks": int
+}
+
+Rules:
+- Enforce JSON output with a parser + 1 retry on parse failure
+- Log all parse failures to data/logs/slm_failures.jsonl
+- Batch inference over full headline corpus; report headlines/sec
+  and peak VRAM used
+- Aggregate monthly: Disruption Intensity Index (DII) per month
+  DII = sum(severity scores) / count(headlines that month)
+  Save to data/processed/dii_monthly.csv
+  DII feeds Module C calibration
+
+### NEW — minimum viable dataset guardrail
+If, after 2 retries, the SLM's JSON parse failure rate exceeds 15%
+on the labeled set, STOP fine-tuning work and report this as a
+blocker — do not silently drop failed rows and continue, since
+that quietly biases the DII metric.
+
+Build order (strict, do not jump steps):
+Step 1: Zero-shot baseline → eval on labeled set → report F1
+Step 2: Only if I approve after seeing Step 1 F1 — LoRA fine-tune
+        300-400 labeled headlines, QLoRA config:
+        lora_r=8, lora_alpha=16, lora_dropout=0.05,
+        target_modules=["q_proj","v_proj"],
+        num_train_epochs=3, lr=2e-4,
+        gradient_checkpointing=True, bf16=True
+Step 3: Eval zero-shot vs fine-tuned side by side (per-field F1)
+
+Labeling strategy (for 300-400 ground truth examples):
+Use Gemini 1.5 Flash free API or Claude.ai as labeling assistant
+with a structured prompt → 4 team members each verify 75-100 rows
+Report inter-annotator agreement (Cohen's Kappa or % agreement)
+This is "LLM-teacher → SLM-student" — a valid academic contribution
+
+### NEW — disagreement resolution protocol
+If Cohen's Kappa < 0.6 on a sample of double-labeled rows (have each
+member re-verify 20 of another member's rows), do NOT just average
+or vote — hold a 30-min team meeting, write down the 2-3 recurring
+ambiguity patterns, update the labeling guideline doc, and re-label
+only the disputed rows.
+Log this process in data/labeled/annotation_agreement.md.
+
+## MODULE C — STRUCTURAL CAUSAL MODEL
+Tool: pgmpy (BayesianNetwork) — NOT DoWhy
+Reason: DoWhy needs large n for statistical estimation.
+pgmpy lets us encode domain knowledge as CPTs and use
+do()-calculus for interventions. This is the correct tool
+for our sample size and academic level.
+
+Fixed DAG (do not change without my approval):
+
+Export_Restriction ──────────────────────────────┐
+        │                                         │
+        ▼                                         │
+Semiconductor_Shortage ──── Commodity_Price_Shock ┤
+        │                                         │
+        ▼                                         │
+Tier2_Allocation_Cut ◄── Supplier_HHI ────────────┘
+        │
+        ▼
+OEM_Production_Drop
+        │
+        ▼
+Revenue_Loss → Procurement_Cost_at_Risk
+
+Implementation:
+- Define BayesianNetwork with edges
+- Define TabularCPD for each node
+- model.check_model() must pass before any inference
+- Inference: VariableElimination for exact inference
+- Intervention: use do()-operator style
+- Run 3 sensitivity checks: vary key CPT values ±20%
+- Sensitivity is a robustness check on assumptions, NOT a CI
+
+## MODULE D — MONTE CARLO SCENARIO ENGINE
+10,000 samples. If one scenario >2 minutes on laptop CPU, batch-sample.
+Always show a distribution, never a single point estimate.
+
+## MODULE E — PROCUREMENT COST-AT-RISK ENGINE
+All parameters labeled ASSUMPTIONS. 3 scenarios minimum (GSCPI 1/2/3 SD).
+
+## MODULE F — STREAMLIT DASHBOARD
+Entry: app/dashboard.py
+Mode 1 headline + Mode 2 scenario selector
+Offline demo cache: data/processed/demo_cache.json
+Disclaimer in sidebar.
+
+## BUILD ORDER
+PHASE -1 data source verification before any code.
+PHASE 0 GPU smoke test.
+PHASE 1 dummy pipeline + dashboard.
+PHASE 2 real data.
+PHASE 3 real SLM (zero-shot F1 before LoRA).
+PHASE 4 real causal model.
+PHASE 5 real cost engine.
+PHASE 6 integration.
+PHASE 7 viva prep.
+
+## WHEN TO STOP AND ASK
+1. >4 GB VRAM on a single forward pass
+2. Paid API at runtime
+3. Claiming real-time forecasting
+4. Data that doesn't exist publicly and no listed fallback
+5. Unverified schema even for a fallback
+6. Architecture change needed
+7. SLM JSON parse failure rate >15% after retries
+8. Cohen's Kappa < 0.6
+9. Single Monte Carlo scenario run >2 minutes on CPU

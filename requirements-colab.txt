@@ -1,0 +1,32 @@
+# Colab T4. Do not use the Windows CUDA index here.
+# After a fresh Colab runtime, print torch.__version__ and torch.version.cuda
+# and replace the torch pin below with what Colab already provides if they differ.
+# Do not `pip install torch` on Colab unless the preinstalled wheel is unusable.
+
+numpy==1.26.4
+pandas==2.2.3
+pyarrow==17.0.0
+openpyxl==3.1.5
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+python-dateutil==2.9.0.post0
+tqdm==4.66.5
+networkx==3.2.1
+matplotlib==3.9.2
+pgmpy==0.1.25
+streamlit==1.39.0
+scikit-learn==1.5.2
+scipy==1.13.1
+statsmodels==0.14.4
+transformers==4.46.3
+accelerate==1.1.1
+peft==0.13.2
+bitsandbytes==0.44.1
+safetensors==0.4.5
+sentencepiece==0.2.0
+protobuf==5.28.3
+huggingface-hub==0.26.2
+jsonschema==4.23.0
+pytest==8.3.3
+mospi-esankhyiki==0.1.4

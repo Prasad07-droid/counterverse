@@ -1,0 +1,9 @@
+[server]
+maxUploadSize = 50
+enableStaticServing = false
+
+[runner]
+fastReruns = true
+
+[browser]
+gatherUsageStats = false

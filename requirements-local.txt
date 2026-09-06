@@ -1,0 +1,61 @@
+# Windows + RTX 3050 Ti + Python 3.14.7. Pins are exact where tested.
+# STEP 1: Python 3.14 venv (system 3.9.13 is too old for current torch).
+# STEP 2: install CUDA torch from the official index, THEN this file.
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+#
+# Installed by torch (do NOT re-pin here — let torch's deps win):
+#   torch==2.11.0+cu128   torchvision==0.26.0+cu128   torchaudio==2.11.0+cu128
+#   numpy==2.5.2   networkx==3.6.1   sympy==1.14.0   filelock==3.32.3
+#   jinja2==3.1.6  typing-extensions==4.16.0  pillow==12.3.0
+#
+# NOTE: Many old exact pins (e.g. pandas==2.2.3) have no Python 3.14 wheel.
+# Updated to versions with 3.14 wheels or removed exact pins where needed.
+# After full pip install succeeds, run: pip freeze > requirements-local-frozen.txt
+#
+# ---------- remaining project deps (install via this file) ----------
+
+# --- Data handling ---
+pandas>=2.3.0
+pyarrow>=17.0.0
+openpyxl>=3.1.5
+requests>=2.32.3
+beautifulsoup4>=4.12.3
+lxml>=5.3.0
+python-dateutil>=2.9.0
+tqdm>=4.66.5
+
+# --- Visualization ---
+matplotlib>=3.10.0
+plotly>=5.24.0
+
+# --- ML / Stats (CPU) ---
+pgmpy>=0.1.25
+scikit-learn>=1.6.0
+scipy>=1.15.0
+statsmodels>=0.14.4
+
+# --- SLM (GPU) ---
+transformers>=4.46.3
+accelerate>=1.1.1
+peft>=0.13.2
+safetensors>=0.4.5
+sentencepiece>=0.2.0
+protobuf>=5.28.3
+huggingface-hub>=0.26.2
+
+# --- bitsandbytes: Windows + Python 3.14 may not have a wheel. ---
+# Try: pip install bitsandbytes
+# If it fails, skip — only needed for QLoRA (Phase 3 Step 2), not zero-shot.
+# bitsandbytes>=0.44.1
+
+# --- Dashboard ---
+streamlit>=1.39.0
+
+# --- Dev / Test ---
+jsonschema>=4.23.0
+pytest>=8.3.3
+
+# --- Optional (install if needed in Phase 2) ---
+# nbformat>=5.10.4
+# jupyter>=1.1.1
+# mospi-esankhyiki>=0.1.4

@@ -1,0 +1,238 @@
+{
+  "metadata": {
+    "source": "UN Comtrade API (v1 preview)",
+    "reporter": "India (699)",
+    "flow": "Imports (M)",
+    "commodities": {
+      "8542": "Electronic integrated circuits (Semiconductors)",
+      "8112": "Gallium, germanium, hafnium, indium, niobium, rhenium, thallium"
+    },
+    "exchange_rate_usd_inr": 83.0,
+    "access_date": "2026-09-05"
+  },
+  "yearly_totals": {
+    "8542": {
+      "2019": {
+        "usd_value": 10172390321.804,
+        "inr_crore": 84430.84,
+        "partners_usd": {
+          "South Korea": 1465748220.748,
+          "Japan": 97753566.034,
+          "China": 3593456939.616,
+          "Singapore": 884506824.547,
+          "Hong Kong": 3547558392.24,
+          "USA": 173434433.685,
+          "Taiwan": 93289756.04
+        },
+        "partners_inr_crore": {
+          "South Korea": 12165.71,
+          "Japan": 811.35,
+          "China": 29825.69,
+          "Singapore": 7341.41,
+          "Hong Kong": 29444.73,
+          "USA": 1439.51,
+          "Taiwan": 774.3
+        }
+      },
+      "2020": {
+        "usd_value": 8417890350.81,
+        "inr_crore": 69868.49,
+        "partners_usd": {
+          "Singapore": 860879963.178,
+          "China": 2915677814.056,
+          "South Korea": 871833218.005,
+          "Japan": 100708532.18,
+          "Taiwan": 421798088.277,
+          "Hong Kong": 2629035957.03,
+          "USA": 139147988.924
+        },
+        "partners_inr_crore": {
+          "Singapore": 7145.3,
+          "China": 24200.13,
+          "South Korea": 7236.22,
+          "Japan": 835.88,
+          "Taiwan": 3500.92,
+          "Hong Kong": 21821.0,
+          "USA": 1154.93
+        }
+      },
+      "2021": {
+        "usd_value": 12391531711.142,
+        "inr_crore": 102849.71,
+        "partners_usd": {
+          "Singapore": 1176140580.823,
+          "China": 4525122635.31,
+          "South Korea": 1171979454.968,
+          "Japan": 151051098.524,
+          "Hong Kong": 3627059585.964,
+          "USA": 265753699.81,
+          "Taiwan": 557586817.089
+        },
+        "partners_inr_crore": {
+          "Singapore": 9761.97,
+          "China": 37558.52,
+          "South Korea": 9727.43,
+          "Japan": 1253.72,
+          "Hong Kong": 30104.59,
+          "USA": 2205.76,
+          "Taiwan": 4627.97
+        }
+      },
+      "2022": {
+        "usd_value": 16122209275.129,
+        "inr_crore": 133814.34,
+        "partners_usd": {
+          "China": 5058281968.096,
+          "USA": 297135548.05,
+          "South Korea": 2253127473.775,
+          "Taiwan": 1012992953.81,
+          "Japan": 215051257.252,
+          "Hong Kong": 3967642868.582,
+          "Singapore": 1556333570.883
+        },
+        "partners_inr_crore": {
+          "China": 41983.74,
+          "USA": 2466.23,
+          "South Korea": 18700.96,
+          "Taiwan": 8407.84,
+          "Japan": 1784.93,
+          "Hong Kong": 32931.44,
+          "Singapore": 12917.57
+        }
+      },
+      "2023": {
+        "usd_value": 105693865.001,
+        "inr_crore": 877.26,
+        "partners_usd": {
+          "Taiwan": 34619651.183,
+          "South Korea": 34756835.637,
+          "Japan": 7685.451,
+          "Singapore": 1257471.565,
+          "Hong Kong": 11093.521,
+          "USA": 829240.476,
+          "China": 1584.242
+        },
+        "partners_inr_crore": {
+          "Taiwan": 287.34,
+          "South Korea": 288.48,
+          "Japan": 0.06,
+          "Singapore": 10.44,
+          "Hong Kong": 0.09,
+          "USA": 6.88,
+          "China": 0.01
+        }
+      }
+    },
+    "8112": {
+      "2019": {
+        "usd_value": 21400205.301,
+        "inr_crore": 177.62,
+        "partners_usd": {
+          "USA": 644529.115,
+          "Hong Kong": 330014.753,
+          "Japan": 109974.27,
+          "South Korea": 63796.009,
+          "Singapore": 233714.687,
+          "China": 2322309.861
+        },
+        "partners_inr_crore": {
+          "USA": 5.35,
+          "Hong Kong": 2.74,
+          "Japan": 0.91,
+          "South Korea": 0.53,
+          "Singapore": 1.94,
+          "China": 19.28
+        }
+      },
+      "2020": {
+        "usd_value": 17857190.998,
+        "inr_crore": 148.21,
+        "partners_usd": {
+          "South Korea": 8249.504,
+          "USA": 2470064.769,
+          "Singapore": 57.06,
+          "Japan": 47486.362,
+          "Hong Kong": 32550.815,
+          "China": 1263723.214,
+          "Taiwan": 3631.223
+        },
+        "partners_inr_crore": {
+          "South Korea": 0.07,
+          "USA": 20.5,
+          "Singapore": 0.0,
+          "Japan": 0.39,
+          "Hong Kong": 0.27,
+          "China": 10.49,
+          "Taiwan": 0.03
+        }
+      },
+      "2021": {
+        "usd_value": 22571385.563,
+        "inr_crore": 187.34,
+        "partners_usd": {
+          "USA": 1753813.551,
+          "Hong Kong": 13018.402,
+          "Singapore": 384916.724,
+          "Japan": 25564.492,
+          "South Korea": 98006.599,
+          "China": 7205051.388,
+          "Taiwan": 3513.501
+        },
+        "partners_inr_crore": {
+          "USA": 14.56,
+          "Hong Kong": 0.11,
+          "Singapore": 3.19,
+          "Japan": 0.21,
+          "South Korea": 0.81,
+          "China": 59.8,
+          "Taiwan": 0.03
+        }
+      },
+      "2022": {
+        "usd_value": 66606995.896,
+        "inr_crore": 552.84,
+        "partners_usd": {
+          "Hong Kong": 398184.313,
+          "Singapore": 128.162,
+          "Japan": 5535541.284,
+          "China": 24127302.523,
+          "USA": 2746759.378,
+          "South Korea": 8048767.061,
+          "Taiwan": 82.282
+        },
+        "partners_inr_crore": {
+          "Hong Kong": 3.3,
+          "Singapore": 0.0,
+          "Japan": 45.94,
+          "China": 200.26,
+          "USA": 22.8,
+          "South Korea": 66.8,
+          "Taiwan": 0.0
+        }
+      },
+      "2023": {
+        "usd_value": 27297.863,
+        "inr_crore": 0.23,
+        "partners_usd": {
+          "USA": 531.543,
+          "South Korea": 93601.789,
+          "Singapore": 2638.975,
+          "Japan": 7307.066,
+          "China": 22355542.076,
+          "Hong Kong": 32938.073,
+          "Taiwan": 14316.0
+        },
+        "partners_inr_crore": {
+          "USA": 0.0,
+          "South Korea": 0.78,
+          "Singapore": 0.02,
+          "Japan": 0.06,
+          "China": 185.55,
+          "Hong Kong": 0.27,
+          "Taiwan": 0.12
+        }
+      }
+    }
+  },
+  "partner_shares": {}
+}
