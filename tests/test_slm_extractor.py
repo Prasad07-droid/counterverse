@@ -248,6 +248,65 @@ class TestSLMExtractor(unittest.TestCase):
         mc_emp = run_monte_carlo(test_probs, n_samples=500, random_seed=42, distribution_source="empirical_fit")
         self.assertEqual(mc_emp["distribution_source"], "empirical_fit")
 
+    def test_gdelt_fallback_integrity_and_staleness(self):
+        """
+        Verifies GDELT fallback cache provenance, URL integrity, and staleness governance:
+        1. CACHE_LAST_REFRESHED timestamp is valid ISO format.
+        2. check_gdelt_cache_staleness() correctly identifies >90-day staleness vs fresh timestamps.
+        3. All fallback headlines have honest provenance labels and zero broken/fabricated URLs.
+        4. Entry 1 canonical Reuters URL date strictly matches its display seendate (2023-07-03).
+        5. All fallback headlines parse cleanly through extract_signal_fast().
+        """
+        from datetime import datetime, timezone, timedelta
+        from src.data_sources import (
+            CACHE_LAST_REFRESHED,
+            CACHE_MAX_AGE_DAYS,
+            CACHED_GDELT_HEADLINES,
+            check_gdelt_cache_staleness,
+            fetch_live_gdelt_headlines
+        )
+        from src.module_b_slm import extract_signal_fast
+
+        # 1. Validate timestamp format
+        dt = datetime.fromisoformat(CACHE_LAST_REFRESHED.replace("Z", "+00:00"))
+        self.assertIsInstance(dt, datetime)
+        self.assertEqual(CACHE_MAX_AGE_DAYS, 90)
+
+        # 2. Test staleness calculation
+        is_stale, age_days, warning = check_gdelt_cache_staleness()
+        self.assertTrue(is_stale, "2024 fallback cache should be detected as stale (>90 days) in 2026")
+        self.assertGreater(age_days, 90)
+        self.assertIn("⚠️ Cached fallback data is over 90 days old", warning)
+
+        # Test fresh timestamp behavior
+        fresh_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        is_stale_fresh, age_fresh, warning_fresh = check_gdelt_cache_staleness(fresh_iso, max_age_days=90)
+        self.assertFalse(is_stale_fresh)
+        self.assertEqual(age_fresh, 0)
+        self.assertIsNone(warning_fresh)
+
+        # 3. Entry 1 date match & canonical link
+        entry_1 = CACHED_GDELT_HEADLINES[0]
+        self.assertEqual(entry_1["seendate"], "2023-07-03")
+        self.assertIn("2023-07-03", entry_1["url"])
+        self.assertEqual(entry_1["provenance_type"], "verified_historical_archive")
+        self.assertFalse(entry_1["is_illustrative"])
+
+        # 4. Entries 2-6: synthetic benchmark scenarios with zero fabricated URLs
+        for i, art in enumerate(CACHED_GDELT_HEADLINES[1:], start=2):
+            self.assertEqual(art["provenance_type"], "illustrative_benchmark_scenario")
+            self.assertTrue(art["is_illustrative"])
+            self.assertEqual(art["url"], "", f"Entry {i} should not have a fabricated URL")
+
+        # 5. Extract signal fast cleanliness
+        for art in CACHED_GDELT_HEADLINES:
+            sig = extract_signal_fast(art["title"])
+            self.assertTrue(sig["is_disruption"])
+            self.assertIn(sig["affected_node"], [
+                "Raw Material Supplier", "Port/Logistics", "Tier-1 Supplier",
+                "Tier-2 Supplier", "Semiconductor Fab", "Assembly Hub"
+            ])
+
 
 if __name__ == "__main__":
     unittest.main()

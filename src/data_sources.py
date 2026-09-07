@@ -263,49 +263,94 @@ def get_sourced_baseline_crore(hs_code: str = "8542", year: str = "2022") -> Sou
 GDELT_BASE_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
 GDELT_SCOPED_QUERY = '(semiconductor OR gallium OR germanium OR "chip shortage" OR "integrated circuit") AND (China OR India OR Taiwan OR "South Korea")'
 
+# ── GDELT Fallback Cache Metadata & Staleness Tracking ──
+# ISO timestamp of last verified fallback cache curation
+CACHE_LAST_REFRESHED = "2024-09-03T00:00:00Z"
+CACHE_MAX_AGE_DAYS = 90
+
+
+def check_gdelt_cache_staleness(
+    last_refreshed_iso: str = CACHE_LAST_REFRESHED,
+    max_age_days: int = CACHE_MAX_AGE_DAYS
+) -> tuple[bool, int, Optional[str]]:
+    """
+    Evaluates whether the GDELT fallback cache exceeds the maximum staleness threshold.
+    Returns: (is_stale, age_days, staleness_warning_or_None)
+    """
+    try:
+        dt = datetime.fromisoformat(last_refreshed_iso.replace("Z", "+00:00"))
+        now = datetime.now(timezone.utc)
+        age_days = (now - dt).days
+        is_stale = age_days > max_age_days
+        warning = (
+            f"⚠️ Cached fallback data is over {max_age_days} days old ({age_days} days elapsed) — live GDELT connection recommended"
+            if is_stale else None
+        )
+        return is_stale, age_days, warning
+    except Exception as e:
+        logger.warning(f"Error calculating cache staleness: {e}")
+        return False, 0, None
+
+
 # Pre-cached fallback headlines in case GDELT public API is rate-limited (HTTP 429)
+# Data Provenance Disclosure:
+# - Entry 1 is an authentic historical shock with a verified canonical Reuters archive link (July 3, 2023).
+# - Entries 2-6 are domain-calibrated simulation archetypes. To avoid dead/broken links, they are
+#   explicitly designated as 'illustrative_benchmark_scenario' with no fabricated external URLs.
 CACHED_GDELT_HEADLINES = [
     {
-        "title": "China tightens export controls on gallium and germanium critical to semiconductor wafer fabs",
-        "url": "https://www.reuters.com/technology/china-gallium-germanium-export-curbs-chip-sector-2023-07-03/",
-        "seendate": "2024-07-15",
+        "title": "China to restrict exports of chipmaking materials gallium and germanium",
+        "url": "https://www.reuters.com/markets/commodities/china-curb-exports-some-gallium-germanium-metals-chip-makers-2023-07-03/",
+        "seendate": "2023-07-03",
         "domain": "reuters.com",
-        "source": "GDELT Live Feed (Cached Sync)"
+        "source": "Reuters Canonical Archive (Historical Shock Baseline)",
+        "provenance_type": "verified_historical_archive",
+        "is_illustrative": False
     },
     {
         "title": "Taiwan TSMC alerts automotive chip customers on supply bottlenecks and raw wafer lead times",
-        "url": "https://www.bloomberg.com/news/articles/tsmc-automotive-semiconductor-supply-constraints",
+        "url": "",
         "seendate": "2024-08-02",
-        "domain": "bloomberg.com",
-        "source": "GDELT Live Feed (Cached Sync)"
+        "domain": "counterverse.benchmark",
+        "source": "Synthetic Benchmark Scenario (Illustrative — Not Live Citation)",
+        "provenance_type": "illustrative_benchmark_scenario",
+        "is_illustrative": True
     },
     {
         "title": "India automotive ECU assemblers seek bilateral chip supply corridors with South Korea and Taiwan",
-        "url": "https://economictimes.indiatimes.com/industry/auto/auto-news/chip-supplies-ecu-makers-taiwan-korea",
+        "url": "",
         "seendate": "2024-08-18",
-        "domain": "economictimes.indiatimes.com",
-        "source": "GDELT Live Feed (Cached Sync)"
+        "domain": "counterverse.benchmark",
+        "source": "Synthetic Benchmark Scenario (Illustrative — Not Live Citation)",
+        "provenance_type": "illustrative_benchmark_scenario",
+        "is_illustrative": True
     },
     {
         "title": "Shanghai container port delays trigger microchip inventory alerts for Indian auto Tier-1 suppliers",
-        "url": "https://www.scmp.com/economy/global-economy/article/shanghai-port-congestion-semiconductor-logistics",
+        "url": "",
         "seendate": "2024-08-25",
-        "domain": "scmp.com",
-        "source": "GDELT Live Feed (Cached Sync)"
+        "domain": "counterverse.benchmark",
+        "source": "Synthetic Benchmark Scenario (Illustrative — Not Live Citation)",
+        "provenance_type": "illustrative_benchmark_scenario",
+        "is_illustrative": True
     },
     {
         "title": "Germanium price spike impacts high-frequency power semiconductors for electric vehicle control units",
-        "url": "https://www.ft.com/content/germanium-gallium-prices-ev-power-semiconductors",
+        "url": "",
         "seendate": "2024-09-01",
-        "domain": "ft.com",
-        "source": "GDELT Live Feed (Cached Sync)"
+        "domain": "counterverse.benchmark",
+        "source": "Synthetic Benchmark Scenario (Illustrative — Not Live Citation)",
+        "provenance_type": "illustrative_benchmark_scenario",
+        "is_illustrative": True
     },
     {
         "title": "Global automotive microcontroller lead times stretch past 24 weeks amid packaging capacity crunch",
-        "url": "https://www.automotivenews.com/mobility-report/auto-mcu-lead-times-packaging-bottleneck",
+        "url": "",
         "seendate": "2024-09-03",
-        "domain": "automotivenews.com",
-        "source": "GDELT Live Feed (Cached Sync)"
+        "domain": "counterverse.benchmark",
+        "source": "Synthetic Benchmark Scenario (Illustrative — Not Live Citation)",
+        "provenance_type": "illustrative_benchmark_scenario",
+        "is_illustrative": True
     }
 ]
 
@@ -324,10 +369,13 @@ def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Di
         - "data_vintage": str ("LIVE (UTC: ...)" or "CACHED_FALLBACK (UTC: ...)")
         - "fetch_timestamp_utc": str
         - "citation": str
-        - "articles": list of dicts [{"title", "url", "seendate", "domain", "source"}]
+        - "articles": list of dicts [{"title", "url", "seendate", "domain", "source", "provenance_type"}]
         - "query": str
         - "message": str
         - "attempts_made": int
+        - "cache_last_refreshed": str
+        - "is_stale": bool
+        - "staleness_warning": Optional[str]
     """
     params = {
         "query": GDELT_SCOPED_QUERY,
@@ -360,7 +408,9 @@ def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Di
                             "url": a.get("url", ""),
                             "seendate": a.get("seendate", "")[:8],
                             "domain": a.get("domain", ""),
-                            "source": "GDELT Document 2.0 API (Live)"
+                            "source": "GDELT Document 2.0 API (Live)",
+                            "provenance_type": "live_gdelt_feed",
+                            "is_illustrative": False
                         })
                     return {
                         "success": True,
@@ -370,7 +420,10 @@ def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Di
                         "articles": articles,
                         "query": GDELT_SCOPED_QUERY,
                         "message": f"Successfully pulled {len(articles)} live articles from GDELT Document 2.0 API (attempt {attempt}/{max_retries}).",
-                        "attempts_made": attempt
+                        "attempts_made": attempt,
+                        "cache_last_refreshed": now_utc,
+                        "is_stale": False,
+                        "staleness_warning": None
                     }
         except Exception as e:
             last_error = e
@@ -381,15 +434,19 @@ def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Di
 
     # Graceful fallback to verified GDELT articles matching exact scope
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
+    is_stale, age_days, staleness_warning = check_gdelt_cache_staleness()
     return {
         "success": False,
-        "data_vintage": f"CACHED_FALLBACK (UTC: {now_utc})",
+        "data_vintage": f"CACHED_FALLBACK (Last Refreshed: {CACHE_LAST_REFRESHED})",
         "fetch_timestamp_utc": now_utc,
-        "citation": "GDELT Project 2.0 Document API (Verified Curated Cache Fallback)",
+        "citation": "GDELT Project 2.0 Document API (Curated Fallback Cache)",
         "articles": CACHED_GDELT_HEADLINES[:max_records],
         "query": GDELT_SCOPED_QUERY,
-        "message": f"GDELT live API returned 429/timeout after {max_retries} attempts with exponential backoff (1s, 2s, 4s). Error: {last_error}. Served verified GDELT-indexed articles matching the exact component query.",
-        "attempts_made": max_retries
+        "message": f"GDELT live API returned 429/timeout after {max_retries} attempts with exponential backoff (1s, 2s, 4s). Error: {last_error}. Served curated benchmark articles matching the exact component query.",
+        "attempts_made": max_retries,
+        "cache_last_refreshed": CACHE_LAST_REFRESHED,
+        "is_stale": is_stale,
+        "staleness_warning": staleness_warning
     }
 
 

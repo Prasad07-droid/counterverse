@@ -94,6 +94,9 @@ def compute_pcar_for_selection(mc_samples, company_selection: str) -> dict:
             return calculate_pcar(mc_samples, company_name=company_selection)
     return calculate_pcar(mc_samples, company_name=company_selection)
 
+import importlib
+import src.data_sources
+importlib.reload(src.data_sources)
 from src.grounding_graph import get_graph_summary, get_grounding_graph
 from src.data_sources import (
     load_comtrade_data,
@@ -2389,7 +2392,10 @@ with tab1:
             if gdelt_result.get("success"):
                 st.session_state["gdelt_status_indicator"] = f"🟢 LIVE — fetched {time.strftime('%Y-%m-%d %H:%M')}"
             else:
-                st.session_state["gdelt_status_indicator"] = "🟡 CACHED FALLBACK — Live feed unavailable"
+                if gdelt_result.get("is_stale"):
+                    st.session_state["gdelt_status_indicator"] = "⚠️ CACHED FALLBACK (>90d old) — Live feed unavailable"
+                else:
+                    st.session_state["gdelt_status_indicator"] = "🟡 CACHED FALLBACK — Live feed unavailable"
             status_box.empty()
         
         gdelt_data = st.session_state.get("gdelt_data", {})
@@ -2399,10 +2405,13 @@ with tab1:
             is_live = gdelt_data.get("success", False)
             conn_status = st.session_state.get(
                 "gdelt_status_indicator",
-                f"🟢 LIVE — fetched {time.strftime('%Y-%m-%d %H:%M')}" if is_live else "🟡 CACHED FALLBACK — Live feed unavailable"
+                f"🟢 LIVE — fetched {time.strftime('%Y-%m-%d %H:%M')}" if is_live else (
+                    "⚠️ CACHED FALLBACK (>90d old) — Live feed unavailable" if gdelt_data.get("is_stale")
+                    else "🟡 CACHED FALLBACK — Live feed unavailable"
+                )
             )
 
-            # Connection Status Banner (Never leaves ... CONNECTING)
+            # Connection Status Banner
             if is_live:
                 st.markdown(f"""
                 <div style="display:flex; align-items:center; justify-content:space-between; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:8px 14px; margin-bottom:4px;">
@@ -2411,12 +2420,21 @@ with tab1:
                 </div>
                 """, unsafe_allow_html=True)
             else:
+                banner_bg = "#fef2f2" if gdelt_data.get("is_stale") else "#fefce8"
+                banner_border = "#fecaca" if gdelt_data.get("is_stale") else "#fef08a"
+                banner_text_col = "#991b1b" if gdelt_data.get("is_stale") else "#854d0e"
+                banner_sub_col = "#b91c1c" if gdelt_data.get("is_stale") else "#a16207"
                 st.markdown(f"""
-                <div style="display:flex; align-items:center; justify-content:space-between; background:#fefce8; border:1px solid #fef08a; border-radius:6px; padding:8px 14px; margin-bottom:4px;">
-                    <span style="font-weight:700; color:#854d0e; font-size:0.82rem;">📡 Connection Status: {conn_status}</span>
-                    <span style="font-size:0.75rem; color:#a16207;">{msg}</span>
+                <div style="display:flex; align-items:center; justify-content:space-between; background:{banner_bg}; border:1px solid {banner_border}; border-radius:6px; padding:8px 14px; margin-bottom:4px;">
+                    <span style="font-weight:700; color:{banner_text_col}; font-size:0.82rem;">📡 Connection Status: {conn_status}</span>
+                    <span style="font-size:0.75rem; color:{banner_sub_col};">{msg}</span>
                 </div>
                 """, unsafe_allow_html=True)
+
+            # Explicit Staleness Warning for Fallback Cache >90 days
+            if not is_live and gdelt_data.get("staleness_warning"):
+                st.warning(gdelt_data["staleness_warning"])
+
             st.caption(f"Source: {gdelt_data.get('citation', 'GDELT Project Document 2.0 API')} · {gdelt_data.get('data_vintage', 'LIVE / CACHED_FALLBACK')}")
 
             st.markdown("##### 📥 Pick a Live GDELT Article to Feed into SLM:")
@@ -2425,11 +2443,19 @@ with tab1:
                 col_art, col_btn = st.columns([4.2, 1])
                 with col_art:
                     seen = art.get('seendate', '2024-09')
+                    prov = art.get('provenance_type', '')
+                    art_url = art.get('url', '')
                     if is_live:
-                        badge = f"<span style='background:#dcfce7; color:#166534; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:4px;'>🟢 LIVE — fetched {time.strftime('%Y-%m-%d %H:%M')}</span>"
+                        badge = f"<span style='background:#dcfce7; color:#166534; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:4px;'>🟢 LIVE GDELT — {seen}</span>"
+                        link_html = f"<a href='{art_url}' target='_blank' style='color:#2563eb; text-decoration:underline;'>[Source Link]</a>" if art_url else "<span style='color:#64748b;'>[No Link]</span>"
+                    elif prov == "verified_historical_archive":
+                        badge = f"<span style='background:#eff6ff; color:#1e40af; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:4px;'>📜 VERIFIED ARCHIVE — {seen}</span>"
+                        link_html = f"<a href='{art_url}' target='_blank' style='color:#2563eb; text-decoration:underline;'>[Canonical Reuters Archive]</a>" if art_url else ""
                     else:
-                        badge = f"<span style='background:#fef3c7; color:#92400e; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:4px;'>🟡 CACHED FALLBACK — {seen}</span>"
-                    st.markdown(f"**{art['title']}** &nbsp; {badge}  \n<span style='font-size:0.75rem; color:var(--text-muted);'>{art.get('domain', '')} · {seen} · [Source Link]({art.get('url', '#')})</span>", unsafe_allow_html=True)
+                        badge = f"<span style='background:#f1f5f9; color:#475569; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:4px;'>🧪 BENCHMARK ARCHETYPE — {seen}</span>"
+                        link_html = "<span style='color:#94a3b8; font-style:italic;'>Calibrated Simulation Archetype (No External URL)</span>"
+
+                    st.markdown(f"**{art['title']}** &nbsp; {badge}  \n<span style='font-size:0.75rem; color:var(--text-muted);'>{art.get('domain', '')} · {seen} · {link_html}</span>", unsafe_allow_html=True)
                 with col_btn:
                     if st.button("Use Headline", key=f"btn_pick_{idx}", use_container_width=True):
                         st.session_state["selected_headline"] = art["title"]
