@@ -40,6 +40,19 @@ NODE_TO_GRAPH_ID = {
     "Assembly Hub": "assembly_hub_india",
 }
 
+DEFAULT_FALLBACK_GRAPH_ID = "tier1_supplier_a"
+
+
+def map_node_to_graph_id(node_name: Any) -> str:
+    """
+    Maps an SLM-extracted affected_node string to the canonical graph node identifier.
+    Guarantees an explicit fallback to 'tier1_supplier_a' for any unmapped, empty,
+    or None input string so that a KeyError never propagates.
+    """
+    if not node_name or not isinstance(node_name, str):
+        return DEFAULT_FALLBACK_GRAPH_ID
+    return NODE_TO_GRAPH_ID.get(node_name.strip(), DEFAULT_FALLBACK_GRAPH_ID)
+
 
 def compute_dependency_ratio(
     direct_import_share: float,
@@ -98,6 +111,20 @@ def calculate_deterministic_risk_score(signal: Dict[str, Any]) -> Dict[str, Any]
     headline_text = str(signal.get("headline", "")).lower()
     full_ctx = f"{summary_text} {headline_text}"
 
+    # Auto-extracted disruption parameters from SLM (Module B)
+    affected_node = signal.get("affected_node", "Tier-1 Supplier")
+    graph_node_id = map_node_to_graph_id(affected_node)
+    event_type = signal.get("event_type", signal.get("disruption_type", "Generic Disruption"))
+    duration_days = int(signal.get("duration_days", 45))
+    severity_pct_raw = signal.get("severity_pct")
+    if severity_pct_raw is not None:
+        try:
+            severity_pct = float(severity_pct_raw)
+        except (ValueError, TypeError):
+            severity_pct = 55.0
+    else:
+        severity_pct = None
+
     def _is_non_disruptive_event(text: str) -> bool:
         # 1. Direct explicit negations of disruption, stoppage, or supply concerns
         negations = [
@@ -152,7 +179,12 @@ def calculate_deterministic_risk_score(signal: Dict[str, Any]) -> Dict[str, Any]
             "canonical_component": "None (Control / Routine)",
             "canonical_region": "None",
             "unverified_fallback_applied": False,
-            "classification_flag": "Non-disruptive / routine operational event confirmed"
+            "classification_flag": "Non-disruptive / routine operational event confirmed",
+            "affected_node": affected_node,
+            "graph_node_id": graph_node_id,
+            "event_type": event_type,
+            "severity_pct": severity_pct if severity_pct is not None else 0.0,
+            "duration_days": duration_days,
         }
 
     severity = int(signal.get("severity", 2))
@@ -319,6 +351,11 @@ def calculate_deterministic_risk_score(signal: Dict[str, Any]) -> Dict[str, Any]
         "canonical_region": canonical_region,
         "unverified_fallback_applied": unverified_fallback,
         "classification_warning": classification_warning,
+        "affected_node": affected_node,
+        "graph_node_id": graph_node_id,
+        "event_type": event_type,
+        "severity_pct": severity_pct if severity_pct is not None else (35.0 if severity == 1 else 55.0 if severity == 2 else 75.0 if severity == 3 else 90.0),
+        "duration_days": duration_days,
         "formula": "0.35*(Exposure Breadth) + 0.25*(Dependency Ratio) + 0.20*(Downstream Criticality) + 0.10*(Tier-1 Centrality) + 0.10*(Exposure Depth)",
         "breakdown": {
             "exposure_breadth": {"value": eb, "weight": 0.35, "contribution": contrib_eb, "desc": "Tier-2/3 component categories affected in locked chain"},
@@ -350,8 +387,9 @@ def simulate_causal_impact(signal: dict) -> dict:
 
     # Compute deterministic risk score
     risk_meta = calculate_deterministic_risk_score(signal)
-    if "affected_node" in signal:
-        risk_meta["graph_node_id"] = NODE_TO_GRAPH_ID.get(signal["affected_node"], "tier1_supplier_a")
+    # Explicit fallback to tier1_supplier_a for any unmapped or missing node string
+    graph_node_id = map_node_to_graph_id(signal.get("affected_node", risk_meta.get("affected_node")))
+    risk_meta["graph_node_id"] = graph_node_id
     r = risk_meta["risk_score"]
 
     # Ground Bayesian posterior marginals directly in the deterministic risk score
@@ -383,7 +421,12 @@ def simulate_causal_impact(signal: dict) -> dict:
         "Medium (5-15%)": round(p_med / total, 3),
         "Low (<5%)": round(p_low / total, 3),
         "None": round(p_none / total, 3),
-        "_risk_meta": risk_meta
+        "_risk_meta": risk_meta,
+        "affected_node": risk_meta.get("affected_node", "Tier-1 Supplier"),
+        "graph_node_id": graph_node_id,
+        "event_type": risk_meta.get("event_type", "Generic Disruption"),
+        "severity_pct": risk_meta.get("severity_pct", 55.0),
+        "duration_days": risk_meta.get("duration_days", 45),
     }
 
     logger.info(f"Deterministic risk score = {r} ({risk_meta['risk_level']}), Probs = {probs}")
