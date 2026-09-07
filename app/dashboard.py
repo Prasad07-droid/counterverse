@@ -52,7 +52,7 @@ from src.module_c_causal import (
     compute_cost_adjusted_recommendation,
 )
 from src.module_d_mc import run_monte_carlo
-from src.module_e_pcar import calculate_pcar
+from src.module_e_pcar import calculate_pcar, OEM_PROFILES
 from src.grounding_graph import get_graph_summary, get_grounding_graph
 from src.data_sources import (
     load_comtrade_data,
@@ -1772,6 +1772,9 @@ def render_results(signal, probs, mc_samples, pcar_metrics):
     st.markdown("---")
 
     # ── Metric Cards Row (Stagger 1) ──
+    company_name = pcar_metrics.get("company_name", "Maruti Suzuki")
+    is_macro = (company_name == "Entire Indian Automotive Industry")
+    
     st.markdown("""
     <div class="reveal-step-1">
         <div class="section-header">
@@ -1780,6 +1783,32 @@ def render_results(signal, probs, mc_samples, pcar_metrics):
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    if not is_macro:
+        st.markdown(f"""
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 8px 14px; margin-bottom: 12px; font-size: 0.82rem; color: #166534; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+                🏢 <strong>Target Enterprise Allocation:</strong> <span style="font-weight:700;">{company_name}</span> &nbsp;|&nbsp; 
+                SIAM FY24 Market Share: <strong>{pcar_metrics.get('market_share_pct', 0)}%</strong> &nbsp;|&nbsp; 
+                Chain Dependency: <strong>{pcar_metrics.get('dependency_ratio_pct', 0)}%</strong>
+            </div>
+            <div>
+                Allocated Procurement Base: <strong style="color:#15803d;">₹{format_inr(pcar_metrics.get('effective_base_crore', 0))} Cr</strong> 
+                <span style="color:#64748b; font-size:0.75rem;">(of ₹{format_inr(pcar_metrics.get('industry_baseline_crore', 0))} Cr total)</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 6px; padding: 8px 14px; margin-bottom: 12px; font-size: 0.82rem; color: #1e40af; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+                🌐 <strong>Macro Industry Scope:</strong> Entire Indian Automotive Sourcing Exposure
+            </div>
+            <div>
+                UN Comtrade Base: <strong>₹{format_inr(pcar_metrics.get('industry_baseline_crore', 0))} Cr</strong>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     mc1, mc2, mc3, mc4, mc5 = st.columns(5)
 
@@ -1822,20 +1851,21 @@ def render_results(signal, probs, mc_samples, pcar_metrics):
         )
 
     with mc4:
+        oem_short = company_name if len(company_name) <= 14 else (company_name[:12] + "..")
         st.markdown(
             f'<div class="reveal-step-1"><div class="metric-card">'
-            f'<div class="metric-label">95% PCaR</div>'
+            f'<div class="metric-label"><span>95% PCaR</span><span style="font-size:0.68rem; color:#2563eb; font-weight:700;">{oem_short}</span></div>'
             f'<div class="metric-value count-up-val" data-target="{pcar_metrics["pcar_95_crore"]}">₹{format_inr(pcar_metrics["pcar_95_crore"])} Cr</div>'
-            f'<div class="metric-sub">Procurement Cost-at-Risk</div></div></div>',
+            f'<div class="metric-sub">{company_name} Exposure</div></div></div>',
             unsafe_allow_html=True
         )
 
     with mc5:
         st.markdown(
             f'<div class="reveal-step-1"><div class="metric-card">'
-            f'<div class="metric-label">Mean Expected Loss</div>'
+            f'<div class="metric-label"><span>Mean Loss</span><span style="font-size:0.68rem; color:#475569; font-weight:600;">{oem_short}</span></div>'
             f'<div class="metric-value count-up-val" data-target="{pcar_metrics["mean_loss_crore"]}">₹{format_inr(pcar_metrics["mean_loss_crore"])} Cr</div>'
-            f'<div class="metric-sub">Lead time: {signal.get("lead_time_weeks", 0)} weeks</div></div></div>',
+            f'<div class="metric-sub">Base: ₹{format_inr(pcar_metrics.get("effective_base_crore", pcar_metrics["mean_loss_crore"]))} Cr</div></div></div>',
             unsafe_allow_html=True
         )
 
@@ -2039,9 +2069,10 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
     """, unsafe_allow_html=True)
 
     # ── Sanity check (A2) ──
+    effective_base = pcar_metrics.get("effective_base_crore", SOURCED_HS8542_BASELINE_CRORE)
     mean_drop_frac = np.mean(mc_samples) / 100.0
-    expected_loss_range_min = mean_drop_frac * SOURCED_HS8542_BASELINE_CRORE * 1.0
-    expected_loss_range_max = mean_drop_frac * SOURCED_HS8542_BASELINE_CRORE * 3.0
+    expected_loss_range_min = mean_drop_frac * effective_base * 1.0
+    expected_loss_range_max = mean_drop_frac * effective_base * 3.0
     actual_mean_loss = pcar_metrics.get('mean_loss_crore', 0)
 
     if not (expected_loss_range_min <= actual_mean_loss <= expected_loss_range_max):
@@ -2053,15 +2084,19 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
 
 
 # ── Compact Scope & Sourced Baseline Metadata Bar ──
+selected_oem = st.session_state.get("selected_oem_company", "Maruti Suzuki")
+oem_profile = OEM_PROFILES.get(selected_oem, OEM_PROFILES["Maruti Suzuki"])
+allocated_base = SOURCED_HS8542_BASELINE_CRORE * oem_profile["market_share"] * oem_profile["dependency_ratio"]
+
 st.markdown(f"""
 <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px; padding:6px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:0.78rem;">
     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <span style="font-weight:700; color:#1e40af; text-transform:uppercase; letter-spacing:0.04em;">🔒 Scope</span>
         <span style="background:#dbeafe; color:#1e40af; font-size:0.72rem; padding:1px 6px; border-radius:4px; font-weight:600;">HS 8112 ➔ HS 8542</span>
-        <span style="color:#475569;">Gallium/Germanium ➔ Semiconductor/ICs ➔ Indian Automotive ECU ➔ OEM</span>
+        <span style="color:#475569;">Gallium/Germanium ➔ Semiconductor/ICs ➔ Indian Automotive ECU ➔ <strong>{selected_oem}</strong></span>
     </div>
     <div style="color:#64748b; font-size:0.75rem;">
-        Sourced Baseline: <strong style="color:#2563eb;">₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr</strong> (UN Comtrade 2022)
+        Allocated Base: <strong style="color:#2563eb;">₹{format_inr(allocated_base)} Cr</strong> <span style="font-size:0.7rem; color:#94a3b8;">(UN Comtrade Macro: ₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr)</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -2070,17 +2105,31 @@ st.markdown(f"""
 # MAIN LAYOUT — Auto-Prediction Engine + Causal Graph
 # ════════════════════════════════════════════════════════════════
 
-# ── Headline Ingestion / Signal Ingest ──
-if "selected_headline" not in st.session_state:
-    st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+# ── Headline Ingestion & Target Enterprise Selector ──
+col_in1, col_in2 = st.columns([2.7, 1.3])
 
-headline_text = st.text_area(
-    "📰 Ingest Disruption Headline / Signal:",
-    value=st.session_state["selected_headline"],
-    height=75,
-    key="main_headline_input",
-    help="AI automatically extracts disruption parameters from this headline."
-)
+with col_in1:
+    if "selected_headline" not in st.session_state:
+        st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+
+    headline_text = st.text_area(
+        "📰 Ingest Disruption Headline / Signal:",
+        value=st.session_state["selected_headline"],
+        height=75,
+        key="main_headline_input",
+        help="AI automatically extracts disruption parameters from this headline."
+    )
+
+with col_in2:
+    selected_company = st.selectbox(
+        "🏢 Target Enterprise / OEM Scope:",
+        options=list(OEM_PROFILES.keys()),
+        index=0,
+        key="selected_oem_company",
+        help="Scales macro UN Comtrade import baseline to individual OEM balance sheet using SIAM FY24 market share and component dependency."
+    )
+    prof = OEM_PROFILES[selected_company]
+    st.caption(f"**PV Share:** {prof['market_share']*100:.1f}% | **Chain Dep:** {prof['dependency_ratio']*100:.0f}%")
 
 if headline_text and headline_text.strip():
     signal_result = cached_extract_signal_grounded(headline_text.strip(), engine="fast" if not SLM_AVAILABLE else "slm")
@@ -2105,7 +2154,7 @@ with col_injector:
     if signal_result and signal_result.get("is_disruption"):
         
         with st.container():
-            st.markdown("**🤖 AI-Extracted Parameters**")
+            st.markdown(f"**🤖 AI-Extracted Parameters ({selected_company})**")
             
             col1, col2 = st.columns(2)
             with col1:
@@ -2156,9 +2205,7 @@ with col_injector:
     **Counterfactual Scenarios:** Fixed at 10,000 
     (Monte Carlo statistical standard — not user-adjustable)
     
-    **Override:** Parameters are AI-suggested. If the 
-    extracted values seem wrong for a specific headline, 
-    refine the headline text and re-analyze.
+    **Enterprise Allocation:** Selected OEM market share % and component dependency % scale the UN Comtrade macro baseline.
     """)
         
         # Single action button
@@ -2226,9 +2273,9 @@ if analyze_clicked and signal_result and signal_result.get("is_disruption"):
         probs = cached_simulate_causal_impact(signal_result)
         st.write("Sampling 10,000 Monte Carlo counterfactual scenarios...")
         mc_samples = run_monte_carlo(probs, n_samples=10000)
-        st.write("Computing Procurement Cost-at-Risk (PCaR)...")
-        pcar_metrics = calculate_pcar(mc_samples)
-        status.update(label="✅ Prediction complete (10,000 scenarios)", state="complete", expanded=False)
+        st.write(f"Computing Procurement Cost-at-Risk (PCaR) for {selected_company}...")
+        pcar_metrics = calculate_pcar(mc_samples, company_name=selected_company)
+        status.update(label=f"✅ Prediction complete for {selected_company} (10,000 scenarios)", state="complete", expanded=False)
 
     render_results(signal_result, probs, mc_samples, pcar_metrics)
 
@@ -2388,8 +2435,9 @@ with tab1:
             st.write("Executing 10,000 Monte Carlo runs...")
             mc_samples = run_monte_carlo(probs)
             st.write("Calculating PCaR metrics...")
-            pcar_metrics = calculate_pcar(mc_samples)
-            status.update(label="✅ Analysis & simulation complete", state="complete", expanded=False)
+            target_company = st.session_state.get("selected_oem_company", "Maruti Suzuki")
+            pcar_metrics = calculate_pcar(mc_samples, company_name=target_company)
+            status.update(label=f"✅ Analysis & simulation complete ({target_company})", state="complete", expanded=False)
 
         # Honest Engine Attribution Banner (Priority 1.1)
         if signal.get("engine") == "Qwen2.5-0.5B-Instruct (Local GPU bf16)":
@@ -2540,8 +2588,9 @@ with tab2:
             st.write("Sampling 10,000 counterfactual outcomes...")
             mc_samples = run_monte_carlo(probs)
             st.write("Deriving PCaR financial risk thresholds...")
-            pcar_metrics = calculate_pcar(mc_samples)
-            status.update(label="✅ Scenario simulation complete", state="complete", expanded=False)
+            target_company = st.session_state.get("selected_oem_company", "Maruti Suzuki")
+            pcar_metrics = calculate_pcar(mc_samples, company_name=target_company)
+            status.update(label=f"✅ Scenario simulation complete ({target_company})", state="complete", expanded=False)
 
         render_results(mock_signal, probs, mc_samples, pcar_metrics)
 
