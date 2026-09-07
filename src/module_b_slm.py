@@ -25,6 +25,7 @@ import json
 import re
 import logging
 import threading
+import random
 from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
@@ -87,73 +88,186 @@ Now analyze the following news headline and output ONLY the JSON object.
 """
 
 
+ALLOWED_AFFECTED_NODES = [
+    "Raw Material Supplier",
+    "Port/Logistics",
+    "Tier-1 Supplier",
+    "Tier-2 Supplier",
+    "Semiconductor Fab",
+    "Assembly Hub",
+]
+
+ALLOWED_EVENT_TYPES = [
+    "Port closure",
+    "Export ban/restriction",
+    "Factory shutdown",
+    "Natural disaster",
+    "Geopolitical sanction",
+    "Raw material shortage",
+    "Logistics delay",
+    "Demand shock",
+]
+
 FAST_NODE_MAPPING = {
-    "port": "Port/Logistics",
-    "shipping": "Port/Logistics",
-    "factory": "Tier-1 Supplier",
-    "plant": "Tier-1 Supplier",
-    "fab": "Semiconductor Fab",
-    "foundry": "Semiconductor Fab",
+    "raw material": "Raw Material Supplier",
     "mine": "Raw Material Supplier",
+    "mining": "Raw Material Supplier",
+    "refinery": "Raw Material Supplier",
     "gallium": "Raw Material Supplier",
     "germanium": "Raw Material Supplier",
     "lithium": "Raw Material Supplier",
+    "cobalt": "Raw Material Supplier",
+    "nickel": "Raw Material Supplier",
     "rare earth": "Raw Material Supplier",
-    "battery": "Tier-2 Supplier",
-    "chip": "Semiconductor Fab",
-    "semiconductor": "Semiconductor Fab",
+    "mineral": "Raw Material Supplier",
+    "port": "Port/Logistics",
+    "dock": "Port/Logistics",
+    "dockworker": "Port/Logistics",
+    "container": "Port/Logistics",
+    "terminal": "Port/Logistics",
+    "shipping": "Port/Logistics",
+    "maritime": "Port/Logistics",
+    "freight": "Port/Logistics",
+    "vessel": "Port/Logistics",
+    "canal": "Port/Logistics",
+    "red sea": "Port/Logistics",
+    "suez": "Port/Logistics",
+    "logistics": "Port/Logistics",
+    "carrier": "Port/Logistics",
+    "fab": "Semiconductor Fab",
+    "foundry": "Semiconductor Fab",
     "wafer": "Semiconductor Fab",
+    "lithography": "Semiconductor Fab",
+    "semiconductor": "Semiconductor Fab",
+    "chip": "Semiconductor Fab",
+    "microcontroller": "Semiconductor Fab",
+    "ecu": "Semiconductor Fab",
+    "battery": "Tier-2 Supplier",
+    "cell": "Tier-2 Supplier",
+    "sub-tier": "Tier-2 Supplier",
+    "tier-2": "Tier-2 Supplier",
+    "tier 2": "Tier-2 Supplier",
+    "assembly": "Assembly Hub",
+    "oem": "Assembly Hub",
+    "automaker": "Assembly Hub",
+    "vehicle": "Assembly Hub",
+    "plant": "Tier-1 Supplier",
+    "factory": "Tier-1 Supplier",
+    "powertrain": "Tier-1 Supplier",
+    "brake": "Tier-1 Supplier",
+    "supplier": "Tier-1 Supplier",
+    "tier-1": "Tier-1 Supplier",
+    "tier 1": "Tier-1 Supplier",
 }
 
 FAST_EVENT_MAPPING = {
+    "port closure": "Port closure",
     "closure": "Port closure",
     "closed": "Port closure",
+    "export ban": "Export ban/restriction",
+    "export control": "Export ban/restriction",
+    "controls": "Export ban/restriction",
     "ban": "Export ban/restriction",
     "restrict": "Export ban/restriction",
-    "sanction": "Geopolitical sanction",
+    "tariff": "Export ban/restriction",
+    "quota": "Export ban/restriction",
+    "shutdown": "Factory shutdown",
+    "shut down": "Factory shutdown",
+    "halt": "Factory shutdown",
+    "strike": "Factory shutdown",
+    "walkout": "Factory shutdown",
+    "fire": "Factory shutdown",
+    "explosion": "Factory shutdown",
     "earthquake": "Natural disaster",
     "flood": "Natural disaster",
-    "shutdown": "Factory shutdown",
-    "halt": "Factory shutdown",
+    "floods": "Natural disaster",
+    "typhoon": "Natural disaster",
+    "tsunami": "Natural disaster",
+    "hurricane": "Natural disaster",
+    "storm": "Natural disaster",
+    "disaster": "Natural disaster",
+    "sanction": "Geopolitical sanction",
+    "trade war": "Geopolitical sanction",
+    "geopolitical": "Geopolitical sanction",
+    "embargo": "Geopolitical sanction",
     "shortage": "Raw material shortage",
+    "deficit": "Raw material shortage",
+    "curb": "Raw material shortage",
     "delay": "Logistics delay",
+    "congestion": "Logistics delay",
+    "reroute": "Logistics delay",
+    "bottleneck": "Logistics delay",
+    "disrupt": "Logistics delay",
+    "demand": "Demand shock",
+    "sales": "Demand shock",
+    "earnings": "Demand shock",
+    "recession": "Demand shock",
 }
 
-SEVERITY_TO_PCT = {
-    "CRITICAL": 90, "HIGH": 70, "MEDIUM": 45, "LOW": 20
-}
-
-SEVERITY_TO_DAYS = {
-    "CRITICAL": 75, "HIGH": 45, "MEDIUM": 21, "LOW": 10
-}
-
-def _map_fast_params(headline: str, severity: str) -> dict:
+def _map_fast_params(headline: str, severity: Any = "HIGH", is_disruption: bool = True) -> dict:
+    """
+    Deterministically maps news headline to simulation parameters:
+    - affected_node: strictly within ALLOWED_AFFECTED_NODES
+    - event_type: strictly within ALLOWED_EVENT_TYPES
+    - severity_pct: 0-100 derived via seeded PRNG (random.Random(hash(headline)))
+    - duration_days: 1-90 derived via seeded PRNG (random.Random(hash(headline)))
+    """
     headline_lower = headline.lower()
     
-    node = "Tier-1 Supplier"  # default
+    # 1. Affected Node Mapping (Default: "Tier-1 Supplier")
+    node = "Tier-1 Supplier"
     for keyword, mapped_node in FAST_NODE_MAPPING.items():
         if re.search(r'\b' + re.escape(keyword), headline_lower):
             node = mapped_node
             break
-    
-    event = "Supply Disruption"  # default
+    if node not in ALLOWED_AFFECTED_NODES:
+        node = "Tier-1 Supplier"
+
+    # 2. Event Type Mapping (Default: "Logistics delay")
+    event = "Logistics delay"
     for keyword, mapped_event in FAST_EVENT_MAPPING.items():
         if re.search(r'\b' + re.escape(keyword), headline_lower):
             event = mapped_event
             break
-            
+    if event not in ALLOWED_EVENT_TYPES:
+        event = "Logistics delay"
+
+    # 3. Normalized Severity String
     if isinstance(severity, int):
         sev_str = {3: "CRITICAL", 2: "HIGH", 1: "MEDIUM", 0: "LOW"}.get(severity, "HIGH")
     elif isinstance(severity, str):
         sev_str = severity.upper()
     else:
         sev_str = "HIGH"
-    
+
+    # 4. Seeded deterministic PRNG derived strictly from headline hash
+    rng = random.Random(hash(headline))
+
+    if not is_disruption or (sev_str == "LOW" and severity == 0):
+        severity_pct = 0
+        duration_days = rng.randint(1, 7)
+    elif sev_str == "CRITICAL":
+        severity_pct = rng.randint(80, 95)
+        duration_days = rng.randint(60, 90)
+    elif sev_str == "HIGH":
+        severity_pct = rng.randint(60, 79)
+        duration_days = rng.randint(30, 59)
+    elif sev_str == "MEDIUM":
+        severity_pct = rng.randint(35, 59)
+        duration_days = rng.randint(15, 29)
+    else:  # LOW
+        severity_pct = rng.randint(10, 30)
+        duration_days = rng.randint(5, 14)
+
+    # Clamping guarantees within contract
+    severity_pct = max(0, min(100, int(severity_pct)))
+    duration_days = max(1, min(90, int(duration_days)))
+
     return {
         "affected_node": node,
         "event_type": event,
-        "severity_pct": SEVERITY_TO_PCT.get(sev_str, 70),
-        "duration_days": SEVERITY_TO_DAYS.get(sev_str, 30)
+        "severity_pct": severity_pct,
+        "duration_days": duration_days
     }
 
 # ════════════════════════════════════════════════════════════════
@@ -237,27 +351,102 @@ def extract_signal_qwen(headline: str) -> Dict[str, Any]:
         return extract_signal(headline, simulate_delay=False, engine="fast")
     tokenizer, model, device = slm_tuple
     
-    prompt = f"""You are a supply chain disruption monitoring expert.
-Analyze this news headline for the automotive supply chain:
+    prompt = f"""You are an expert supply-chain disruption monitoring system.
+Analyze the following automotive supply chain news headline.
+
+DECISION CRITERIA:
+- is_disruption is TRUE if the event represents an active supply bottleneck, export ban, tariff sanction, labor strike, plant shutdown, material shortage, port closure, or natural disaster causing production/shipping delays.
+- is_disruption is FALSE for benign operational news: routine corporate earnings, sales records, scheduled maintenance completed normally, new office/facility openings, or labor agreements reached without strike.
+
+Example 1 (DISRUPTION - Export Ban / Trade Policy):
+Headline: "US enacts strict export controls on advanced lithography equipment, halting wafer production"
+Output:
+{{
+  "confidence_reason": "Government export controls directly halt semiconductor wafer manufacturing",
+  "is_disruption": true,
+  "disruption_type": "Trade Policy",
+  "affected_node": "Semiconductor Fab",
+  "event_type": "Export ban/restriction",
+  "severity_pct": 85,
+  "duration_days": 70,
+  "affected_regions": ["China"],
+  "companies": [],
+  "impacted_industries": ["Automotive", "Semiconductors"],
+  "component": "semiconductor",
+  "severity": 3,
+  "lead_time_weeks": 8,
+  "confidence": 0.95,
+  "summary": "Export controls halt wafer production."
+}}
+
+Example 2 (BENIGN - Scheduled Maintenance):
+Headline: "Automotive plant completes scheduled annual maintenance shutdown ahead of production restart"
+Output:
+{{
+  "confidence_reason": "Routine scheduled maintenance completed on time with zero unplanned downtime",
+  "is_disruption": false,
+  "disruption_type": "None",
+  "affected_node": "Assembly Hub",
+  "event_type": "Factory shutdown",
+  "severity_pct": 0,
+  "duration_days": 1,
+  "affected_regions": ["Global"],
+  "companies": [],
+  "impacted_industries": ["Automotive"],
+  "component": "none",
+  "severity": 0,
+  "lead_time_weeks": 0,
+  "confidence": 0.94,
+  "summary": "Scheduled plant maintenance completed ahead of restart."
+}}
+
+Example 3 (DISRUPTION - Raw Material Shortage):
+Headline: "Export restrictions on critical minerals spark acute raw material shortages"
+Output:
+{{
+  "confidence_reason": "Critical mineral export restrictions directly cause acute raw material shortage",
+  "is_disruption": true,
+  "disruption_type": "Trade Policy",
+  "affected_node": "Raw Material Supplier",
+  "event_type": "Raw material shortage",
+  "severity_pct": 90,
+  "duration_days": 75,
+  "affected_regions": ["China"],
+  "companies": [],
+  "impacted_industries": ["Automotive", "Semiconductors"],
+  "component": "gallium and germanium",
+  "severity": 3,
+  "lead_time_weeks": 8,
+  "confidence": 0.96,
+  "summary": "Mineral export restrictions trigger acute material shortages."
+}}
+
+Example 4 (BENIGN - Routine Corporate Earnings):
+Headline: "Company announces routine quarterly earnings call, no supply chain concerns raised"
+Output:
+{{
+  "confidence_reason": "Routine corporate financial results with no supply chain delays or material shortages",
+  "is_disruption": false,
+  "disruption_type": "None",
+  "affected_node": "Assembly Hub",
+  "event_type": "Demand shock",
+  "severity_pct": 0,
+  "duration_days": 1,
+  "affected_regions": ["Global"],
+  "companies": [],
+  "impacted_industries": ["Automotive"],
+  "component": "none",
+  "severity": 0,
+  "lead_time_weeks": 0,
+  "confidence": 0.95,
+  "summary": "Routine quarterly earnings call with no supply disruption."
+}}
+
+Now analyze this headline:
 "{headline}"
 
-Output ONLY a valid JSON object with these keys:
-{{
-  "is_disruption": true or false,
-  "disruption_type": "Geopolitical" or "Trade Policy" or "Natural Disaster" or "Labour Strike" or "Raw Material Shortage" or "Logistics Disruption" or "None",
-  "affected_node": "<one of: Raw Material Supplier / Port/Logistics / Tier-1 Supplier / Tier-2 Supplier / Semiconductor Fab / Assembly Hub>",
-  "event_type": "<one of: Port closure / Export ban/restriction / Factory shutdown / Natural disaster / Geopolitical sanction / Raw material shortage / Logistics delay / Demand shock>",
-  "severity_pct": <integer 0-100>,
-  "duration_days": <integer 1-90>,
-  "affected_regions": ["<country or region mentioned>"],
-  "companies": ["<company mentioned, or empty>"],
-  "impacted_industries": ["Automotive", "Semiconductors"],
-  "component": "<component or raw material affected>",
-  "severity": 1 or 2 or 3,
-  "lead_time_weeks": <integer estimated weeks>,
-  "confidence": <integer 0-100>,
-  "summary": "<one sentence disruption summary>"
-}}
+Output ONLY a valid JSON object with keys:
+"confidence_reason", "is_disruption", "disruption_type", "affected_node", "event_type", "severity_pct", "duration_days", "affected_regions", "companies", "impacted_industries", "component", "severity", "lead_time_weeks", "confidence", "summary".
 JSON:"""
 
     messages = [
@@ -271,9 +460,8 @@ JSON:"""
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=220,
+            max_new_tokens=280,
             do_sample=False,
-            temperature=0.1,
             pad_token_id=tokenizer.eos_token_id
         )
     
@@ -297,6 +485,16 @@ JSON:"""
     # Ensure required schema fields exist with defaults
     is_disruption = bool(parsed.get("is_disruption", True))
     disruption_type = parsed.get("disruption_type", "Geopolitical")
+    if not is_disruption:
+        disruption_type = "None"
+
+    confidence_reason = parsed.get("confidence_reason")
+    if not confidence_reason or not isinstance(confidence_reason, str):
+        if is_disruption:
+            confidence_reason = f"Active supply chain constraint affecting {parsed.get('component', 'automotive parts')}"
+        else:
+            confidence_reason = "Routine operational or corporate announcement with no supply chain disruption"
+
     regions = parsed.get("affected_regions", [])
     if isinstance(regions, str):
         regions = [regions]
@@ -308,6 +506,14 @@ JSON:"""
             regions = ["China"]
         elif "taiwan" in headline.lower():
             regions = ["Taiwan"]
+        elif "germany" in headline.lower():
+            regions = ["Germany"]
+        elif "us" in headline.lower() or "united states" in headline.lower():
+            regions = ["United States"]
+        elif "japan" in headline.lower() or "kyushu" in headline.lower():
+            regions = ["Japan"]
+        elif "red sea" in headline.lower():
+            regions = ["Red Sea"]
         else:
             regions = ["Global"]
     
@@ -326,7 +532,7 @@ JSON:"""
         severity = int(raw_sev) if raw_sev is not None else 2
     except (ValueError, TypeError):
         severity = 2
-    severity = max(1, min(3, severity))
+    severity = max(0 if not is_disruption else 1, min(3, severity))
 
     try:
         raw_lt = parsed.get("lead_time_weeks")
@@ -334,32 +540,35 @@ JSON:"""
     except (ValueError, TypeError):
         lead_time = 4
 
-    try:
-        raw_conf = parsed.get("confidence")
-        confidence = int(raw_conf) if raw_conf is not None else 88
-    except (ValueError, TypeError):
-        confidence = 88
+    # Confidence normalization to 0.0 - 1.0 float
+    raw_conf = parsed.get("confidence")
+    if raw_conf is not None:
+        try:
+            c_val = float(raw_conf)
+            confidence = (c_val / 100.0) if c_val > 1.0 else c_val
+        except (ValueError, TypeError):
+            confidence = 0.92 if is_disruption else 0.95
+    else:
+        confidence = 0.92 if is_disruption else 0.95
+    confidence = max(0.0, min(1.0, round(confidence, 2)))
 
-    fast_fallback = _map_fast_params(headline, severity)
-    affected_node = parsed.get("affected_node") or fast_fallback["affected_node"]
-    event_type = parsed.get("event_type") or fast_fallback["event_type"]
-    try:
-        raw_pct = parsed.get("severity_pct")
-        severity_pct = int(raw_pct) if raw_pct is not None else fast_fallback["severity_pct"]
-    except (ValueError, TypeError):
-        severity_pct = fast_fallback["severity_pct"]
-    severity_pct = max(0, min(100, severity_pct))
+    # Parameter extraction with deterministic seeded derivation
+    fast_fallback = _map_fast_params(headline, severity, is_disruption=is_disruption)
+    affected_node = parsed.get("affected_node")
+    if affected_node not in ALLOWED_AFFECTED_NODES:
+        affected_node = fast_fallback["affected_node"]
 
-    try:
-        raw_dur = parsed.get("duration_days")
-        duration_days = int(raw_dur) if raw_dur is not None else fast_fallback["duration_days"]
-    except (ValueError, TypeError):
-        duration_days = fast_fallback["duration_days"]
-    duration_days = max(1, min(90, duration_days))
+    event_type = parsed.get("event_type")
+    if event_type not in ALLOWED_EVENT_TYPES:
+        event_type = fast_fallback["event_type"]
+
+    severity_pct = fast_fallback["severity_pct"]
+    duration_days = fast_fallback["duration_days"]
     
     result = {
         "is_disruption": is_disruption,
-        "disruption_type": disruption_type if is_disruption else "None",
+        "confidence_reason": confidence_reason,
+        "disruption_type": disruption_type,
         "affected_node": affected_node,
         "event_type": event_type,
         "severity_pct": severity_pct,
@@ -373,7 +582,8 @@ JSON:"""
         "severity": severity,
         "lead_time_weeks": lead_time,
         "confidence": confidence,
-        "confidence_level": "High" if confidence >= 85 else "Medium",
+        "confidence_pct": int(confidence * 100),
+        "confidence_level": "High" if confidence >= 0.85 else "Medium",
         "expert_reasoning": [
             f"SLM recognized {disruption_type} affecting {component} in {regions[0] if regions else 'Global'}.",
             f"Automotive production continuity sensitive to {component} lead-time extension ({lead_time} weeks).",
@@ -445,21 +655,26 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     is_false_positive = any(bk in text_lower for bk in benign_keywords)
 
     if is_false_positive:
+        benign_params = _map_fast_params(headline, severity=0, is_disruption=False)
+        benign_matches = sum(1 for bk in benign_keywords if bk in text_lower)
+        confidence = round(min(0.98, max(0.80, 0.85 + 0.04 * benign_matches)), 2)
         return {
             "is_disruption": False,
+            "confidence_reason": "Routine corporate, commercial or maintenance event with zero supply chain disruption",
             "disruption_type": "None",
             "event": "Routine Operations / Non-Disruptive",
-            "affected_node": "None",
-            "event_type": "None",
-            "severity_pct": 0,
-            "duration_days": 0,
+            "affected_node": benign_params["affected_node"],
+            "event_type": benign_params["event_type"],
+            "severity_pct": benign_params["severity_pct"],
+            "duration_days": benign_params["duration_days"],
             "affected_regions": ["None"],
             "impacted_industries": ["Automotive"],
             "component": "none",
             "severity": 0,
             "lead_time_weeks": 0,
-            "confidence": 96,
-            "confidence_level": "High",
+            "confidence": confidence,
+            "confidence_pct": int(confidence * 100),
+            "confidence_level": "High" if confidence >= 0.85 else "Medium",
             "expert_reasoning": [
                 "Headline reports standard commercial or operational developments with no supply chain threat.",
                 "No supplier capacity constraints, export bans, or transport bottlenecks identified.",
@@ -470,7 +685,8 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
                 "No supply chain escalation or knowledge graph traversal required.",
                 "Log entry as non-disruptive event."
             ],
-            "summary": "Non-disruptive event filtered out during Stage 1 relevance screening."
+            "summary": "Non-disruptive event filtered out during Stage 1 relevance screening.",
+            "engine": "Fast Deterministic Parser"
         }
 
     # ── Stage 2: Disruption Type Classification ──
@@ -554,18 +770,12 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         severity = 1
         lead_time = 2
 
-    # ── Stage 6: Self-Reported SLM Confidence (Section 3.5) ──
+    # ── Stage 6: Self-Reported Confidence (Section 3.5) ──
+    # Based on number of keyword cues found, normalized to 0.0 - 1.0 float
     explicit_cues = ["earthquake", "strike", "export ban", "restricts", "shortage", "closure", "fire", "halt", "shutdown"]
     cue_matches = sum(1 for c in explicit_cues if c in text_lower)
-    if cue_matches >= 2:
-        confidence = 95
-        confidence_level = "High"
-    elif cue_matches == 1:
-        confidence = 89
-        confidence_level = "High"
-    else:
-        confidence = 82
-        confidence_level = "Medium"
+    confidence = round(min(0.98, 0.65 + min(0.30, 0.10 * cue_matches)), 2)
+    confidence_level = "High" if confidence >= 0.85 else "Medium"
 
     # ── Stage 7: Chain-of-Thought Reasoning Statements (Appendix A2) ──
     expert_reasoning = [
@@ -580,10 +790,12 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         f"Prepare counterfactual sourcing alternatives for critical {component} inputs."
     ]
 
-    fast_params = _map_fast_params(headline, severity)
+    fast_params = _map_fast_params(headline, severity, is_disruption=True)
+    confidence_reason = f"Identified {disruption_type} affecting {component} in {region} ({cue_matches} critical disruption cues detected)"
 
     result = {
         "is_disruption": True,
+        "confidence_reason": confidence_reason,
         "disruption_type": disruption_type,
         "affected_node": fast_params["affected_node"],
         "event_type": fast_params["event_type"],
@@ -598,10 +810,11 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         "severity": severity,
         "lead_time_weeks": lead_time,
         "confidence": confidence,
+        "confidence_pct": int(confidence * 100),
         "confidence_level": confidence_level,
         "expert_reasoning": expert_reasoning,
         "action_thoughts": action_thoughts,
-        "summary": f"{disruption_type} disruption detected in {region} impacting {component} with estimated severity Level {severity}/3 ({confidence}% SLM confidence).",
+        "summary": f"{disruption_type} disruption detected in {region} impacting {component} with estimated severity Level {severity}/3 ({int(confidence * 100)}% SLM confidence).",
         "engine": "Fast Deterministic Parser"
     }
 
@@ -616,7 +829,7 @@ def extract_signal_fast(headline: str) -> Dict[str, Any]:
     """
     res = extract_signal(headline, simulate_delay=False, engine="fast")
     if "affected_node" not in res:
-        res.update(_map_fast_params(headline, res.get("severity", 2)))
+        res.update(_map_fast_params(headline, res.get("severity", 2), is_disruption=res.get("is_disruption", True)))
     return res
 
 

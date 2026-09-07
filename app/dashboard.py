@@ -1830,8 +1830,9 @@ def render_results(signal, probs, mc_samples, pcar_metrics):
     is_critical = (severity >= 3)
     sev_card_class = "critical" if is_critical else ""
 
-    confidence = signal.get("confidence", 92)
-    confidence_level = signal.get("confidence_level", "High")
+    raw_conf = signal.get("confidence", 0.92)
+    confidence = int(raw_conf * 100) if raw_conf <= 1.0 else int(raw_conf)
+    confidence_level = signal.get("confidence_level", "High" if confidence >= 85 else "Medium")
     conf_badge_class = "status-badge-optimal" if confidence >= 85 else "status-badge-warning"
 
     comp_title = signal.get("component", "Unknown").title().replace(" And ", " and ").replace(" Of ", " of ")
