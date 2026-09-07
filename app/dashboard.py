@@ -754,11 +754,62 @@ div[data-testid="stHorizontalBlock"] { gap: 20px !important; }
 .reveal-step-3 {
     animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
+
+/* ── Basic Responsive Breakpoints (Issue 4) ── */
+@media (max-width: 900px) {
+    .hero-section {
+        flex-direction: column !important;
+        gap: 20px !important;
+        margin-bottom: 24px !important;
+    }
+    .hero-left {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    .hero-right {
+        width: 100% !important;
+    }
+    .nav-bar {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+    .nav-tabs {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+    .nav-tab {
+        padding: 6px 10px !important;
+        font-size: 0.78rem !important;
+    }
+    .nav-user {
+        display: none !important;
+    }
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+}
+
+/* ── Respect Prefers-Reduced-Motion (Issue 3) ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .reveal-step-1, .reveal-step-2, .reveal-step-3 {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════════
-# CUSTOM NAV BAR
+# CUSTOM NAV BAR (Issue 2 Functional Anchors)
 # ════════════════════════════════════════════════════════════════
 st.markdown("""
 <div class="nav-bar">
@@ -767,17 +818,40 @@ st.markdown("""
         <span>Disruption Simulation</span>
         <span class="nav-subtitle">Counterfactual Supply Chain Risk Analysis</span>
     </div>
-    <div class="nav-tabs">
-        <span class="nav-tab active">⊛ Graph</span>
-        <span class="nav-tab">◈ Knowledge</span>
-        <span class="nav-tab">◎ Predict</span>
-        <span class="nav-tab">⌘ Console</span>
-        <span class="nav-tab">⚡ FlowGPT</span>
+    <div class="nav-tabs" id="custom-nav-tabs">
+        <a href="#analysis-modes-section" class="nav-tab active" onclick="selectDashboardTab(0); return false;">📰 Live GDELT</a>
+        <a href="#analysis-modes-section" class="nav-tab" onclick="selectDashboardTab(1); return false;">🎯 Scenarios</a>
+        <a href="#analysis-modes-section" class="nav-tab" onclick="selectDashboardTab(2); return false;">📈 SIAM 2021</a>
+        <a href="#analysis-modes-section" class="nav-tab" onclick="selectDashboardTab(3); return false;">🔬 Table 5</a>
+        <a href="#analysis-modes-section" class="nav-tab" onclick="selectDashboardTab(4); return false;">🛡️ Governance</a>
     </div>
     <div class="nav-user">
-        👤 Guest
+        👤 Institutional Auditor
     </div>
 </div>
+
+<script>
+function selectDashboardTab(tabIndex) {
+    try {
+        const doc = window.parent.document || document;
+        const tabs = doc.querySelectorAll('.stTabs [data-baseweb="tab"]');
+        if (tabs && tabs[tabIndex]) {
+            tabs[tabIndex].click();
+        }
+        const target = doc.getElementById('analysis-modes-section');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+        const navTabs = document.querySelectorAll('#custom-nav-tabs .nav-tab');
+        navTabs.forEach((nt, idx) => {
+            if (idx === tabIndex) nt.classList.add('active');
+            else nt.classList.remove('active');
+        });
+    } catch (e) {
+        console.warn('Tab navigation error:', e);
+    }
+}
+</script>
 """, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════════
@@ -1206,6 +1280,21 @@ body {{ background: #ffffff; overflow: hidden; }}
     height: 6px;
     border-radius: 50%;
     background: #10b981;
+}}
+
+/* ── Respect Prefers-Reduced-Motion (Issue 3) ── */
+@media (prefers-reduced-motion: reduce) {{
+    *, *::before, *::after {{
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }}
+    .sim-pulse-dot {{
+        animation: none !important;
+    }}
+    .flow-particle, animateMotion, animate {{
+        display: none !important;
+    }}
 }}
 </style>
 </head>
@@ -2130,7 +2219,6 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
             st.warning(f"⚠️ Integrity Warning: PCaR Output (₹{format_inr(actual_mean_loss)}) outside expected bounds for a {mean_drop_frac:.1%} drop!")
 
     st.caption(f"ℹ️ **Sourced Baseline**: Calibrated against UN Comtrade HS 8542 Electronic Integrated Circuits Indian import turnover (₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Crore, 2022 full calendar year · 🟡 Cached Fallback). Source citation: UN Comtrade Database, Reporter: India, Flow: Imports.")
-    st.caption("ℹ️ **Data Scope Lock**: Analysis is strictly restricted to Gallium/Germanium (HS 8112) → Semiconductor/ICs (HS 8542) → Indian Automotive ECU → OEM vehicle production. Generic / non-chain components are deliberately excluded.")
 
 
 # ── Compact Scope & Sourced Baseline Metadata Bar ──
@@ -2162,6 +2250,7 @@ st.caption("Source: UN Comtrade 2022 · 🟡 Cached Fallback (HS 8542 Full Year 
 # ════════════════════════════════════════════════════════════════
 # MAIN LAYOUT — Auto-Prediction Engine + Causal Graph
 # ════════════════════════════════════════════════════════════════
+st.markdown('<div id="main-analyze-top"></div>', unsafe_allow_html=True)
 
 # ── Headline Ingestion & Target Enterprise Selector ──
 col_in1, col_in2 = st.columns([2.7, 1.3])
@@ -2169,14 +2258,17 @@ col_in1, col_in2 = st.columns([2.7, 1.3])
 with col_in1:
     if "selected_headline" not in st.session_state:
         st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+    if "main_headline_input" not in st.session_state:
+        st.session_state["main_headline_input"] = st.session_state["selected_headline"]
 
     headline_text = st.text_area(
         "📰 Ingest Disruption Headline / Signal:",
-        value=st.session_state["selected_headline"],
+        value=st.session_state.get("selected_headline", ""),
         height=75,
         key="main_headline_input",
         help="AI automatically extracts disruption parameters from this headline."
     )
+    st.session_state["selected_headline"] = headline_text
 
 with col_in2:
     curr_sel = st.session_state.get("selected_oem_company", "Maruti Suzuki")
@@ -2194,8 +2286,12 @@ with col_in2:
         prof = OEM_PROFILES.get(selected_company, OEM_PROFILES["Maruti Suzuki"])
         st.caption(f"**PV Share:** {prof['market_share']*100:.1f}% | **Chain Dep:** {prof['dependency_ratio']*100:.0f}%")
 
+if "extraction_engine" not in st.session_state:
+    st.session_state["extraction_engine"] = "slm" if SLM_AVAILABLE else "fast"
+
+active_engine = st.session_state.get("extraction_engine", "slm" if SLM_AVAILABLE else "fast")
 if headline_text and headline_text.strip():
-    signal_result = cached_extract_signal_grounded(headline_text.strip(), engine="fast" if not SLM_AVAILABLE else "slm")
+    signal_result = cached_extract_signal_grounded(headline_text.strip(), engine=active_engine)
     st.session_state["auto_params_extracted"] = True
     st.session_state["last_signal_result"] = signal_result
 else:
@@ -2252,7 +2348,7 @@ with col_injector:
         with st.expander("🔍 How did AI extract these parameters?"):
             st.markdown("""
     **Extraction Method:** """ + 
-    ("Local SLM (Qwen2.5-0.5B)" if SLM_AVAILABLE else 
+    ("Local SLM (Qwen2.5-0.5B)" if (SLM_AVAILABLE and active_engine == "slm") else 
      "Fast Deterministic Parser") + """
     
     **Node Detection:** Keyword-to-node mapping against 
@@ -2348,7 +2444,7 @@ if analyze_clicked and signal_result and signal_result.get("is_disruption"):
 # ════════════════════════════════════════════════════════════════
 st.markdown("---")
 st.markdown("""
-<div class="section-header">
+<div class="section-header" id="analysis-modes-section">
     <h3>🔬 Analysis Modes</h3>
     <span class="section-badge">Live GDELT · Scenario · SIAM Backtest · Table 5 · Governance</span>
 </div>
@@ -2459,107 +2555,89 @@ with tab1:
                 with col_btn:
                     if st.button("Use Headline", key=f"btn_pick_{idx}", use_container_width=True):
                         st.session_state["selected_headline"] = art["title"]
+                        st.session_state["main_headline_input"] = art["title"]
+                        st.toast("✅ Headline ingested! Click '⚡ Analyze' in the top section to run simulation.", icon="⚡")
                         st.rerun()
                 st.markdown("<hr style='margin: 6px 0; border: none; border-top: 1px solid #f1f5f9;'>", unsafe_allow_html=True)
 
+    # Ingested Headline Banner (Single Source of Truth reference)
+    curr_head = st.session_state.get("selected_headline", "")
+    st.markdown(f"""
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb; border-radius: 8px; padding: 12px 16px; margin: 14px 0 12px 0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#1e40af;">📌 Active Ingested Headline (Top Input)</span>
+            <a href="#main-analyze-top" onclick="try {{ (window.parent.document || document).getElementById('main-analyze-top')?.scrollIntoView({{ behavior: 'smooth' }}); }} catch(e) {{}} return true;" style="display:inline-flex; align-items:center; gap:4px; background:#2563eb; color:#ffffff; padding:4px 12px; border-radius:4px; font-size:0.78rem; font-weight:600; text-decoration:none;">
+                ⬆ Jump to Top & Analyze
+            </a>
+        </div>
+        <div style="font-size:0.92rem; font-weight:600; color:#1e293b; margin:6px 0 4px 0;">
+            "{curr_head}"
+        </div>
+        <span style="font-size:0.75rem; color:#64748b;">Tab 1 is a read-only companion view. Trigger simulation runs exclusively via the primary <strong>⚡ Analyze</strong> button at the top.</span>
+    </div>
+    """, unsafe_allow_html=True)
+
     # Signal Extraction Engine Toggle (Priority 1.1)
-    col_eng, col_eng_desc = st.columns([1.5, 1])
+    col_eng, col_eng_desc = st.columns([1.6, 1])
     with col_eng:
-        if SLM_AVAILABLE:
-            extraction_engine_choice = st.radio(
-                "🧠 Signal Extraction Engine (Priority 1.1):",
-                [
-                    "⚡ Local SLM (Qwen2.5-0.5B-Instruct on RTX 3050 Ti GPU)",
-                    "🚀 Fast Mode (Deterministic Rule-Based Parser)"
-                ],
-                index=0,
-                horizontal=True,
-                help="Toggle between actual local neural language model inference (GPU bf16, ~3.5s) and fast deterministic keyword parser (<10ms)."
-            )
-            engine_choice = "slm" if "Qwen2.5" in extraction_engine_choice else "fast"
+        current_engine = st.session_state.get("extraction_engine", "slm" if SLM_AVAILABLE else "fast")
+        engine_options = [
+            "⚡ Local SLM (Qwen2.5-0.5B-Instruct on RTX 3050 Ti GPU)" if SLM_AVAILABLE else "⚡ Local SLM (Disabled — no GPU detected)",
+            "🚀 Fast Mode (Deterministic Rule-Based Parser)"
+        ]
+        current_idx = 0 if (SLM_AVAILABLE and current_engine == "slm") else 1
+
+        selected_engine_label = st.radio(
+            "🧠 Signal Extraction Engine (Priority 1.1):",
+            engine_options,
+            index=current_idx,
+            horizontal=True,
+            disabled=not SLM_AVAILABLE,
+            help="Toggle between actual local neural language model inference (GPU bf16, ~3.5s) and fast deterministic keyword parser (<10ms). Controls the top Auto-Prediction Engine extraction."
+        )
+        new_engine = "slm" if (SLM_AVAILABLE and "Qwen2.5" in selected_engine_label) else "fast"
+        if new_engine != st.session_state.get("extraction_engine"):
+            st.session_state["extraction_engine"] = new_engine
+            st.rerun()
+
+    with col_eng_desc:
+        if not SLM_AVAILABLE:
+            st.caption("ℹ️ *SLM unavailable — no GPU detected. Fast Mode is active.*")
         else:
-            extraction_engine_choice = st.radio(
-                "🧠 Signal Extraction Engine (Priority 1.1):",
-                [
-                    "⚡ Local SLM (Disabled — no GPU detected)",
-                    "🚀 Fast Mode (Deterministic Rule-Based Parser)"
-                ],
-                index=1,
-                horizontal=True,
-                disabled=True,
-                help="SLM unavailable — no GPU detected. Fast Mode is active."
-            )
-            st.caption("ℹ️ *SLM unavailable — no GPU detected.*")
-            engine_choice = "fast"
+            st.caption("ℹ️ Toggling engines updates parameter extraction for the top Auto-Prediction Engine.")
 
-    # Headline Input & Fallback
-    headline_input = st.text_area(
-        "Headline to Analyze (Live GDELT Selection or Custom Manual Input):",
-        value=st.session_state["selected_headline"],
-        height=80,
-        help="You can freely edit or type any headline manually as a fallback."
-    )
-
-    btn_label = "▶ Analyze Headline with Local SLM (GPU)" if engine_choice == "slm" else "▶ Analyze Headline with Fast Parser"
-    if st.button(btn_label, key="btn_mode1", type="primary"):
-        status_msg = "Extracting parameters with genuine Local SLM (Qwen2.5-0.5B on RTX 3050 Ti GPU)..." if engine_choice == "slm" else "Extracting parameters with Fast Deterministic Parser..."
-        with st.status("⚡ Running extraction & causal simulation...", expanded=False) as status:
-            st.write(status_msg)
-            st.write("Grounding entities against static knowledge graph (GraphRAG)...")
-            if SLM_AVAILABLE:
-                signal = cached_extract_signal_grounded(headline_input, engine=engine_choice)
-            else:
-                from src.module_b_slm import extract_signal_fast
-                result = extract_signal_fast(headline_input)
-                from src.grounding_graph import ground_entities
-                grounding = ground_entities(result)
-                signal = {"signal": result, "grounding": grounding, **result}
-                st.info(
-                    "⚡ Running in Fast Mode — Local GPU/SLM unavailable in this "
-                    "environment. Results use deterministic rule-based extraction."
-                )
-            st.write("Computing output state probabilities (Monte Carlo)...")
-            probs = cached_simulate_causal_impact(signal)
-            st.write("Executing 10,000 Monte Carlo runs...")
-            mc_samples = run_monte_carlo(probs)
-            st.write("Calculating PCaR metrics...")
-            target_company = st.session_state.get("selected_oem_company", "Maruti Suzuki")
-            pcar_metrics = compute_pcar_for_selection(mc_samples, target_company)
-            status.update(label=f"✅ Analysis & simulation complete ({target_company})", state="complete", expanded=False)
-
-        # Honest Engine Attribution Banner (Priority 1.1)
-        if signal.get("engine") == "Qwen2.5-0.5B-Instruct (Local GPU bf16)":
-            st.markdown("""
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 10px 14px; margin: 12px 0;">
-                <span style="font-weight: 700; color: #15803d; font-size: 0.85rem;">🤖 ACTIVE INFERENCE ENGINE: Qwen2.5-0.5B-Instruct (Genuine Neural SLM)</span>
-                <div style="font-size: 0.78rem; color: #166534; margin-top: 2px;">
-                    Inference executed locally on <strong>NVIDIA GeForce RTX 3050 Ti Laptop GPU</strong> in <code>torch.bfloat16</code> (~950 MiB VRAM allocated, latency ~3.8s). Zero cloud API dependency.
-                </div>
+    # Honest Engine Attribution Banner (Priority 1.1)
+    active_eng = st.session_state.get("extraction_engine", "slm" if SLM_AVAILABLE else "fast")
+    if SLM_AVAILABLE and active_eng == "slm":
+        st.markdown("""
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 10px 14px; margin: 10px 0;">
+            <span style="font-weight: 700; color: #15803d; font-size: 0.85rem;">🤖 ACTIVE INFERENCE ENGINE: Qwen2.5-0.5B-Instruct (Genuine Neural SLM)</span>
+            <div style="font-size: 0.78rem; color: #166534; margin-top: 2px;">
+                Inference executed locally on <strong>NVIDIA GeForce RTX 3050 Ti Laptop GPU</strong> in <code>torch.bfloat16</code> (~950 MiB VRAM allocated, latency ~3.8s). Zero cloud API dependency.
             </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 6px; padding: 10px 14px; margin: 12px 0;">
-                <span style="font-weight: 700; color: #1e40af; font-size: 0.85rem;">⚡ ACTIVE INFERENCE ENGINE: Fast Deterministic Heuristic Parser</span>
-                <div style="font-size: 0.78rem; color: #1e3a8a; margin-top: 2px;">
-                    Rule-based pattern extraction mode (&lt;10ms latency). Neural SLM bypassed.
-                </div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 6px; padding: 10px 14px; margin: 10px 0;">
+            <span style="font-weight: 700; color: #1e40af; font-size: 0.85rem;">⚡ ACTIVE INFERENCE ENGINE: Fast Deterministic Heuristic Parser</span>
+            <div style="font-size: 0.78rem; color: #1e3a8a; margin-top: 2px;">
+                Rule-based pattern extraction mode (&lt;10ms latency). Neural SLM bypassed.
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
-        # ── GraphRAG Entity Grounding Visualization (Task 3) ──
-        # Shows per-entity verification status: green "Graph-Verified" or grey "Unverified"
-        # Demonstrates retrieval-augmented grounding per AlMahri et al. (2026), Section 1
-        grounding_data = signal.get("grounding", {})
+    # ── GraphRAG Entity Grounding Visualization (Task 3) ──
+    signal_for_grounding = st.session_state.get("last_signal_result")
+    if signal_for_grounding:
+        grounding_data = signal_for_grounding.get("grounding", {})
         grounding_results = grounding_data.get("grounding_results", [])
         relationship_checks = grounding_data.get("relationship_checks", [])
         g_summary = grounding_data.get("summary", {})
 
-        with st.expander("🔗 Entity Grounding — GraphRAG Verification Layer", expanded=True):
-            # Summary bar
+        with st.expander("🔗 Entity Grounding — GraphRAG Verification Layer (Current Headline)", expanded=True):
             verified_ct = g_summary.get("verified_count", 0)
             total_ct = g_summary.get("total_entities", 0)
-            unverified_ct = g_summary.get("unverified_count", 0)
             v_rate = g_summary.get("verification_rate", 0)
             bar_class = "grounding-summary-bar" if v_rate >= 75 else "grounding-summary-bar partial"
 
@@ -2587,7 +2665,6 @@ with tab1:
                 entity_name = ent.get("canonical_name") or ent.get("entity_text", "Unknown")
                 entity_type = ent.get("entity_type", "")
 
-                # Build attribute string for verified entities
                 attr_html = ""
                 if is_verified:
                     attrs = ent.get("graph_attributes", {})
@@ -2634,8 +2711,8 @@ with tab1:
                     """, unsafe_allow_html=True)
 
             st.caption("*Grounding is deterministic (graph.has_node / graph.has_edge lookups) — zero additional LLM calls. Unverified entities are NOT blocked; they proceed through the pipeline flagged for human review.*")
-
-        render_results(signal, probs, mc_samples, pcar_metrics)
+    else:
+        st.info("Ingest a headline at the top to view its GraphRAG entity grounding.")
 
 # ── TAB 2: Predefined Scenarios ──
 with tab2:
