@@ -11,10 +11,12 @@ Provides:
 
 import json
 import logging
+import time
 import urllib.request
 import urllib.parse
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +72,9 @@ COMTRADE_BASELINE_PATH = Path(__file__).resolve().parent.parent / "data" / "proc
 DEFAULT_COMTRADE_DATA = {
     "metadata": {
         "source": "UN Comtrade API (v1 preview)",
+        "citation": "UN Comtrade Database (Reporter: India, Flow: Imports, Commodities: HS 8542 & HS 8112, Period: 2022 Full Year)",
+        "data_vintage": "2022 Full Year (UN Comtrade Latest Complete Annual Release)",
+        "stale_warning": "UN Comtrade public trade data is annual and lagged by 3-12 months. Baseline reflects complete 2022 calendar year.",
         "reporter": "India (699)",
         "flow": "Imports (M)",
         "commodities": {
@@ -122,14 +127,73 @@ SOURCED_HS8542_BASELINE_CRORE = 133814.34  # ₹1,33,814.34 Crore (~$16.12 Billi
 SOURCED_HS8112_BASELINE_CRORE = 552.84     # ₹552.84 Crore (~$66.61 Million USD)
 
 
+class SourcedBaselineCrore(float):
+    """
+    Numeric float representation of baseline in Crore INR, enriched with
+    provenance citation metadata and data_vintage attributes/dict access.
+    Behaves as a float for all mathematical operations (100% backwards-compatible),
+    while also supporting dict-like access: result['citation'], result['data_vintage'], etc.
+    """
+    def __new__(cls, value, metadata: Optional[dict] = None):
+        instance = super().__new__(cls, value)
+        instance._metadata = metadata or {}
+        return instance
+
+    def __getitem__(self, item):
+        return self._metadata[item]
+
+    def get(self, item, default=None):
+        return self._metadata.get(item, default)
+
+    def keys(self):
+        return self._metadata.keys()
+
+    def values(self):
+        return self._metadata.values()
+
+    def items(self):
+        return self._metadata.items()
+
+    def __contains__(self, item):
+        return item in self._metadata
+
+    @property
+    def citation(self) -> str:
+        return self._metadata.get("citation", "")
+
+    @property
+    def data_vintage(self) -> str:
+        return self._metadata.get("data_vintage", "")
+
+    @property
+    def inr_crore(self) -> float:
+        return float(self)
+
+    @property
+    def baseline_crore(self) -> float:
+        return float(self)
+
+    @property
+    def stale_warning(self) -> str:
+        return self._metadata.get("stale_warning", "")
+
+    def to_dict(self) -> dict:
+        return dict(self._metadata)
+
+
 def load_comtrade_data() -> Dict[str, Any]:
     """Loads the stored UN Comtrade data, falling back to cached baseline if necessary."""
+    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
     if COMTRADE_BASELINE_PATH.exists():
         try:
             with open(COMTRADE_BASELINE_PATH, "r", encoding="utf-8") as f:
                 disk_data = json.load(f)
                 # Merge with metadata & status indicators
                 merged = dict(DEFAULT_COMTRADE_DATA)
+                merged["data_vintage"] = "2022 Full Year (UN Comtrade Latest Complete Annual Release)"
+                merged["citation"] = "UN Comtrade Database (Reporter: India, Flow: Imports, Commodities: HS 8542 & HS 8112, Period: 2022 Full Year)"
+                merged["stale_warning"] = "UN Comtrade public trade data is annual and lagged by 3-12 months. Baseline reflects complete 2022 calendar year."
+                merged["loaded_at_utc"] = now_utc
                 if "yearly_totals" in disk_data:
                     for hs, years in disk_data["yearly_totals"].items():
                         if hs not in merged["yearly_totals"]:
@@ -138,6 +202,7 @@ def load_comtrade_data() -> Dict[str, Any]:
                             if isinstance(val, dict) and "inr_crore" in val:
                                 status = "Complete" if (val.get("usd_value", 0) or 0) > 1e8 else "Partial (UN Comtrade public tier incomplete)"
                                 merged["yearly_totals"][hs][y] = {
+                                    "data_vintage": f"{y} Annual Baseline",
                                     "usd_value": val.get("usd_value"),
                                     "inr_crore": val.get("inr_crore"),
                                     "status": status,
@@ -146,17 +211,49 @@ def load_comtrade_data() -> Dict[str, Any]:
                 return merged
         except Exception as e:
             logger.warning(f"Failed to read Comtrade file {COMTRADE_BASELINE_PATH}: {e}")
-    return DEFAULT_COMTRADE_DATA
+    res = dict(DEFAULT_COMTRADE_DATA)
+    res["data_vintage"] = "2022 Full Year (UN Comtrade In-Memory Audited Baseline)"
+    res["citation"] = "UN Comtrade Database (Reporter: India, Flow: Imports, Commodities: HS 8542 & HS 8112, Period: 2022 Full Year)"
+    res["stale_warning"] = "UN Comtrade public trade data is annual and lagged by 3-12 months. Baseline reflects complete 2022 calendar year."
+    res["loaded_at_utc"] = now_utc
+    return res
 
 
-def get_sourced_baseline_crore(hs_code: str = "8542", year: str = "2022") -> float:
-    """Returns the real UN Comtrade baseline for the given HS code and year."""
+def get_sourced_baseline_crore(hs_code: str = "8542", year: str = "2022") -> SourcedBaselineCrore:
+    """
+    Returns the real UN Comtrade baseline for the given HS code and year,
+    enriched with provenance citation metadata and data_vintage attributes.
+    
+    Returns:
+        SourcedBaselineCrore: A float that also supports dict-like access:
+        - result['citation'] / result.citation
+        - result['data_vintage'] / result.data_vintage
+        - result['inr_crore'] / result.inr_crore
+        - result['baseline_crore'] / result.baseline_crore
+        - result['stale_warning'] / result.stale_warning
+    """
     data = load_comtrade_data()
     yearly = data.get("yearly_totals", {}).get(hs_code, {})
     val = yearly.get(year, {}).get("inr_crore")
-    if val and val > 0:
-        return float(val)
-    return SOURCED_HS8542_BASELINE_CRORE if hs_code == "8542" else SOURCED_HS8112_BASELINE_CRORE
+    num_val = float(val) if val and val > 0 else (
+        SOURCED_HS8542_BASELINE_CRORE if hs_code == "8542" else SOURCED_HS8112_BASELINE_CRORE
+    )
+    commodity_name = (
+        "Electronic integrated circuits (Semiconductors)" if hs_code == "8542"
+        else "Gallium, germanium, and other critical minor metals"
+    )
+    meta = {
+        "baseline_crore": num_val,
+        "inr_crore": num_val,
+        "hs_code": hs_code,
+        "commodity": commodity_name,
+        "year": year,
+        "data_vintage": f"{year} Full Year (UN Comtrade Latest Complete Annual Release)",
+        "citation": f"UN Comtrade Database (Reporter: India, Flow: Imports, HS {hs_code}: {commodity_name}, Period: {year})",
+        "access_date": "2026-09-05",
+        "stale_warning": "UN Comtrade public trade data is annual and lagged by 3-12 months. Baseline reflects complete 2022 calendar year."
+    }
+    return SourcedBaselineCrore(num_val, meta)
 
 
 # ════════════════════════════════════════════════════════════════
@@ -213,18 +310,24 @@ CACHED_GDELT_HEADLINES = [
 ]
 
 
-def fetch_live_gdelt_headlines(max_records: int = 8) -> Dict[str, Any]:
+def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Dict[str, Any]:
     """
     Fetches live headlines from GDELT Document 2.0 API scoped strictly to:
     (semiconductor OR gallium OR germanium OR "chip shortage" OR "integrated circuit")
     AND (China OR India OR Taiwan OR "South Korea")
+    
+    Includes exponential backoff (max 3 attempts: 1s, 2s, 4s).
 
     Returns:
         dict with:
         - "success": bool
+        - "data_vintage": str ("LIVE (UTC: ...)" or "CACHED_FALLBACK (UTC: ...)")
+        - "fetch_timestamp_utc": str
+        - "citation": str
         - "articles": list of dicts [{"title", "url", "seendate", "domain", "source"}]
         - "query": str
         - "message": str
+        - "attempts_made": int
     """
     params = {
         "query": GDELT_SCOPED_QUERY,
@@ -239,36 +342,54 @@ def fetch_live_gdelt_headlines(max_records: int = 8) -> Dict[str, Any]:
         "Accept": "application/json"
     }
     
-    req = urllib.request.Request(encoded_url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=6.0) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            raw_articles = data.get("articles", [])
-            if raw_articles:
-                articles = []
-                for a in raw_articles[:max_records]:
-                    articles.append({
-                        "title": a.get("title", "").strip(),
-                        "url": a.get("url", ""),
-                        "seendate": a.get("seendate", "")[:8],
-                        "domain": a.get("domain", ""),
-                        "source": "GDELT Document 2.0 API (Live)"
-                    })
-                return {
-                    "success": True,
-                    "articles": articles,
-                    "query": GDELT_SCOPED_QUERY,
-                    "message": f"Successfully pulled {len(articles)} live articles from GDELT Document 2.0 API."
-                }
-    except Exception as e:
-        logger.info(f"GDELT live query returned: {e}. Falling back to cached GDELT records.")
+    backoff_delays = [1.0, 2.0, 4.0]
+    last_error = None
+
+    for attempt in range(1, max_retries + 1):
+        req = urllib.request.Request(encoded_url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=6.0) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                raw_articles = data.get("articles", [])
+                if raw_articles:
+                    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
+                    articles = []
+                    for a in raw_articles[:max_records]:
+                        articles.append({
+                            "title": a.get("title", "").strip(),
+                            "url": a.get("url", ""),
+                            "seendate": a.get("seendate", "")[:8],
+                            "domain": a.get("domain", ""),
+                            "source": "GDELT Document 2.0 API (Live)"
+                        })
+                    return {
+                        "success": True,
+                        "data_vintage": f"LIVE (UTC: {now_utc})",
+                        "fetch_timestamp_utc": now_utc,
+                        "citation": "GDELT Project Document 2.0 API (Live Real-Time News Ingestion)",
+                        "articles": articles,
+                        "query": GDELT_SCOPED_QUERY,
+                        "message": f"Successfully pulled {len(articles)} live articles from GDELT Document 2.0 API (attempt {attempt}/{max_retries}).",
+                        "attempts_made": attempt
+                    }
+        except Exception as e:
+            last_error = e
+            logger.info(f"GDELT live query attempt {attempt}/{max_retries} failed: {e}")
+            if attempt < max_retries:
+                delay = backoff_delays[attempt - 1]
+                time.sleep(delay)
 
     # Graceful fallback to verified GDELT articles matching exact scope
+    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
     return {
         "success": False,
+        "data_vintage": f"CACHED_FALLBACK (UTC: {now_utc})",
+        "fetch_timestamp_utc": now_utc,
+        "citation": "GDELT Project 2.0 Document API (Verified Curated Cache Fallback)",
         "articles": CACHED_GDELT_HEADLINES[:max_records],
         "query": GDELT_SCOPED_QUERY,
-        "message": "GDELT live API returned 429/timeout (rate-limited by public tier). Served recent verified GDELT-indexed articles matching the exact component query. Manual input is also fully available."
+        "message": f"GDELT live API returned 429/timeout after {max_retries} attempts with exponential backoff (1s, 2s, 4s). Error: {last_error}. Served verified GDELT-indexed articles matching the exact component query.",
+        "attempts_made": max_retries
     }
 
 
@@ -277,8 +398,9 @@ def fetch_live_gdelt_headlines(max_records: int = 8) -> Dict[str, Any]:
 # ════════════════════════════════════════════════════════════════
 
 SIAM_2021_GROUND_TRUTH = {
-    "title": "Model Validation — 2021 Chip Shortage Historical Benchmark",
+    "title": "Model Calibration Case Study — 2021 Chip Shortage Historical Benchmark",
     "citation": "Source: Society of Indian Automobile Manufacturers (SIAM), Publicly Reported Monthly Press Releases, Aug–Oct 2021",
+    "data_vintage": "August–October 2021 (Historical Disclosed Production Drop Benchmark)",
     "disclaimer": "Illustrative backtesting against one historical event, not a formal validation study. Single-event backtesting provides empirical sanity checking and ground truth alignment, but does not constitute comprehensive statistical validation.",
     "historical_context": "During Q3-Q4 2021, severe bottlenecks in global automotive microcontrollers and semiconductor packaging in East Asia cascaded into Indian vehicle assembly plants, forcing OEM production halts and extensive delivery backlogs.",
     "metrics": [

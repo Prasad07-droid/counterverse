@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-09-07T22:42:00+05:30",
+  "git_commit_hash": "0b2db1a7f7a26b2a491085be26e14ba6891acfd5",
+  "test_results": {
+    "test_file": "tests/test_slm_extractor.py",
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "status": "PASS"
+  },
+  "py_compile_results": {
+    "total_checked": 8,
+    "failed_count": 0,
+    "failed_files": [],
+    "checked_files": [
+      "app/dashboard.py",
+      "src/data_sources.py",
+      "src/grounding_graph.py",
+      "src/module_b_slm.py",
+      "src/module_c_causal.py",
+      "src/module_d_mc.py",
+      "src/module_e_pcar.py",
+      "src/__init__.py"
+    ]
+  },
+  "table_5_metrics": {
+    "evaluation_engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
+    "disruption_monitoring": {
+      "precision": 0.733,
+      "recall": 1.0,
+      "f1": 0.846
+    },
+    "classification": {
+      "precision": 0.636,
+      "recall": 1.0,
+      "f1": 0.778
+    },
+    "risk_manager": {
+      "precision": 0.636,
+      "recall": 1.0,
+      "f1": 0.778
+    },
+    "csco_decision": {
+      "precision": 0.733,
+      "recall": 1.0,
+      "f1": 0.846
+    },
+    "macro_average": {
+      "precision": 0.684,
+      "recall": 1.0,
+      "f1": 0.812
+    }
+  },
+  "confusion_matrix_summary": {
+    "stage1_disruption_detection": {
+      "true_positives": 11,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "true_negatives": 0,
+      "recall": 1.0,
+      "specificity": 0.0
+    }
+  }
+}

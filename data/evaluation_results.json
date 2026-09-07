@@ -7,9 +7,9 @@
       "f1": 0.846
     },
     "classification": {
-      "precision": 0.727,
+      "precision": 0.636,
       "recall": 1.0,
-      "f1": 0.842
+      "f1": 0.778
     },
     "risk_manager": {
       "precision": 0.636,
@@ -17,14 +17,14 @@
       "f1": 0.778
     },
     "csco_decision": {
-      "precision": 0.533,
+      "precision": 0.733,
       "recall": 1.0,
-      "f1": 0.696
+      "f1": 0.846
     },
     "macro_average": {
-      "precision": 0.657,
+      "precision": 0.684,
       "recall": 1.0,
-      "f1": 0.79
+      "f1": 0.812
     }
   },
   "detailed_results": [
@@ -42,8 +42,8 @@
       "predicted_summary": "Trade Policy (HIGH)",
       "ground_truth_summary": "Trade Policy (HIGH)",
       "match": "YES",
-      "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Trade Policy\",\n  \"affected_regions\": [\"China\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Wafer production\",\n  \"severity\": 2,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"US imposes strict export controls on advanced semiconductor lithography equipment due to Chinese import restrictions, affecting US automotive and semiconductors industries.\"\n}\n```"
+      "engine": "Fast Deterministic Parser",
+      "raw_slm_output": ""
     },
     {
       "id": "SCEN-02",
@@ -53,14 +53,14 @@
       "pred_disruption": true,
       "gt_type": "Trade Policy",
       "pred_type": "Logistics Disruption",
-      "pred_risk_score": 0.848,
+      "pred_risk_score": 0.781,
       "pred_risk_level": "HIGH",
       "gt_risk_level": "HIGH",
       "predicted_summary": "Logistics Disruption (HIGH)",
       "ground_truth_summary": "Trade Policy (HIGH)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"Taiwan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"logistics disruptions\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"Taiwan's semiconductor manufacturing facility is experiencing significant logistics disruptions due to regional trade restrictions.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"Taiwan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Logistics\",\n  \"severity\": 2,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85,\n  \"summary\": \"Taiwan's semiconductor manufacturing facility experienced significant bottlenecks due to regional trade restrictions, leading to disruptions in logistics operations.\"\n}\n```"
     },
     {
       "id": "SCEN-03",
@@ -70,14 +70,14 @@
       "pred_disruption": true,
       "gt_type": "None",
       "pred_type": "Logistics Disruption",
-      "pred_risk_score": 0.905,
-      "pred_risk_level": "HIGH",
+      "pred_risk_score": 0.0,
+      "pred_risk_level": "LOW",
       "gt_risk_level": "LOW",
-      "predicted_summary": "Logistics Disruption (HIGH)",
+      "predicted_summary": "Logistics Disruption (LOW)",
       "ground_truth_summary": "None (Filtered)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"Bengaluru\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"\",\n  \"severity\": 3,\n  \"lead_time_weeks\": null,\n  \"confidence\": 95,\n  \"summary\": \"Domestic semiconductor distributor opens new headquarters and customer experience center in Bengaluru, potentially disrupting logistics between India and Europe.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"Bengaluru\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Logistics\",\n  \"severity\": 2,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-04",
@@ -94,7 +94,7 @@
       "ground_truth_summary": "Logistics Disruption (MEDIUM)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"China\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Containerized Automotive Parts\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"Shanghai port closure and dock congestion disruptions Asian containerized automotive parts shipping.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"China\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Logistics\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-05",
@@ -111,7 +111,7 @@
       "ground_truth_summary": "Logistics Disruption (HIGH)",
       "match": "YES",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"Red Sea\", \"Cape of Good Hope\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Cargo movement\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 5,\n  \"confidence\": 95,\n  \"summary\": \"The Red Sea shipping crisis has triggered an indefinite maritime reroute to circumvent Cape of Good Hope, leading to a significant increase in freight transit times for both automotive and semiconductor industries.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"Africa\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Cargo movement\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 4,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-06",
@@ -121,14 +121,14 @@
       "pred_disruption": true,
       "gt_type": "None",
       "pred_type": "Logistics Disruption",
-      "pred_risk_score": 0.905,
-      "pred_risk_level": "HIGH",
+      "pred_risk_score": 0.0,
+      "pred_risk_level": "LOW",
       "gt_risk_level": "LOW",
-      "predicted_summary": "Logistics Disruption (HIGH)",
+      "predicted_summary": "Logistics Disruption (LOW)",
       "ground_truth_summary": "None (Filtered)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"Chennai\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"\",\n  \"severity\": 3,\n  \"lead_time_weeks\": null,\n  \"confidence\": 95,\n  \"summary\": \"Routine maintenance completed smoothly at Chennai container terminal with zero vessel waiting times\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Delay\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"Chennai\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Vessel\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85,\n  \"summary\": \"Routine maintenance was completed successfully at the Chennai container terminal without any vessel delays.\"\n}\n```"
     },
     {
       "id": "SCEN-07",
@@ -145,7 +145,7 @@
       "ground_truth_summary": "Trade Policy (HIGH)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Raw Material Shortage\",\n  \"affected_regions\": [\"China\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Gallium and Germanium\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"China's restrictions on gallium and germanium exports due to national security concerns have led to acute raw material shortages in the automotive and semiconductor industries.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Raw Material Shortage\",\n  \"affected_node\": \"Raw Material Supplier\",\n  \"event_type\": \"Raw Material Shortage\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"China\"],\n  \"companies\": [\"China\"],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Gallium and Germanium\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-08",
@@ -162,7 +162,7 @@
       "ground_truth_summary": "Raw Material Shortage (HIGH)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"China\", \"South Korea\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Lithium and Cobalt Refineries\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 6,\n  \"confidence\": 95\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Tier-1 Supplier\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Lithium Cobalt Refinery\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-09",
@@ -172,14 +172,14 @@
       "pred_disruption": true,
       "gt_type": "None",
       "pred_type": "Logistics Disruption",
-      "pred_risk_score": 0.905,
-      "pred_risk_level": "HIGH",
+      "pred_risk_score": 0.0,
+      "pred_risk_level": "LOW",
       "gt_risk_level": "LOW",
-      "predicted_summary": "Logistics Disruption (HIGH)",
+      "predicted_summary": "Logistics Disruption (LOW)",
       "ground_truth_summary": "None (Filtered)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Electrical Vehicles (EVs)\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 5,\n  \"confidence\": 95,\n  \"summary\": \"Leading automaker celebrated an impressive milestone in its quarterly expansion of 100,000 EV sales, marking a significant shift towards sustainable transportation.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Raw Materials\",\n  \"severity\": 2,\n  \"lead_time_weeks\": 4,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-10",
@@ -189,14 +189,14 @@
       "pred_disruption": true,
       "gt_type": "Labour Strike",
       "pred_type": "Logistics Disruption",
-      "pred_risk_score": 0.617,
+      "pred_risk_score": 0.878,
       "pred_risk_level": "HIGH",
       "gt_risk_level": "MEDIUM",
       "predicted_summary": "Logistics Disruption (HIGH)",
       "ground_truth_summary": "Labour Strike (MEDIUM)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"Germany\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"German automakers are facing a logistics disruption due to a strike by their workers.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"Germany\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Raw Materials\",\n  \"severity\": 2,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85,\n  \"summary\": \"German automakers' logistics disruptions due to powertrain assembly plant closures.\"\n}\n```"
     },
     {
       "id": "SCEN-11",
@@ -213,7 +213,7 @@
       "ground_truth_summary": "Labour Strike (MEDIUM)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Containers\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"US West Coast dockworkers strike disrupts container unloading at key automotive import ports\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Containers\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-12",
@@ -230,7 +230,7 @@
       "ground_truth_summary": "None (Filtered)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Transportation\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 5,\n  \"confidence\": 95,\n  \"summary\": \"Automotive supplier union successfully concluded an annual wage agreement without work stoppages.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Logistics Disruption\",\n  \"affected_node\": \"Logistics\",\n  \"event_type\": \"Logistics Disruption\",\n  \"severity_pct\": 50,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"United States\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Logistics\",\n  \"severity\": 2,\n  \"lead_time_weeks\": 4,\n  \"confidence\": 85\n}\n```"
     },
     {
       "id": "SCEN-13",
@@ -247,7 +247,7 @@
       "ground_truth_summary": "Natural Disaster (HIGH)",
       "match": "YES",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_regions\": [\"Taiwan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 5,\n  \"confidence\": 95,\n  \"summary\": \"Taiwan's major semiconductor factories have been forced to shut down due to an earthquake, affecting both the automotive industry and key components.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_node\": \"Taiwan\",\n  \"event_type\": \"Factory Shutdown\",\n  \"severity_pct\": 85,\n  \"duration_days\": 1,\n  \"affected_regions\": [\"Taiwan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Semiconductor Fabs\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 95\n}\n```"
     },
     {
       "id": "SCEN-14",
@@ -264,7 +264,7 @@
       "ground_truth_summary": "Natural Disaster (HIGH)",
       "match": "YES",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_regions\": [\"Japan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95,\n  \"summary\": \"Kyushu province in Japan experienced flooding due to severe weather conditions, affecting semiconductor manufacturing facilities.\"\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_node\": \"Semiconductor Fab\",\n  \"event_type\": \"Natural Disaster\",\n  \"severity_pct\": 75,\n  \"duration_days\": 14,\n  \"affected_regions\": [\"Japan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"SiWafers\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 1,\n  \"confidence\": 85,\n  \"summary\": \"Kyushu region experienced severe flooding due to natural disasters, affecting semiconductor fabrication plants in Japan.\"\n}\n```"
     },
     {
       "id": "SCEN-15",
@@ -281,7 +281,7 @@
       "ground_truth_summary": "Natural Disaster (MEDIUM)",
       "match": "NO",
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
-      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_regions\": [\"South Korea\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Coastal breakwaters\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 95\n}\n```"
+      "raw_slm_output": "```json\n{\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_node\": \"Port\",\n  \"event_type\": \"Natural Disaster\",\n  \"severity_pct\": 75,\n  \"duration_days\": 30,\n  \"affected_regions\": [\"South Korea\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"Breakwaters\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 4,\n  \"confidence\": 85\n}\n```"
     }
   ]
 }
