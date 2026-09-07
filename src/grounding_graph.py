@@ -176,7 +176,7 @@ def build_grounding_graph() -> nx.DiGraph:
         ("China Minmetals", "China"),
     ]
     for src, dst in operates_in:
-        G.add_edge(src, dst, relationship="operates_in")
+        G.add_edge(src, dst, relationship="operates_in", edge_confidence=1.0)
 
     # Company → Component (depends_on) — OEMs depend on components
     depends_on = [
@@ -186,7 +186,7 @@ def build_grounding_graph() -> nx.DiGraph:
         ("Hyundai India", "ECU"), ("Hyundai India", "Integrated Circuits"),
     ]
     for src, dst in depends_on:
-        G.add_edge(src, dst, relationship="depends_on")
+        G.add_edge(src, dst, relationship="depends_on", edge_confidence=1.0)
 
     # Company → Component (supplies) — suppliers produce components
     supplies = [
@@ -199,7 +199,7 @@ def build_grounding_graph() -> nx.DiGraph:
         ("Samsung Foundry", "Integrated Circuits"), ("Samsung Foundry", "Semiconductor Wafer"),
     ]
     for src, dst in supplies:
-        G.add_edge(src, dst, relationship="supplies")
+        G.add_edge(src, dst, relationship="supplies", edge_confidence=1.0)
 
     # Component → Component (requires) — supply chain dependencies
     requires = [
@@ -213,7 +213,7 @@ def build_grounding_graph() -> nx.DiGraph:
         ("Automotive Sensor", "Integrated Circuits"),
     ]
     for src, dst in requires:
-        G.add_edge(src, dst, relationship="requires")
+        G.add_edge(src, dst, relationship="requires", edge_confidence=1.0)
 
     # Company → Industry (belongs_to)
     belongs_to = [
@@ -225,7 +225,7 @@ def build_grounding_graph() -> nx.DiGraph:
         ("Samsung Foundry", "Semiconductors"), ("China Minmetals", "Metals & Mining"),
     ]
     for src, dst in belongs_to:
-        G.add_edge(src, dst, relationship="belongs_to")
+        G.add_edge(src, dst, relationship="belongs_to", edge_confidence=1.0)
 
     # Country → Component (exports) — trade-flow edges
     exports = [
@@ -236,7 +236,7 @@ def build_grounding_graph() -> nx.DiGraph:
         ("Japan", "Integrated Circuits"), ("Japan", "Microcontroller"),
     ]
     for src, dst in exports:
-        G.add_edge(src, dst, relationship="exports")
+        G.add_edge(src, dst, relationship="exports", edge_confidence=1.0)
 
     # Country → Country (imports_from) — India's import dependencies
     imports_from = [
@@ -244,7 +244,11 @@ def build_grounding_graph() -> nx.DiGraph:
         ("India", "South Korea"), ("India", "Japan"),
     ]
     for src, dst in imports_from:
-        G.add_edge(src, dst, relationship="imports_from")
+        G.add_edge(src, dst, relationship="imports_from", edge_confidence=1.0)
+
+    # Initialize and guarantee edge_confidence=1.0 across all edges
+    for u, v in G.edges():
+        G[u][v].setdefault("edge_confidence", 1.0)
 
     logger.info(f"Grounding graph built: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
     verify_graph_integrity(G)
@@ -307,6 +311,59 @@ def get_grounding_graph() -> nx.DiGraph:
     if _GROUNDING_GRAPH is None:
         _GROUNDING_GRAPH = build_grounding_graph()
     return _GROUNDING_GRAPH
+
+
+def apply_alternate_supplier_signal(
+    graph: Optional[nx.DiGraph],
+    node_a: str,
+    node_b: str,
+    new_confidence: float
+) -> bool:
+    """
+    Adjusts a specific edge's confidence in-memory (session-scoped, not persisted).
+    Supports canonical entity resolution for node names and logs all adjustments.
+
+    Args:
+        graph: NetworkX DiGraph instance (if None, defaults to singleton grounding graph).
+        node_a: Source node name or raw entity text.
+        node_b: Target node name or raw entity text.
+        new_confidence: Float in [0.0, 1.0] representing updated edge confidence.
+
+    Returns:
+        bool: True if edge exists and was updated, False otherwise.
+    """
+    if graph is None:
+        graph = get_grounding_graph()
+
+    can_a = resolve_entity(node_a) or node_a
+    can_b = resolve_entity(node_b) or node_b
+
+    # Check forward edge, raw edge, or reversed edge
+    target_edge = None
+    if graph.has_edge(can_a, can_b):
+        target_edge = (can_a, can_b)
+    elif graph.has_edge(node_a, node_b):
+        target_edge = (node_a, node_b)
+    elif graph.has_edge(can_b, can_a):
+        target_edge = (can_b, can_a)
+    elif graph.has_edge(node_b, node_a):
+        target_edge = (node_b, node_a)
+
+    if target_edge:
+        src, dst = target_edge
+        old_conf = graph[src][dst].get("edge_confidence", 1.0)
+        clamped_conf = max(0.0, min(1.0, float(new_confidence)))
+        graph[src][dst]["edge_confidence"] = clamped_conf
+        logger.info(
+            f"Alternate supplier signal applied (session-scoped): "
+            f"Edge ({src} -> {dst}) confidence updated from {old_conf:.2f} to {clamped_conf:.2f}"
+        )
+        return True
+    else:
+        logger.warning(
+            f"Cannot adjust edge confidence: Edge ({node_a}, {node_b}) not found in grounding graph."
+        )
+        return False
 
 
 # ════════════════════════════════════════════════════════════════
@@ -532,18 +589,21 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
         for c_can in component_canonicals:
             if G.has_edge(r_canonical, c_can):
                 edge_data = G.edges[r_canonical, c_can]
+                edge_conf = edge_data.get("edge_confidence", 1.0)
                 relationship_checks.append({
                     "source": r_canonical,
                     "target": c_can,
                     "relationship": edge_data.get("relationship", "unknown"),
+                    "edge_confidence": edge_conf,
                     "status": "Graph-Verified",
-                    "description": f"{r_canonical} \u2192 {c_can} ({edge_data.get('relationship', 'linked')})"
+                    "description": f"{r_canonical} \u2192 {c_can} ({edge_data.get('relationship', 'linked')}, edge_conf: {edge_conf:.2f})"
                 })
             else:
                 relationship_checks.append({
                     "source": r_canonical,
                     "target": c_can,
                     "relationship": "unknown",
+                    "edge_confidence": 0.0,
                     "status": "Unverified",
                     "description": f"No direct edge between {r_canonical} and {c_can} in grounding graph"
                 })
@@ -568,7 +628,7 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def _get_connected_summary(G: nx.DiGraph, node: str, max_edges: int = 5) -> List[Dict[str, str]]:
+def _get_connected_summary(G: nx.DiGraph, node: str, max_edges: int = 5) -> List[Dict[str, Any]]:
     """Returns a summary of edges connected to a node (both in and out)."""
     edges = []
     for _, target, data in list(G.out_edges(node, data=True))[:max_edges]:
@@ -576,12 +636,14 @@ def _get_connected_summary(G: nx.DiGraph, node: str, max_edges: int = 5) -> List
             "direction": "outgoing",
             "target": target,
             "relationship": data.get("relationship", "unknown"),
+            "edge_confidence": data.get("edge_confidence", 1.0),
         })
     for source, _, data in list(G.in_edges(node, data=True))[:max_edges]:
         edges.append({
             "direction": "incoming",
             "source": source,
             "relationship": data.get("relationship", "unknown"),
+            "edge_confidence": data.get("edge_confidence", 1.0),
         })
     return edges
 
