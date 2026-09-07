@@ -85,7 +85,7 @@ industry average.*
 ### Problem & Scoping Formulation
 The aggregate UN Comtrade HS 8542 baseline (₹1,33,814 Crore, 2022) reflects total Indian import turnover of electronic integrated circuits across the entire automotive sector. Evaluating an individual automaker (e.g. Maruti Suzuki or Tata Motors) against the entire national trade flow overestimates single-enterprise exposure.
 
-### Allocation Mathematical Formula
+### Allocation Mathematical Formula & Boundedness Proof
 Individual enterprise exposure is scaled down deterministically using official SIAM market share figures and component BOM dependency ratios:
 
 $$\text{Company Exposed Base} = \text{Macro Baseline (₹1,33,814 Cr)} \times \text{Company Market Share (\%)} \times \text{Chain Dependency Ratio (\%)} $$
@@ -94,15 +94,69 @@ $$\text{Company PCaR} = \text{Simulated Production Drop (\%)} \times \text{Compa
 
 ### Sourced Empirical Parameters (SIAM FY2023-24 Baseline)
 
-| Enterprise / OEM | PV Market Share (%) | Source | Chain Dependency (%) | Rationale / BOM Profile | Allocated Sourcing Base |
-|---|---|---|---|---|---|
-| **Maruti Suzuki** | 41.7% | SIAM FY24 official disclosures | 38% | High volume mass-market PV; dual-sensor ECUs | ₹21,192 Cr |
-| **Hyundai India** | 14.6% | SIAM FY24 official disclosures | 42% | Higher electronics intensity (ADAS, dual digital screens) | ₹8,206 Cr |
-| **Tata Motors** | 13.9% | SIAM FY24 official disclosures | 45% | EV market leadership (~70% EV share); heavy inverter/BMS exposure | ₹8,370 Cr |
-| **Mahindra & Mahindra** | 11.2% | SIAM FY24 official disclosures | 44% | Premium SUV platform architecture; multi-microcontroller ECUs | ₹6,594 Cr |
-| **Entire Indian Industry** | 100.0% | Macro UN Comtrade aggregate | 100% | National aggregate import turnover (HS 8542) | ₹1,33,814 Cr |
+| Enterprise / OEM | PV Market Share (%) | Source | Chain Dependency (%) | Rationale / BOM Profile | Allocated Sourcing Base | Allocation Ratio |
+|---|---|---|---|---|---|---|
+| **Maruti Suzuki** | 41.7% | SIAM FY24 official disclosures | 38% | High volume mass-market PV; dual-sensor ECUs | ₹21,192 Cr | 15.85% |
+| **Hyundai India** | 14.6% | SIAM FY24 official disclosures | 42% | Higher electronics intensity (ADAS, dual digital screens) | ₹8,206 Cr | 6.13% |
+| **Tata Motors** | 13.9% | SIAM FY24 official disclosures | 45% | EV market leadership (~70% EV share); heavy inverter/BMS exposure | ₹8,370 Cr | 6.26% |
+| **Mahindra & Mahindra** | 11.2% | SIAM FY24 official disclosures | 44% | Premium SUV platform architecture; multi-microcontroller ECUs | ₹6,594 Cr | 4.93% |
+| **Subtotal (4 Named OEMs)** | **81.4%** | SIAM FY24 | **Weighted 40.7%** | Major passenger vehicle manufacturers | **₹44,362 Cr** | **33.16%** |
+| **Entire Indian Industry** | 100.0% | Macro UN Comtrade aggregate | 100% | National aggregate import turnover (HS 8542) | ₹1,33,814 Cr | 100.00% |
 
-*All parameters are grounded in disclosed SIAM industry volumes and annual report disclosures.*
+#### Internal Consistency & Macro Aggregate Boundedness:
+Summing the allocated exposure across all four named OEMs:
+$$\sum_{i=1}^{4} \text{Allocation Ratio}_i = 15.85\% + 6.13\% + 6.26\% + 4.93\% = 33.16\%$$
+
+Consequently, the sum of simulated losses across the four named OEMs is bounded by the macro aggregate loss:
+$$\sum_{i=1}^{4} \text{Company PCaR}_i \approx 0.3316 \times \text{Macro PCaR} < \text{Macro PCaR}$$
+
+The remaining ~66.84% (₹89,452 Cr) represents non-covered passenger vehicle manufacturers (Kia, Toyota, Honda, MG, Volkswagen), commercial vehicles (Tata CV, Ashok Leyland), two-wheelers, tractors, and unexposed non-semiconductor electronic components. This relationship is verified in unit test `test_company_level_pcar_internal_consistency()`.
+
+---
+
+## Auto-Extracted Parameter Derivation & Seeded Determinism
+
+To replace manual UI sliders while maintaining rigorous reproducibility, `src/module_b_slm.py` extracts disruption simulation parameters directly from unstructured headlines using deterministic taxonomy mappings and seeded pseudo-random number generation (PRNG):
+
+### 1. Node & Event Taxonomy Mapping
+
+- **`affected_node`**: Mapped from headline keywords to `ALLOWED_AFFECTED_NODES`:
+  - `"Raw Material Supplier"`: keywords like *raw material, mine, mining, refinery, gallium, germanium, lithium, cobalt*
+  - `"Port/Logistics"`: keywords like *port, dock, dockworker, container, terminal, shipping, maritime, freight, red sea, suez*
+  - `"Tier-1 Supplier"`: keywords like *supplier, plant, factory, powertrain, brake, tier-1*
+  - `"Tier-2 Supplier"`: keywords like *battery, cell, sub-tier, tier-2*
+  - `"Semiconductor Fab"`: keywords like *fab, foundry, wafer, lithography, semiconductor, chip, microcontroller, ecu*
+  - `"Assembly Hub"`: keywords like *assembly, oem, automaker, vehicle*
+  - *Fallback:* Defaults strictly to `"Tier-1 Supplier"`.
+- **`event_type`**: Mapped from headline keywords to `ALLOWED_EVENT_TYPES`:
+  - `"Port closure"`: *port closure, closure, closed*
+  - `"Export ban/restriction"`: *export ban, export control, controls, ban, restrict, tariff, quota*
+  - `"Factory shutdown"`: *shutdown, shut down, halt, strike, walkout, fire, explosion*
+  - `"Natural disaster"`: *earthquake, flood, floods, typhoon, tsunami, hurricane, storm, disaster*
+  - `"Geopolitical sanction"`: *sanction, trade war, geopolitical, embargo*
+  - `"Raw material shortage"`: *shortage, deficit, curb*
+  - `"Logistics delay"`: *delay, congestion, reroute, bottleneck, disrupt*
+  - `"Demand shock"`: *demand, sales, earnings, recession*
+  - *Fallback:* Defaults strictly to `"Logistics delay"`.
+
+### 2. Seeded PRNG Determinism (`hash(headline)`)
+
+To guarantee that the exact same headline produces identical disruption severity and duration across separate invocations without state persistence, parameters are seeded via:
+```python
+rng = random.Random(hash(headline))
+```
+
+Severity and duration ranges are governed by the classified disruption level:
+
+| Disruption Severity Level | `is_disruption` | `severity_pct` Range | `duration_days` Range |
+|---|---|---|---|
+| **CRITICAL** | `True` | $80\% - 95\%$ | $60 - 90$ days |
+| **HIGH** | `True` | $60\% - 79\%$ | $30 - 59$ days |
+| **MEDIUM** | `True` | $35\% - 59\%$ | $15 - 29$ days |
+| **LOW** | `True` | $10\% - 30\%$ | $5 - 14$ days |
+| **Benign / Non-Disruptive** | `False` | $0\%$ | $1 - 7$ days |
+
+All parameters are strictly bounded: $0 \le \text{severity\_pct} \le 100$ and $1 \le \text{duration\_days} \le 90$. This guarantees schema integrity and determinism across all evaluation and testing pipelines.
 
 
 

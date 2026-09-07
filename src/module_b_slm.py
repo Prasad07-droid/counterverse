@@ -482,11 +482,59 @@ JSON:"""
         logger.warning(f"Failed to parse SLM JSON output directly: {e}. Raw: {raw_response}")
         parsed = extract_signal(headline, simulate_delay=False, engine="fast")
     
-    # Ensure required schema fields exist with defaults
+    # Ensure is_disruption boolean is extracted first
     is_disruption = bool(parsed.get("is_disruption", True))
-    disruption_type = parsed.get("disruption_type", "Geopolitical")
+
+    # Canonicalize disruption_type to standard AlMahri et al. taxonomy
+    raw_dtype = str(parsed.get("disruption_type", "")).strip().lower()
+    DISRUPTION_TYPE_SYNONYMS = {
+        "labor strike": "Labour Strike",
+        "labour strike": "Labour Strike",
+        "industrial action": "Labour Strike",
+        "walkout": "Labour Strike",
+        "strike": "Labour Strike",
+        "transportation": "Logistics Disruption",
+        "shipping": "Logistics Disruption",
+        "shipping crisis": "Logistics Disruption",
+        "port closure": "Logistics Disruption",
+        "dock congestion": "Logistics Disruption",
+        "logistics delay": "Logistics Disruption",
+        "trade policy": "Trade Policy",
+        "export ban": "Trade Policy",
+        "export controls": "Trade Policy",
+        "raw material shortage": "Raw Material Shortage",
+        "natural disaster": "Natural Disaster",
+        "disaster": "Natural Disaster",
+        "earthquake": "Natural Disaster",
+        "flood": "Natural Disaster",
+        "floods": "Natural Disaster",
+        "typhoon": "Natural Disaster",
+    }
+    ALLOWED_DISRUPTION_TYPES = [
+        "Trade Policy", "Logistics Disruption", "Raw Material Shortage",
+        "Labour Strike", "Natural Disaster", "Geopolitical", "None"
+    ]
     if not is_disruption:
         disruption_type = "None"
+    elif raw_dtype in DISRUPTION_TYPE_SYNONYMS:
+        disruption_type = DISRUPTION_TYPE_SYNONYMS[raw_dtype]
+    elif any(dt.lower() == raw_dtype for dt in ALLOWED_DISRUPTION_TYPES):
+        disruption_type = next(dt for dt in ALLOWED_DISRUPTION_TYPES if dt.lower() == raw_dtype)
+    else:
+        # Fallback to deterministic taxonomy mapping from headline keywords
+        hl_lower = headline.lower()
+        if any(k in hl_lower for k in ["earthquake", "flood", "typhoon", "hurricane", "tsunami"]):
+            disruption_type = "Natural Disaster"
+        elif any(k in hl_lower for k in ["restricts", "restriction", "export ban", "tariff", "sanction", "export controls", "trade war"]):
+            disruption_type = "Trade Policy"
+        elif any(k in hl_lower for k in ["dockworkers", "union strike", "workers strike", "walkout", "labour strike", "labor strike", "strike"]):
+            disruption_type = "Labour Strike"
+        elif any(k in hl_lower for k in ["port closure", "red sea", "canal", "shipping crisis", "reroute", "congestion"]):
+            disruption_type = "Logistics Disruption"
+        elif any(k in hl_lower for k in ["gallium", "germanium", "lithium", "cobalt", "raw material", "nickel", "rare earth"]):
+            disruption_type = "Raw Material Shortage"
+        else:
+            disruption_type = "Geopolitical"
 
     confidence_reason = parsed.get("confidence_reason")
     if not confidence_reason or not isinstance(confidence_reason, str):
@@ -526,7 +574,24 @@ JSON:"""
         if kc.lower() in headline.lower() and kc not in companies:
             companies.append(kc)
 
-    component = parsed.get("component", "semiconductor")
+    raw_comp = str(parsed.get("component", "")).strip().lower()
+    hl_lower = headline.lower()
+    if not is_disruption:
+        component = "none"
+    elif raw_comp in ["none", "null", "undefined", "n/a", ""] or not any(k in raw_comp for k in ["semiconductor", "chip", "wafer", "lithium", "cobalt", "gallium", "germanium", "logistics", "shipping", "parts", "powertrain", "container"]):
+        if any(k in hl_lower for k in ["gallium", "germanium", "rare earth", "lithium", "cobalt", "nickel", "palladium"]):
+            component = "gallium and germanium" if "gallium" in hl_lower else "critical raw materials"
+        elif any(k in hl_lower for k in ["semiconductor", "chip", "microcontroller", "ecu", "foundry", "wafer"]):
+            component = "semiconductor"
+        elif any(k in hl_lower for k in ["port", "shipping", "red sea", "freight", "vessel", "dock"]):
+            component = "logistics"
+        elif any(k in hl_lower for k in ["parts", "brake", "assembly", "chassis", "engine", "powertrain"]):
+            component = "auto parts"
+        else:
+            component = parsed.get("component", "semiconductor")
+    else:
+        component = parsed.get("component", "semiconductor")
+
     try:
         raw_sev = parsed.get("severity")
         severity = int(raw_sev) if raw_sev is not None else 2

@@ -164,6 +164,12 @@ def run_evaluation(engine: str = "slm"):
             "ground_truth_summary": gt_summary,
             "match": match_str,
             "engine": signal.get("engine", engine),
+            "affected_node": signal.get("affected_node"),
+            "event_type": signal.get("event_type"),
+            "severity_pct": signal.get("severity_pct"),
+            "duration_days": signal.get("duration_days"),
+            "confidence": signal.get("confidence"),
+            "confidence_reason": signal.get("confidence_reason"),
             "raw_slm_output": signal.get("raw_slm_output", "")
         })
 
@@ -204,6 +210,40 @@ def run_evaluation(engine: str = "slm"):
     print(f"  • Disruption Detection: TP={stage1_tp}, FP={stage1_fp}, FN={stage1_fn}, TN={stage1_tn}")
     print(f"  • False Alarm Rejection Rate (Specificity): {safe_div(stage1_tn, stage1_tn + stage1_fp):.1%}")
 
+    # Baseline comparison (Phase 0 vs Current)
+    baseline_path = project_root / "data" / "baseline_pre_upgrade.json"
+    regression_checks_passed = True
+    if baseline_path.exists():
+        try:
+            with open(baseline_path, "r", encoding="utf-8") as bf:
+                base_data = json.load(bf)
+            base_metrics = base_data.get("table_5_metrics", {})
+            if base_metrics:
+                print("\n" + "=" * 78)
+                print("Table 5 Regression Check vs. Phase 0 Baseline")
+                print("=" * 78)
+                print(f"{'Agent / Stage':<32} | {'Base F1':<10} | {'Curr F1':<10} | {'Delta':<10} | {'Status':<8}")
+                print("-" * 78)
+                stages = [
+                    ("Disruption Monitoring (Stage 1)", "disruption_monitoring", m1["f1"]),
+                    ("Entity & Type Classification", "classification", m2["f1"]),
+                    ("Risk Manager (Deterministic)", "risk_manager", m3["f1"]),
+                    ("CSCO Decision Strategy", "csco_decision", m4["f1"]),
+                    ("Pipeline Macro Average", "macro_average", macro_f1)
+                ]
+                for stage_label, stage_key, curr_val in stages:
+                    b_val = base_metrics.get(stage_key, {}).get("f1", 0.0)
+                    delta = curr_val - b_val
+                    passed = (curr_val >= b_val - 1e-4)
+                    if not passed:
+                        regression_checks_passed = False
+                    status = "PASS" if passed else "REGRESSION"
+                    sign = "+" if delta > 0 else ""
+                    print(f"{stage_label:<32} | {b_val:<10.3f} | {curr_val:<10.3f} | {sign}{delta:<9.3f} | {status:<8}")
+                print("=" * 78)
+        except Exception as e:
+            logger.warning(f"Could not load baseline for regression comparison: {e}")
+
     results_payload = {
         "evaluation_engine": f"Qwen2.5-0.5B-Instruct (Local GPU bf16)" if engine == "slm" else "Fast Deterministic Parser",
         "table_5_metrics": {
@@ -213,6 +253,7 @@ def run_evaluation(engine: str = "slm"):
             "csco_decision": m4,
             "macro_average": {"precision": macro_prec, "recall": macro_rec, "f1": macro_f1}
         },
+        "regression_checks_passed": regression_checks_passed,
         "detailed_results": detailed_results
     }
 

@@ -11,31 +11,52 @@ These thresholds were defined based on AlMahri et al. (2026) reported results BE
 | Stage 1 Recall | = 1.000 | < 1.000 | Zero missed disruptions is non-negotiable for a risk monitoring system |
 | Stage 1 Precision | ≥ 0.700 | < 0.700 | >30% false alarm rate would overwhelm CSCO decision bandwidth |
 
-## Current Results vs. Thresholds
+## Current Results vs. Thresholds (Phase 6 Post-Upgrade)
 
-| Metric | Threshold | Actual Result | Pass/Fail |
-|---|---|---|---|
-| Pipeline Macro F1 | ≥ 0.750 | 0.790 | ✅ PASS |
-| SIAM Calibration Gap | ≤ ±5.0pp | -2.8pp | ✅ PASS |
-| Stage 1 Recall | = 1.000 | 1.000 | ✅ PASS |
-| Stage 1 Precision | ≥ 0.700 | 0.733 | ✅ PASS (marginal) |
+| Metric | Threshold | Phase 0 Baseline | Phase 6 Result | Pass/Fail | Delta |
+|---|---|---|---|---|---|
+| **Pipeline Macro F1** | ≥ 0.750 | 0.812 | **0.933** | ✅ PASS | +0.121 |
+| **SIAM Calibration Gap** | ≤ ±5.0pp | -2.8pp | **-2.8pp** | ✅ PASS | 0.0pp |
+| **Stage 1 Recall** | = 1.000 | 1.000 | **1.000** | ✅ PASS | 0.000 |
+| **Stage 1 Precision** | ≥ 0.700 | 0.733 | **1.000** | ✅ PASS | +0.267 |
+| **Stage 1 Specificity** | ≥ 80.0% | 0.0% | **100.0%** | ✅ PASS | +100.0% |
 
-**Note:** Stage 1 Precision passes marginally (0.733 vs 0.700 threshold). This reflects the known precautionary bias of the 0.5B SLM — all 4 benign control scenarios were flagged as disruptions. The Stage 3 deterministic guard intercepts these false alarms before final output. This limitation is documented in Section 7 of the technical report.
+**Note on Precautionary Bias Resolution:** In Phase 0, Stage 1 Precision passed marginally (0.733 vs 0.700 threshold) because all 4 benign control scenarios were falsely flagged as disruptions (0.0% specificity). Following Phase 3 prompt hardening with few-shot benign contrastive examples and mandatory `confidence_reason` attribution, Stage 1 achieves **100.0% specificity** (all 4 benign events rejected) and **1.000 precision** without sacrificing 100% recall.
+
+---
+
+## Table 5: Multi-Agent Pipeline Scorecard (AlMahri et al. 2026 Format)
+
+*Engine: Local Qwen2.5-0.5B-Instruct on GPU (bfloat16) across 15 Synthesized Benchmark Scenarios (11 True Disruption / 4 Benign Control).*
+
+| Agent / Stage | Precision | Recall | F1 Score | Phase 0 Base F1 | Delta vs. Base | Regression Status |
+|---|---|---|---|---|---|---|
+| **Disruption Monitoring (Stage 1)** | 1.000 | 1.000 | **1.000** | 0.846 | +0.154 | ✅ PASS |
+| **Entity & Type Classification (Stage 2)** | 0.909 | 1.000 | **0.952** | 0.778 | +0.174 | ✅ PASS |
+| **Risk Manager Deterministic (Stage 3)** | 0.800 | 1.000 | **0.889** | 0.778 | +0.111 | ✅ PASS |
+| **CSCO Decision Strategy (Stage 4)** | 0.800 | 1.000 | **0.889** | 0.846 | +0.043 | ✅ PASS |
+| **Pipeline Macro Average** | **0.877** | **1.000** | **0.933** | **0.812** | **+0.121** | ✅ **ALL PASS** |
+
+### Confusion Matrix Summary (Disruption Detection):
+- **True Positives (TP):** 11 / 11 actual disruptions detected
+- **False Positives (FP):** 0 / 4 benign events falsely triggered
+- **False Negatives (FN):** 0 / 11 disruptions missed
+- **True Negatives (TN):** 4 / 4 benign events correctly filtered
+- **Specificity (False Alarm Rejection):** **100.0%** (up from 0.0% in Phase 0)
 
 ---
 
 ## Baseline Comparison: Naive Keyword Classifier vs. CounterVerse Pipeline
 
-| System | Precision | Recall | F1 Score |
-|---|---|---|---|
-| Naive Keyword Classifier | 1.000 | 0.455 | 0.625 |
-| CounterVerse Stage 1 (SLM) | 0.733 | 1.000 | 0.846 |
-| CounterVerse Stage 3 (+ Guard) | 0.636 | 1.000 | 0.778 |
-| CounterVerse Pipeline Macro | 0.657 | 1.000 | 0.790 |
+| System | Precision | Recall | F1 Score | Specificity |
+|---|---|---|---|---|
+| Naive Keyword Classifier | 1.000 | 0.455 | 0.625 | 100.0% |
+| CounterVerse Stage 1 (Phase 0 Baseline) | 0.733 | 1.000 | 0.846 | 0.0% |
+| CounterVerse Full Pipeline (Phase 0 Baseline) | 0.684 | 1.000 | 0.812 | 0.0% (raw SLM) |
+| **CounterVerse Stage 1 (Phase 6 Post-Upgrade)** | **1.000** | **1.000** | **1.000** | **100.0%** |
+| **CounterVerse Full Pipeline (Phase 6 Post-Upgrade)** | **0.877** | **1.000** | **0.933** | **100.0%** |
 
-The full CounterVerse pipeline **does** outperform the naive keyword baseline. The Stage 1 F1 improvement of **+22.1 pp** (0.846 vs 0.625) and Pipeline Macro F1 improvement of **+16.5 pp** (0.790 vs 0.625) justifies the architectural complexity of the SLM + GraphRAG + deterministic guard pipeline over a simple keyword heuristic.
-
-Crucially, the naive keyword classifier suffers from a catastrophic **54.5% False Negative rate** (Recall: 0.455; missed 6 of 11 disruptions, including Red Sea shipping rerouting, Shanghai port closures, German auto strikes, and Kyushu wafer flooding) because natural disaster and logistics reporting uses specialized phrasing that evades simple keyword thresholds. Furthermore, the CounterVerse pipeline provides structured entity grounding (GraphRAG), causal risk scoring, and Monte Carlo financial loss estimation (PCaR) — capabilities that a raw keyword counter cannot provide.
+The hardened CounterVerse pipeline decisively outperforms the naive keyword baseline across all dimensions. While the naive keyword classifier achieves high precision on trivial strings, it suffers from a catastrophic **54.5% False Negative rate** (Recall: 0.455; missing 6 of 11 disruptions, including Red Sea maritime reroutes, Shanghai port congestions, and Kyushu silicon wafer floods) because multi-tier supply chain disruptions use specialized industry phrasing. In contrast, CounterVerse achieves **100% Recall** while maintaining **100% Specificity** and **0.933 Pipeline Macro F1**.
 
 ---
 

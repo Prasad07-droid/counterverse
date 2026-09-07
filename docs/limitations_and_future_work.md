@@ -72,9 +72,12 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 #### 3. "Precision Theater" in Monte Carlo Sampling
 * **The Reality:** Running 10,000 Monte Carlo draws generates narrow, sharp percentiles (e.g., ₹2,842.15 Cr at 95% VaR). However, if the underlying input distributions (severity $\mu, \sigma$, hop attenuation factors $\alpha$, spot premium multiplier $U[1.3, 2.8]$) are estimated or calibrated rather than fitted to longitudinal transactional empirical data, the precision is an illusion.
 * **The Simulation Bound:** Fixed distribution bounds ($U[1.3, 2.8]$, triangular drop).
+* **Current Mitigation & Open Gap Status:**
+  - *Mitigation Implemented (Phase 4):* In `src/module_d_mc.py`, the engine now programmatically returns explicit distribution honesty metadata: `"distribution_source": "calibrated_estimate_unfitted"` and `"distribution_shape": "uniform_heuristic"`, surfaced directly in Tab 5 (Model Governance).
+  - *Open Gap:* **Distribution fitting against empirical commodity spot indices (e.g. DRAMeXchange spot index or ICIS chemical price series) is still NOT done.** This remains an open research and data-acquisition limitation.
 * **The Engineering Fix:** 
   - Implement **Global Sensitivity Analysis (Sobol Indices & Morris Method)** to explicitly display which input uncertainty drives variance in PCaR.
-  - Replace uniform heuristics with empirical econometric priors fitted to historical spot market spikes (e.g., DRAMeXchange spot index or ICIS chemical spot volatility).
+  - Replace uniform heuristics with empirical econometric priors fitted to historical spot market spikes.
 
 #### 4. Closed-System Fallacy (Cross-Industry Competition & Second-Order Macro Shocks)
 * **The Reality:** The automotive sector consumes only ~15% of high-purity gallium (GaAs/GaN). The remaining 85% is consumed by defense radar, 5G RF power amplifiers, and LED/power electronics. When China restricts exports, defense and aerospace firms outbid automotive OEMs for spot allocations.
@@ -98,7 +101,10 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 #### 7. Non-Stationarity: Dynamic Supply Chain Rewiring
 * **The Reality:** Supply networks are living organisms. Within 4 to 8 weeks of an export ban, Germanium buyers re-route procurement through Belgian recycling facilities or Canadian zinc-smelter byproducts.
-* **The Simulation Bound:** Graph edges and transfer matrices are static and immutable.
+* **The Simulation Bound:** Static 30-node, 69-edge topological graph structure.
+* **Current Mitigation & Open Gap Status:**
+  - *Mitigation Implemented (Phase 4):* Added an `edge_confidence` attribute (default `1.0`) to all graph edges and an `apply_alternate_supplier_signal(graph, node_a, node_b, new_confidence)` API in `src/grounding_graph.py`. When alternate sourcing is qualified, edge confidence is down-weighted in the grounding engine.
+  - *Open Gap:* **This is strictly session-scoped (in-memory only) and does NOT constitute a live dynamic graph.** It does not persist topology rewiring to disk or a database, nor does it dynamically discover new supplier nodes or routes from real-time web telemetry. The underlying verified node and edge sets remain locked to the 30-node scope statement. This narrows the impedance gap for in-session simulation, but live topological rewiring remains an open production constraint.
 * **The Engineering Fix:** 
   - Incorporate **Dynamic Topology Adaptation**: when edge impedance exceeds threshold $\theta$, trigger alternative edge activation with a re-qualification penalty function.
 
@@ -119,12 +125,18 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
   - Deploy via **On-Premise Enterprise Containers** or **Confidential Computing (Intel SGX / AWS Nitro Enclaves)**.
   - Implement **Federated Supply Chain Learning & Zero-Knowledge Proofs (ZKP)**: Tier-1 suppliers prove capacity availability without disclosing sensitive supplier identities or raw prices.
 
-#### 10. AI Headline Extraction Fragility & GDELT Noise
-* **The Reality:** Rule-based keyword matching and zero-shot small language models (SLMs, e.g., 0.5B parameters) struggle with linguistic subtleties ("China considers reviewing restrictions" vs. "China enacts complete export ban"). GDELT produces massive noise, syndicated syndications, and sentiment swings disconnected from physical volume drops.
-* **The Simulation Bound:** Keyword heuristic baseline + zero-shot SLM with high Stage 1 sensitivity.
-* **The Engineering Fix:** 
-  - Implement **Multi-Agent Cross-Verification with RAG (Retrieval-Augmented Generation)**: require verification across 3 independent tier-1 sources (e.g., Reuters, Bloomberg, Official Ministry Gazette).
-  - Use structured information extraction models fine-tuned on trade-compliance regulatory corpora with strict JSON Schema constraints.
+#### 10. Precautionary SLM False Positive Bias & Headline Noise
+* **The Reality:** Zero-shot small language models (SLMs, e.g. Qwen2.5-0.5B) exhibit acute precautionary bias when prompt-engineered as supply chain monitors, treating routine operational corporate news (earnings calls, facility openings, scheduled plant maintenance) as supply disruptions.
+* **The Simulation Bound & Empirical Verification:**
+  - *Phase 0 Baseline:* Raw SLM flagged **all 4 benign control scenarios** as disruptions.
+    - **Stage 1 Specificity:** **0.0%** (0 / 4 benign events rejected; True Negatives = 0, False Positives = 4).
+    - **Stage 1 Precision:** **0.733** (11 / 15 headlines flagged as disruption).
+    - **Stage 1 F1 Score:** **0.846**.
+  - *Phase 3 Upgrade:* Added few-shot benign contrastive examples and mandatory `confidence_reason` attribution directly to `extract_signal_qwen()`.
+    - **Stage 1 Specificity:** **100.0%** (4 / 4 benign events rejected; True Negatives = 4, False Positives = 0).
+    - **Stage 1 Precision:** **1.000** (11 / 11 flagged events were true disruptions).
+    - **Stage 1 F1 Score:** **1.000** (improved from 0.846, **+0.154** absolute delta).
+* **Remaining Limitation:** While few-shot prompting eliminated false positives on the synthesized benchmark, real-world GDELT feeds exhibit adversarial noise, sarcasm, and syndicated re-reporting that still require cross-source corroboration before enterprise execution.
 
 #### 11. Validation vs. Single-Event Calibration
 * **The Reality:** Demonstrating a $\Delta = -2.8\text{pp}$ error against the 2021 SIAM semiconductor shortage is a calibration milestone, not an out-of-sample validation. The 2021 shortage was a demand-surge + pandemic lockdown crisis; a future Taiwan Strait blockade or gallium quota is a raw material embargo with entirely different elasticity curves.
