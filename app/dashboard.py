@@ -52,7 +52,20 @@ from src.module_c_causal import (
     compute_cost_adjusted_recommendation,
 )
 from src.module_d_mc import run_monte_carlo
-from src.module_e_pcar import calculate_pcar, OEM_PROFILES
+import importlib
+import src.module_e_pcar as module_e_pcar
+try:
+    importlib.reload(module_e_pcar)
+except Exception:
+    pass
+calculate_pcar = getattr(module_e_pcar, "calculate_pcar")
+OEM_PROFILES = getattr(module_e_pcar, "OEM_PROFILES", {
+    "Maruti Suzuki": {"market_share": 0.417, "dependency_ratio": 0.38, "description": "India's largest automaker; high-volume mass-market PV"},
+    "Hyundai India": {"market_share": 0.146, "dependency_ratio": 0.42, "description": "Second largest PV maker; higher electronic component density"},
+    "Tata Motors": {"market_share": 0.139, "dependency_ratio": 0.45, "description": "EV market leader (~70% EV share); high semiconductor intensity"},
+    "Mahindra": {"market_share": 0.112, "dependency_ratio": 0.44, "description": "SUV market leader; heavily impacted in 2021 chip crisis"},
+    "Entire Indian Automotive Industry": {"market_share": 1.000, "dependency_ratio": 1.00, "description": "Macro-level aggregate Indian automotive semiconductor import exposure"}
+})
 from src.grounding_graph import get_graph_summary, get_grounding_graph
 from src.data_sources import (
     load_comtrade_data,
@@ -2287,15 +2300,16 @@ st.markdown("---")
 st.markdown("""
 <div class="section-header">
     <h3>🔬 Analysis Modes</h3>
-    <span class="section-badge">Live GDELT · Scenario · SIAM Backtest · Table 5</span>
+    <span class="section-badge">Live GDELT · Scenario · SIAM Backtest · Table 5 · Governance</span>
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📰 Headline Analysis (Live GDELT)",
     "🎯 Scenario Selector",
     "📈 Model Calibration (SIAM 2021)",
-    "🔬 Pipeline Benchmark (Table 5)"
+    "🔬 Pipeline Benchmark (Table 5)",
+    "🛡️ Model Governance & Limitations"
 ])
 
 # ── TAB 1: Headline Analysis with Live GDELT Feed ──
@@ -2838,6 +2852,158 @@ with tab4:
 ⚠️ Stage 1 Specificity = 0.0% — The small 0.5B parameter SLM (Qwen2.5-0.5B-Instruct) exhibits an inherent precautionary bias: all 4 benign control scenarios in the 15-scenario benchmark were classified as disruptions. Stage 3 deterministic semantic guard (_is_non_disruptive_event()) intercepts these false alarms and resets risk score to 0.000 (LOW) before final output. Pipeline Macro F1 = 0.790 reflects post-guard performance.
 """)
 
+# ── TAB 5: Model Governance & Real-World Limitations ──
+with tab5:
+    st.markdown("### 🛡️ Model Governance, Operational Boundaries & Real-World Risks")
+    st.caption("Critical evaluation of CounterVerse: Deconstructing the chasm between a stylized academic simulation sandbox and industrial enterprise deployment across 15 core dimensions.")
+
+    # Executive Overview Callout
+    st.markdown("""
+    <div style="background: rgba(30, 41, 59, 0.03); border: 1px solid #cbd5e1; border-left: 5px solid #0284c7; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 800; font-size: 0.95rem; color: #0369a1;">⚖️ THE SIMULATION VS. REALITY PARADOX</span>
+            <span style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px;">Formal Model Boundary</span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.55;">
+            A simulation optimizes for <strong>internal mathematical consistency</strong> (verifying that graph BFS and Monte Carlo equations propagate correctly). 
+            Industrial deployment tests <strong>external validity</strong> (how real humans, suppliers, commodities, and political entities behave under panic and imperfect information). 
+            Below, all 15 operational gaps are cataloged into two foundational pillars with concrete engineering fixes.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 4 KPI Summary Cards
+    gov_col1, gov_col2, gov_col3, gov_col4 = st.columns(4)
+    with gov_col1:
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">Identified Constraints</div>
+            <div class="metric-value">15 Gaps</div>
+            <div class="metric-sub">Formally Documented</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with gov_col2:
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">Pillar A: Simulation Bounds</div>
+            <div class="metric-value">7 Limits</div>
+            <div class="metric-sub">Graph, Buffers & Reflexivity</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with gov_col3:
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">Pillar B: Deployment Risks</div>
+            <div class="metric-value">8 Risks</div>
+            <div class="metric-sub">Data Lag, BOM Privacy & Noise</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with gov_col4:
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">Roadmap Resolution</div>
+            <div class="metric-value">v2.0</div>
+            <div class="metric-sub">Full Enterprise Blueprint</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
+
+    # Slide Deck Layout Container
+    st.markdown("#### 📽️ Presentation Slide Specification: *Simulation Validity vs. Deployment Risk*")
+    st.caption("Organized for academic capstone defenses, conference presentations, and executive steering committee reviews.")
+
+    slide_p1, slide_p2 = st.columns(2)
+    with slide_p1:
+        st.markdown("""
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 8px; padding: 14px 16px; height: 100%;">
+            <div style="font-weight: 700; color: #1d4ed8; font-size: 0.9rem; margin-bottom: 8px;">
+                CATEGORY 1: SIMULATION VALIDITY (INTERNAL)
+            </div>
+            <div style="font-size: 0.8rem; color: #475569; margin-bottom: 12px;">
+                <em>Constraints of the mathematical, graph, and statistical engine</em>
+            </div>
+            <ul style="font-size: 0.82rem; color: var(--text-primary); padding-left: 18px; margin: 0; line-height: 1.6;">
+                <li><strong>Graph Mesh vs. 4-Tier Chain:</strong> Real supply networks are cyclic, multi-sourced meshes; our 8-node DAG is an abstraction.</li>
+                <li><strong>Missing Buffers & Lead Times:</strong> No inventory stock-and-flow dynamics; shocks propagate instantly across BFS hops.</li>
+                <li><strong>Monte Carlo "Precision Theater":</strong> 10k draws give narrow percentiles, but inputs use uniform heuristics rather than empirical econometric fits.</li>
+                <li><strong>Closed-System Fallacy:</strong> Ignores cross-industry competition (defense radar & 5G outbidding auto OEMs for Ga/Ge).</li>
+                <li><strong>Model Reflexivity:</strong> Forecasting a shortage triggers panic double-ordering and hoarding, amplifying real severity.</li>
+                <li><strong>Discrete vs. Continuous Timing:</strong> Real export bans have partial enforcement, licenses, and rolling phases, not fixed scalars.</li>
+                <li><strong>Non-Stationary Topology:</strong> Real firms rewire and onboard new suppliers within weeks of a shock.</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with slide_p2:
+        st.markdown("""
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: 4px solid #ef4444; border-radius: 8px; padding: 14px 16px; height: 100%;">
+            <div style="font-weight: 700; color: #b91c1c; font-size: 0.9rem; margin-bottom: 8px;">
+                CATEGORY 2: REAL-WORLD DEPLOYMENT RISK (EXTERNAL)
+            </div>
+            <div style="font-size: 0.8rem; color: #475569; margin-bottom: 12px;">
+                <em>Operational, commercial, and institutional friction in production</em>
+            </div>
+            <ul style="font-size: 0.82rem; color: var(--text-primary); padding-left: 18px; margin: 0; line-height: 1.6;">
+                <li><strong>Macro Data Lag:</strong> UN Comtrade is annual, lagged by 3–12 months, and aggregates dissimilar chips under HS 8542.</li>
+                <li><strong>Proprietary BOM Privacy:</strong> Automakers will not disclose confidential supplier contracts or BOM ratios in public web tools.</li>
+                <li><strong>NLP Extraction Fragility:</strong> Zero-shot SLM & keyword parsing struggle with diplomatic nuances; GDELT has high noise.</li>
+                <li><strong>Single-Event Calibration:</strong> Matching SIAM 2021 (within 2.8pp) proves parameter plausibility, not out-of-sample validation.</li>
+                <li><strong>The Actionability Gap:</strong> CPOs need prescriptive supplier reallocation (MILP), hedging plays, and scheduling, not just a risk number.</li>
+                <li><strong>Diplomatic & Bilateral Noise:</strong> Bilateral exemptions and government diplomacy frequently overturn graph logic.</li>
+                <li><strong>Model Liability & Asymmetric Loss:</strong> Unnecessary spot commitments from false alarms cause direct corporate financial harm.</li>
+                <li><strong>Latency vs. Market Reality:</strong> Traders and OEMs act on direct supplier calls hours before news hits GDELT.</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown('<div style="height: 16px;"></div>', unsafe_allow_html=True)
+
+    # Detailed 15-Point Breakdown with Engineering Fixes
+    st.markdown("#### 🔬 Comprehensive Engineering Solutions & Enterprise Roadmap")
+    st.caption("How each limitation is solved in the production architecture (documented in `docs/limitations_and_future_work.md`).")
+
+    with st.expander("📌 Category 1 Detailed Breakdown: Internal Simulation Validity & Solutions", expanded=True):
+        st.markdown("""
+        | # | Simulation Constraint | Real-World Phenomenon | Proposed Enterprise Engineering Fix |
+        |---|---|---|---|
+        | **1** | **Graph Oversimplification** | Clean 4-tier chain ignores alternate routing, cyclic sub-assemblies, and dual-sourcing (e.g. Taiwan + Korea). | **Bipartite Neo4j Knowledge Graph** with dynamic edge impedance reflecting AEC-Q100 qualification lag. |
+        | **2** | **Missing Inventory Buffers** | Shocks take 60–120 days to traverse safety stocks, ocean transit, and wafer fab WIP cycles. | **SimPy Discrete-Event Engine** with differential stock-and-flow conservation: $\\frac{d(\\text{Stock})}{dt} = \\text{Inflow}(t - L) - \\text{Outflow}(t)$. |
+        | **3** | **Monte Carlo "Precision Theater"** | 10k runs give false precision if severity distributions and multiplier $U[1.3, 2.8]$ are heuristic. | **Global Sensitivity Analysis (Sobol Indices & Morris Method)** + empirical priors fitted to ICIS spot indices. |
+        | **4** | **Closed-System Fallacy** | Auto sector uses only ~15% of gallium; defense radar & 5G outbid auto buyers in spot shortages. | **Cross-Industry Elasticity Term:** $\\text{Drop}_{\\text{auto}} = \\text{Global} \\times (1 + \\frac{\\text{WTP}_{\\text{defense}}}{\\text{WTP}_{\\text{auto}}} \\cdot \\text{Share}_{\\text{defense}})$. |
+        | **5** | **Model Reflexivity** | Predicting a shortage triggers panic-buying and double-ordering, artificially magnifying the crisis. | **Multi-Agent Reinforcement Learning (MARL)** simulating bounded-rational inventory hoarding games. |
+        | **6** | **Discrete Timing Scalar** | Disruption duration is rarely fixed ($D=45$ days); policies face rolling exemptions and delays. | **Stochastic Survival Function (Cox Proportional Hazard Model)** updated via real-time regulatory filings. |
+        | **7** | **Static Graph Topology** | Supply chains adapt within weeks by qualifying secondary refiners and alternative chip packages. | **Dynamic Topology Rewiring:** activate alternative supplier edges when primary cost exceeds threshold $\\theta$. |
+        """)
+
+    with st.expander("📌 Category 2 Detailed Breakdown: Real-World Deployment Risks & Solutions", expanded=True):
+        st.markdown("""
+        | # | Deployment Risk | Real-World Phenomenon | Proposed Enterprise Engineering Fix |
+        |---|---|---|---|
+        | **8** | **Macro Comtrade Lag** | Annual HS 8542 data is months old and lumps all microcontrollers and diodes together. | **High-Frequency Customs EDI Telemetry:** weekly port container TEUs (JNPT/Mundra bills of entry) and fab lead-time indices. |
+        | **9** | **Proprietary BOM Privacy** | OEMs consider parts lists and supplier margins confidential trade secrets. | **Confidential Enclaves (AWS Nitro / Intel SGX)** + **Federated Zero-Knowledge Proofs (ZKP)** for multi-tier verification. |
+        | **10** | **AI Extraction Fragility** | GDELT headline noise, syndications, and zero-shot SLM sentiment ambiguity. | **Triangulated Multi-Agent RAG:** consensus verification across 3 tier-1 sources (Bloomberg, Reuters, Official Gazettes). |
+        | **11** | **Single-Event Calibration** | 2021 SIAM backtest proves parameter plausibility for one event, not generalized out-of-sample validity. | **Multi-Crisis Benchmark Suite:** cross-testing on 2011 Fukushima, 2023 Red Sea, and 2024 Noto Japan earthquakes. |
+        | **12** | **The Actionability Gap** | A financial loss figure alone does not tell a procurement officer what operational play to execute. | **Mixed-Integer Linear Programming (MILP):** prescriptive optimizer generating exact buffer ramps and hedging contracts. |
+        | **13** | **Diplomatic / Lobbying Friction** | Backchannel trade diplomacy and conglomerate exemptions override graph physics. | **Geopolitical Bilateral Exemption Bayesian Prior** conditioned on strategic trade treaties (e.g. India-US iCET). |
+        | **14** | **Model Risk & Liability** | Unnecessary emergency air-freight or spot commitments caused by false alarms create financial loss. | **Asymmetric Loss Function Calibration:** explicitly weight False Positives vs. False Negatives ($C_{\\text{FN}} \\approx 10 \\times C_{\\text{FP}}$). |
+        | **15** | **Latency & Adversarial Disinformation** | Commodity desks react hours before press releases; bad actors can plant spoofed headlines. | **Direct EDI 856 Telemetry** + **Adversarial Cryptographic News Provenance & Source Domain Filtering**. |
+        """)
+
+    st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
+
+    # Viva Defense Guidelines Box
+    with st.expander("🎓 Academic Defense / Viva Cheat Sheet (Key Questions & Answers)", expanded=False):
+        st.markdown("""
+        **Q1: "Isn't your Monte Carlo PCaR just precision theater based on arbitrary distributions?"**  
+        *Answer:* Exactly. That is Limitation #3 in our governance documentation. In this prototype, our objective is demonstrating the computational architecture—connecting unstructured NLP signals to a causal DAG and stochastic loss estimation. In production, we mandate Sobol Variance Sensitivity Analysis and fitting to ICIS/spot commodity distributions.
+
+        **Q2: "How can you estimate Maruti Suzuki's exposure without having their actual BOM?"**  
+        *Answer:* We explicitly clarify this as a top-down macroeconomic allocation using official SIAM FY24 market shares (41.7%) and industry-average ECU silicon intensity (38%) derived from UN Comtrade HS 8542. As detailed in Limitation #9, enterprise deployment requires on-premise confidential enclaves operating directly over private ERP line items.
+
+        **Q3: "Why is SIAM 2021 labeled a calibration case study rather than validation?"**  
+        *Answer:* Because model parameters were calibrated with knowledge of the historical 2021 event. Labeling this validation would be circular. As stated in Limitation #11, authentic validation requires testing against independent, held-out historical events without parameter tuning.
+        """)
 
 # ── Footer ──
 st.markdown("""
