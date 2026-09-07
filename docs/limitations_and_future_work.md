@@ -12,7 +12,7 @@ CounterVerse demonstrates a proof-of-concept multi-agent architecture coupling *
 
 While the internal pipeline achieves computational consistency and replicates historical benchmarks within calibration tolerances ($\le \pm 5.0\text{pp}$), **a major chasm exists between a stylized simulation sandbox and live industrial deployment**.
 
-To prevent *"precision theater"*—presenting an exact monetary loss figure that masks fragile assumptions—this document formally categorizes the **15 core constraints** into two foundational pillars:
+To prevent *"precision theater"*—presenting an exact monetary loss figure that masks fragile assumptions—this document formally categorizes the **16 core constraints** into two foundational pillars:
 1. **Simulation Validity:** Internal structural boundaries of the mathematical and graph model.
 2. **Real-World Deployment Risk:** External systemic, commercial, behavioural, and operational friction in live supply chains.
 
@@ -46,7 +46,7 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 ---
 
-## Detailed Matrix: The 15 Real-World Gaps & Their Engineering Fixes
+## Detailed Matrix: The 16 Real-World Gaps & Their Engineering Fixes
 
 ### Category 1: Simulation Validity (Internal Modeling Constraints)
 
@@ -118,9 +118,10 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 * **The Engineering Fix:** 
   - Complement macro Comtrade with high-frequency telemetry: weekly container port TEU imports (Indian JNPT/Mundra customs bills of entry), air cargo manifests, and spot foundry lead-time trackers (e.g., TrendForce/Gartner semiconductor indices).
 
-#### 9. Proprietary OEM BOM Confidentiality (The B2B Data Barrier)
+#### 9. Proprietary OEM BOM Confidentiality & Heuristic Dependency Ratios
 * **The Reality:** No automotive OEM (Maruti, Tata, Hyundai) will upload their proprietary Bill of Materials (BOM), supplier cost margins, or tier-N contracts into a public cloud-hosted web application.
-* **The Simulation Bound:** Uses public SIAM FY24 market share estimates and estimated BOM dependency ratios (38%–45%).
+* **The Simulation Bound:** Uses public SIAM FY24 market share estimates and domain-estimated BOM dependency ratios (38%–45%).
+* **Heuristic Assignment Disclosure:** As documented in `docs/assumptions_and_dag.md`, the dependency ratios (Maruti 0.38, Hyundai 0.42, Tata 0.45, Mahindra 0.44) are heuristic proxies reflecting relative electronics intensity across vehicle segments, NOT certified audited OEM BOM disclosures. While the formula $\sum (\text{Market Share}_i \times \text{Dependency}_i) = 33.16\% \le 1.0$ guarantees **algebraic internal consistency by construction**, it does **not guarantee empirical ground-truth accuracy**.
 * **The Engineering Fix:** 
   - Deploy via **On-Premise Enterprise Containers** or **Confidential Computing (Intel SGX / AWS Nitro Enclaves)**.
   - Implement **Federated Supply Chain Learning & Zero-Knowledge Proofs (ZKP)**: Tier-1 suppliers prove capacity availability without disclosing sensitive supplier identities or raw prices.
@@ -175,6 +176,15 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 * **The Engineering Fix:** 
   - Implement **Direct API Telemetry Connectors** (EDI 856 Advanced Shipping Notices, AIS vessel tracking, customs clearance EDI).
   - Instate an **Adversarial Noise Filter** checking source domain provenance, cryptographic news verification, and cross-source semantic consensus before triggering simulation runs.
+
+#### 16. Evaluation Harness Sample Size Sensitivity ($N=15$) & SLM Decoding Reproducibility
+* **The Reality:** The pipeline evaluation benchmark consists of 15 synthesized scenarios (11 disruptions, 4 controls). At this sample size, a single scenario classification flip swings precision, recall, or $F_1$ by 6.7 to 9.1 percentage points ($1/11 \approx 9.09\%$, $1/15 \approx 6.67\%$). As a result, comparing pipeline iterations on a single-shot scorecard is statistically sensitive to small perturbations.
+* **The Simulation Bound & Determinism Verification:**
+  - *Decoding Determinism:* In `src/module_b_slm.py`, `extract_signal_qwen()` strictly uses greedy decoding (`do_sample=False`). In identical environments, the SLM generation is 100% deterministic (test-verified run-to-run variance = 0).
+  - *Baseline Divergence Reconciliation:* Differences observed between early pre-Phase-0 draft numbers (Stage 2 $F_1=0.842$, Stage 4 $F_1=0.696$) and the official Phase 0 baseline recorded at commit `0b2db1a` (Stage 2 $F_1=0.778$, Stage 4 $F_1=0.846$) stem from the extreme sensitivity of single-shot metrics on $N=15$. In both cases, the current Phase 6 model ($F_1 = 0.952$ and $0.889$) strictly outperforms all historical baselines.
+* **The Engineering Fix:**
+  - Expand the synthetic evaluation testbed from $N=15$ to $N \ge 100$ stratified scenarios.
+  - Report bootstrap confidence intervals (e.g., 1,000 resamples) or multi-run variance envelopes ($\text{mean} \pm \text{std}$) rather than isolated single-shot point estimates.
 
 ---
 
