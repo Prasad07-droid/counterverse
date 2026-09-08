@@ -46,8 +46,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Semiconductor Fab",
       "event_type": "Export ban/restriction",
-      "severity_pct": 83,
-      "duration_days": 77,
+      "severity_pct": 92,
+      "duration_days": 62,
       "confidence": 0.95,
       "confidence_reason": "Government export controls directly halt semiconductor wafer manufacturing",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Government export controls directly halt semiconductor wafer manufacturing\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Trade Policy\",\n  \"affected_node\": \"Semiconductor Fab\",\n  \"event_type\": \"Export ban/restriction\",\n  \"severity_pct\": 85,\n  \"duration_days\": 70,\n  \"affected_regions\": [\"China\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"semiconductor\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 8,\n  \"confidence\": 0.95,\n  \"summary\": \"Export controls halt wafer production.\"\n}\n```"
@@ -69,8 +69,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Semiconductor Fab",
       "event_type": "Export ban/restriction",
-      "severity_pct": 90,
-      "duration_days": 75,
+      "severity_pct": 83,
+      "duration_days": 86,
       "confidence": 0.95,
       "confidence_reason": "Severe packaging bottlenecks due to regional trade restrictions",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Severe packaging bottlenecks due to regional trade restrictions\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Supply Chain Disruption\",\n  \"affected_node\": \"Taiwan Semiconductor Manufacturing Company\",\n  \"event_type\": \"Packaging Bottleneck\",\n  \"severity_pct\": 100,\n  \"duration_days\": 30,\n  \"affected_regions\": [\"Asia\"],\n  \"companies\": [\"Taiwan Semiconductor Manufacturing Company\"],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"packaging\",\n  \"severity\": 5,\n  \"lead_time_weeks\": 15,\n  \"confidence\": 0.95,\n  \"summary\": \"Severe packaging bottlenecks in Taiwan Semiconductor Manufacturing Company due to regional trade restrictions.\"\n}\n```"
@@ -93,7 +93,7 @@
       "affected_node": "Semiconductor Fab",
       "event_type": "Logistics delay",
       "severity_pct": 0,
-      "duration_days": 7,
+      "duration_days": 1,
       "confidence": 1.0,
       "confidence_reason": "Domestic semiconductor distributor launches new facilities to enhance customer experience and expansion into new markets",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Domestic semiconductor distributor launches new facilities to enhance customer experience and expansion into new markets\",\n  \"is_disruption\": false,\n  \"disruption_type\": \"None\",\n  \"affected_node\": \"Customer Experience Center\",\n  \"event_type\": \"Facility opening\",\n  \"severity_pct\": 0,\n  \"duration_days\": 0,\n  \"affected_regions\": [\"India\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"new facility\",\n  \"severity\": 0,\n  \"lead_time_weeks\": 0,\n  \"confidence\": 1,\n  \"summary\": \"Domestic semiconductor distributor introduces new facilities to expand its customer base and market presence.\"\n}\n```"
@@ -115,8 +115,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Port/Logistics",
       "event_type": "Port closure",
-      "severity_pct": 88,
-      "duration_days": 82,
+      "severity_pct": 83,
+      "duration_days": 74,
       "confidence": 0.99,
       "confidence_reason": "Port closure and dock congestion disrupt Asian containerized automotive parts shipping",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Port closure and dock congestion disrupt Asian containerized automotive parts shipping\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_node\": \"Asian Container Ports\",\n  \"event_type\": \"Disaster\",\n  \"severity_pct\": 100,\n  \"duration_days\": 30,\n  \"affected_regions\": [\"Asia\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\"],\n  \"component\": \"containerized parts\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 15,\n  \"confidence\": 0.99,\n  \"summary\": \"Asian container ports shut down due to natural disasters disrupting containerized automotive parts shipping.\"\n}\n```"
@@ -138,8 +138,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Port/Logistics",
       "event_type": "Logistics delay",
-      "severity_pct": 84,
-      "duration_days": 79,
+      "severity_pct": 81,
+      "duration_days": 70,
       "confidence": 0.95,
       "confidence_reason": "Sea transport disruptions due to Red Sea shipping crisis leading to indefinite rerouting around Cape of Good Hope",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Sea transport disruptions due to Red Sea shipping crisis leading to indefinite rerouting around Cape of Good Hope\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Transportation\",\n  \"affected_node\": \"Cargo ships\",\n  \"event_type\": \"Disruption\",\n  \"severity_pct\": 95,\n  \"duration_days\": 14,\n  \"affected_regions\": [\"Red Sea\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Cape of Good Hope\", \"Cargo shipments\"],\n  \"component\": \"sea transport\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 14,\n  \"confidence\": 0.95,\n  \"summary\": \"Indefinite rerouting due to sea transport disruptions triggered by a global shipping crisis.\"\n}\n```"
@@ -184,8 +184,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Raw Material Supplier",
       "event_type": "Raw material shortage",
-      "severity_pct": 88,
-      "duration_days": 68,
+      "severity_pct": 95,
+      "duration_days": 74,
       "confidence": 0.96,
       "confidence_reason": "National Security Restrictions on Critical Minerals Cause Acute Raw Material Shortages",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"National Security Restrictions on Critical Minerals Cause Acute Raw Material Shortages\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Raw Material Shortage\",\n  \"affected_node\": \"Raw Material Supplier\",\n  \"event_type\": \"Raw material shortage\",\n  \"severity_pct\": 90,\n  \"duration_days\": 75,\n  \"affected_regions\": [\"China\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"gallium and germanium\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 8,\n  \"confidence\": 0.96,\n  \"summary\": \"National Security Restrictions on Critical Minerals Triggered Acute Material Shortages.\"\n}\n```"
@@ -207,8 +207,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Raw Material Supplier",
       "event_type": "Raw material shortage",
-      "severity_pct": 86,
-      "duration_days": 82,
+      "severity_pct": 81,
+      "duration_days": 81,
       "confidence": 0.95,
       "confidence_reason": "Tier-4 supply shock due to global lithium and cobalt refinery curbs, impacting EV battery manufacturers",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Tier-4 supply shock due to global lithium and cobalt refinery curbs, impacting EV battery manufacturers\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Supply Chain Disruption\",\n  \"affected_node\": \"Lithium Cobalt Refinery\",\n  \"event_type\": \"Production Shutdown\",\n  \"severity_pct\": 95,\n  \"duration_days\": 100,\n  \"affected_regions\": [\"Global\"],\n  \"companies\": [\"EV Battery Manufacturers\"],\n  \"impacted_industries\": [\"Automotive\", \"Electronics\"],\n  \"component\": \"Refinery\",\n  \"severity\": 5,\n  \"lead_time_weeks\": 10,\n  \"confidence\": 0.95,\n  \"summary\": \"Global lithium and cobalt refinery curbs lead to Tier-4 supply shock affecting EV battery manufacturers.\"\n}\n```"
@@ -231,7 +231,7 @@
       "affected_node": "Assembly Hub",
       "event_type": "Demand shock",
       "severity_pct": 0,
-      "duration_days": 2,
+      "duration_days": 3,
       "confidence": 1.0,
       "confidence_reason": "Automobile manufacturer celebrates significant milestone in electric vehicle sales, indicating strong market demand and growth potential.",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Automobile manufacturer celebrates significant milestone in electric vehicle sales, indicating strong market demand and growth potential.\",\n  \"is_disruption\": false,\n  \"disruption_type\": \"None\",\n  \"affected_node\": \"Automotive\",\n  \"event_type\": \"Sales increase\",\n  \"severity_pct\": 100,\n  \"duration_days\": 1,\n  \"affected_regions\": [\"Global\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\"],\n  \"component\": \"none\",\n  \"severity\": 0,\n  \"lead_time_weeks\": 0,\n  \"confidence\": 1,\n  \"summary\": \"Automobile manufacturer reports impressive sales growth, signaling robust market performance.\"\n}\n```"
@@ -253,8 +253,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Assembly Hub",
       "event_type": "Factory shutdown",
-      "severity_pct": 92,
-      "duration_days": 71,
+      "severity_pct": 93,
+      "duration_days": 84,
       "confidence": 0.99,
       "confidence_reason": "Unusual industrial action by German auto workers leading to shutdown of major powertrain assembly operations",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Unusual industrial action by German auto workers leading to shutdown of major powertrain assembly operations\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Industrial Action\",\n  \"affected_node\": \"Powertrain Assembly Hub\",\n  \"event_type\": \"Plant Shutdown\",\n  \"severity_pct\": 100,\n  \"duration_days\": 30,\n  \"affected_regions\": [\"Germany\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Powertrain\"],\n  \"component\": \"powertrain assembly\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 30,\n  \"confidence\": 0.99,\n  \"summary\": \"Unusual industrial action by German auto workers leading to shutdown of major powertrain assembly operations.\"\n}\n```"
@@ -277,7 +277,7 @@
       "affected_node": "Port/Logistics",
       "event_type": "Factory shutdown",
       "severity_pct": 90,
-      "duration_days": 68,
+      "duration_days": 62,
       "confidence": 0.99,
       "confidence_reason": "Labor strike disrupts container unloading at key automotive import ports",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Labor strike disrupts container unloading at key automotive import ports\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Labor Strike\",\n  \"affected_node\": \"Container Unloading\",\n  \"event_type\": \"Port Closure\",\n  \"severity_pct\": 100,\n  \"duration_days\": 30,\n  \"affected_regions\": [\"California\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive Import\"],\n  \"component\": \"container unloading\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 30,\n  \"confidence\": 0.99,\n  \"summary\": \"Labor strike disrupts container unloading at key automotive import ports in California.\"\n}\n```"
@@ -300,7 +300,7 @@
       "affected_node": "Tier-1 Supplier",
       "event_type": "Logistics delay",
       "severity_pct": 0,
-      "duration_days": 3,
+      "duration_days": 5,
       "confidence": 1.0,
       "confidence_reason": "Union successfully concluded annual wage agreement without work stoppage",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Union successfully concluded annual wage agreement without work stoppage\",\n  \"is_disruption\": false,\n  \"disruption_type\": \"None\",\n  \"affected_node\": \"Automotive suppliers\",\n  \"event_type\": \"Wage negotiation\",\n  \"severity_pct\": 100,\n  \"duration_days\": 0,\n  \"affected_regions\": [\"Global\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\"],\n  \"component\": \"wages\",\n  \"severity\": 0,\n  \"lead_time_weeks\": 0,\n  \"confidence\": 1,\n  \"summary\": \"Automotive industry successfully negotiated wage terms without worker strikes or disruptions.\"\n}\n```"
@@ -322,8 +322,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Semiconductor Fab",
       "event_type": "Factory shutdown",
-      "severity_pct": 36,
-      "duration_days": 22,
+      "severity_pct": 49,
+      "duration_days": 21,
       "confidence": 1.0,
       "confidence_reason": "Magnitude 7.4 earthquake in Taiwan causes immediate disruption to major Hsinchu semiconductor fabs, leading to emergency shutdown.",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Magnitude 7.4 earthquake in Taiwan causes immediate disruption to major Hsinchu semiconductor fabs, leading to emergency shutdown.\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_node\": \"Hsinchu Semiconductor Fabs\",\n  \"event_type\": \"Disaster\",\n  \"severity_pct\": 100,\n  \"duration_days\": 24,\n  \"affected_regions\": [\"Taiwan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"none\",\n  \"severity\": 0,\n  \"lead_time_weeks\": 0,\n  \"confidence\": 1,\n  \"summary\": \"Magnitude 7.4 earthquake in Taiwan disrupts major Hsinchu semiconductor fabs, triggering emergency shutdown.\"\n}\n```"
@@ -346,7 +346,7 @@
       "affected_node": "Semiconductor Fab",
       "event_type": "Natural disaster",
       "severity_pct": 80,
-      "duration_days": 70,
+      "duration_days": 86,
       "confidence": 0.99,
       "confidence_reason": "Major flood in southern Japan causes significant damage to silicon wafer processing facilities, disrupting supply chains.",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Major flood in southern Japan causes significant damage to silicon wafer processing facilities, disrupting supply chains.\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Natural Disaster\",\n  \"affected_node\": \"Silicon Wafer Processing Facilities\",\n  \"event_type\": \"Supply Chain Disruption\",\n  \"severity_pct\": 100,\n  \"duration_days\": 30,\n  \"affected_regions\": [\"Japan\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Semiconductors\"],\n  \"component\": \"silicon wafer\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 30,\n  \"confidence\": 0.99,\n  \"summary\": \"Major flooding damages silicon wafer processing facilities in southern Japan, leading to disruptions in supply chains.\"\n}\n```"
@@ -368,8 +368,8 @@
       "engine": "Qwen2.5-0.5B-Instruct (Local GPU bf16)",
       "affected_node": "Port/Logistics",
       "event_type": "Factory shutdown",
-      "severity_pct": 84,
-      "duration_days": 86,
+      "severity_pct": 82,
+      "duration_days": 62,
       "confidence": 0.99,
       "confidence_reason": "Tropical storm damage to coastal breakwaters at Busan Port causes immediate disruptions to vessel docking operations.",
       "raw_slm_output": "```json\n{\n  \"confidence_reason\": \"Tropical storm damage to coastal breakwaters at Busan Port causes immediate disruptions to vessel docking operations.\",\n  \"is_disruption\": true,\n  \"disruption_type\": \"Port Closure\",\n  \"affected_node\": \"Vessel Docking Operations\",\n  \"event_type\": \"Disaster\",\n  \"severity_pct\": 100,\n  \"duration_days\": 7,\n  \"affected_regions\": [\"South Korea\"],\n  \"companies\": [],\n  \"impacted_industries\": [\"Automotive\", \"Transportation\"],\n  \"component\": \"breakwater infrastructure\",\n  \"severity\": 3,\n  \"lead_time_weeks\": 7,\n  \"confidence\": 0.99,\n  \"summary\": \"Tropical storm damages coastal breakwaters at Busan Port, leading to immediate vessel dockings being halted.\"\n}\n```"
