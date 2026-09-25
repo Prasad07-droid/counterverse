@@ -245,3 +245,182 @@ def calculate_pcar_by_company(
     )
     return metrics
 
+
+# ════════════════════════════════════════════════════════════════
+# PHASE 4: CUSTOM BOM UPLOAD — PCaR for Any Company
+# ════════════════════════════════════════════════════════════════
+
+import csv
+import io
+import json as _json
+
+
+def parse_bom_csv(csv_content: str) -> list:
+    """
+    Parses CSV BOM content into a list of component dicts.
+    Expected CSV columns: component_name, hs_code, annual_spend_crore
+    
+    Returns:
+        List of dicts with keys: component_name, hs_code, annual_spend_crore
+    """
+    reader = csv.DictReader(io.StringIO(csv_content))
+    components = []
+    for row in reader:
+        try:
+            components.append({
+                "component_name": row.get("component_name", row.get("name", "")).strip(),
+                "hs_code": row.get("hs_code", row.get("hs", "")).strip(),
+                "annual_spend_crore": float(row.get("annual_spend_crore", row.get("spend_crore", row.get("spend", 0)))),
+            })
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Skipping invalid BOM row: {row} — {e}")
+            continue
+    return components
+
+
+def parse_bom_json(json_content: str) -> list:
+    """
+    Parses JSON BOM content into a list of component dicts.
+    Expected JSON: [{"component_name": ..., "hs_code": ..., "annual_spend_crore": ...}, ...]
+
+    Returns:
+        List of dicts with keys: component_name, hs_code, annual_spend_crore
+    """
+    try:
+        data = _json.loads(json_content)
+    except _json.JSONDecodeError as e:
+        logger.error(f"Invalid BOM JSON: {e}")
+        return []
+
+    if isinstance(data, dict):
+        data = data.get("components", data.get("bom", [data]))
+    if not isinstance(data, list):
+        return []
+
+    components = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        try:
+            components.append({
+                "component_name": item.get("component_name", item.get("name", "")).strip(),
+                "hs_code": str(item.get("hs_code", item.get("hs", ""))).strip(),
+                "annual_spend_crore": float(item.get("annual_spend_crore", item.get("spend_crore", item.get("spend", 0)))),
+            })
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Skipping invalid BOM item: {item} — {e}")
+            continue
+    return components
+
+
+def calculate_pcar_custom_bom(
+    mc_samples: np.ndarray,
+    bom_components: list,
+    company_name: str = "Custom Enterprise",
+    ground_against_graph: bool = True,
+) -> dict:
+    """
+    Calculates Procurement Cost-at-Risk using a custom Bill of Materials.
+    
+    Each BOM component specifies its annual procurement spend in Crore INR.
+    The total BOM baseline replaces the default UN Comtrade macro baseline,
+    enabling PCaR calculation for ANY company with known procurement data.
+    
+    If ground_against_graph is True, each component is verified against the
+    GraphRAG grounding graph for entity validation.
+    
+    Args:
+        mc_samples: Monte Carlo production drop samples (np.ndarray or MonteCarloResult).
+        bom_components: List of dicts with keys:
+            - component_name: str
+            - hs_code: str (e.g. "8542")
+            - annual_spend_crore: float
+        company_name: Label for the custom enterprise.
+        ground_against_graph: Whether to verify components against GraphRAG.
+    
+    Returns:
+        dict with PCaR metrics plus component-level grounding results.
+    """
+    logger.info(f"Calculating Custom BOM PCaR for '{company_name}' ({len(bom_components)} components)...")
+
+    if not bom_components:
+        raise ValueError("BOM component list is empty. Provide at least one component.")
+
+    # Handle dict or MonteCarloResult input
+    if isinstance(mc_samples, dict) and "samples" in mc_samples:
+        samples_array = np.asarray(mc_samples["samples"])
+    else:
+        samples_array = np.asarray(mc_samples)
+
+    # Calculate total BOM baseline
+    total_baseline_crore = sum(c.get("annual_spend_crore", 0) for c in bom_components)
+    if total_baseline_crore <= 0:
+        raise ValueError(f"Total BOM baseline is ₹{total_baseline_crore} Cr — must be positive.")
+
+    # GraphRAG grounding (optional)
+    grounding_results = []
+    if ground_against_graph:
+        try:
+            from src.grounding_graph import resolve_entity, get_grounding_graph
+            G = get_grounding_graph()
+            for comp in bom_components:
+                canonical = resolve_entity(comp["component_name"])
+                grounding_results.append({
+                    "component": comp["component_name"],
+                    "hs_code": comp["hs_code"],
+                    "spend_crore": comp["annual_spend_crore"],
+                    "canonical_name": canonical,
+                    "graph_verified": canonical is not None and G.has_node(canonical),
+                })
+        except ImportError:
+            logger.warning("GraphRAG grounding unavailable — skipping BOM verification.")
+
+    # Monte Carlo loss calculation (same formula as calculate_pcar)
+    drop_fractions = samples_array / 100.0
+    premium_multiplier_samples = np.random.uniform(low=1.3, high=2.8, size=len(samples_array))
+    loss_samples = drop_fractions * total_baseline_crore * premium_multiplier_samples
+
+    # Component-level loss allocation
+    component_pcars = []
+    for comp in bom_components:
+        comp_share = comp["annual_spend_crore"] / total_baseline_crore if total_baseline_crore > 0 else 0
+        comp_losses = loss_samples * comp_share
+        component_pcars.append({
+            "component_name": comp["component_name"],
+            "hs_code": comp["hs_code"],
+            "annual_spend_crore": comp["annual_spend_crore"],
+            "share_pct": round(comp_share * 100, 2),
+            "mean_loss_crore": float(round(np.mean(comp_losses), 2)),
+            "pcar_95_crore": float(round(np.percentile(comp_losses, 95), 2)),
+            "pcar_99_crore": float(round(np.percentile(comp_losses, 99), 2)),
+        })
+
+    metrics = {
+        "company_name": company_name,
+        "bom_type": "custom",
+        "total_baseline_crore": float(round(total_baseline_crore, 2)),
+        "effective_base_crore": float(round(total_baseline_crore, 2)),
+        "num_components": len(bom_components),
+        "component_count": len(bom_components),
+        "mean_loss_crore": float(round(np.mean(loss_samples), 2)),
+        "mean_loss_pct": float(round((np.mean(loss_samples) / total_baseline_crore) * 100, 2)) if total_baseline_crore > 0 else 0.0,
+        "median_loss_crore": float(round(np.median(loss_samples), 2)),
+        "pcar_95_crore": float(round(np.percentile(loss_samples, 95), 2)),
+        "pcar_95_pct": float(round((np.percentile(loss_samples, 95) / total_baseline_crore) * 100, 2)) if total_baseline_crore > 0 else 0.0,
+        "pcar_99_crore": float(round(np.percentile(loss_samples, 99), 2)),
+        "worst_case_loss_crore": float(round(np.max(loss_samples), 2)),
+        "worst_case_pct": float(round((np.max(loss_samples) / total_baseline_crore) * 100, 2)) if total_baseline_crore > 0 else 0.0,
+        "component_pcars": component_pcars,
+        "grounding_results": grounding_results,
+        "component_grounding": grounding_results,
+        "allocation_formula": "BOM_Baseline × Production_Drop% × Premium_Multiplier U[1.3, 2.8]",
+        "_loss_samples": loss_samples,
+    }
+
+    logger.info(
+        f"Custom BOM PCaR for {company_name}: "
+        f"95% VaR = ₹{metrics['pcar_95_crore']:,.0f} Cr (Base: ₹{total_baseline_crore:,.0f} Cr)"
+    )
+    return metrics
+
+

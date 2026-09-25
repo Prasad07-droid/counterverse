@@ -27,3 +27,11 @@ __pycache__/
 data/logs/*.jsonl
 !data/logs/.gitkeep
 *.crdownload
+
+# Runtime-generated persistence files
+data/processed/headline_cache.db
+data/processed/grounding_graph_custom.json
+
+# Local documents
+*.pdf
+

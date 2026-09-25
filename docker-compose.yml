@@ -1,0 +1,45 @@
+# ══════════════════════════════════════════════════════════════
+# CounterVerse — Docker Compose Configuration
+# ══════════════════════════════════════════════════════════════
+# Launch: docker compose up --build
+# Stop:   docker compose down
+#
+# Services:
+#   dashboard - Streamlit UI on port 8501
+#   api       - FastAPI backend on port 8000
+
+services:
+  dashboard:
+    build: .
+    container_name: counterverse-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - COUNTERVERSE_STREAMLIT_PORT=8501
+    volumes:
+      - ./data:/app/data
+    command: >
+      streamlit run app/dashboard.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+      --browser.gatherUsageStats=false
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: counterverse-api
+    ports:
+      - "8000:8000"
+    environment:
+      - COUNTERVERSE_API_HOST=0.0.0.0
+      - COUNTERVERSE_API_PORT=8000
+    volumes:
+      - ./data:/app/data
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped

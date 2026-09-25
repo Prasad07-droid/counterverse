@@ -60,6 +60,9 @@ except Exception:
     pass
 calculate_pcar = getattr(module_e_pcar, "calculate_pcar")
 calculate_pcar_by_company = getattr(module_e_pcar, "calculate_pcar_by_company", None)
+calculate_pcar_custom_bom = getattr(module_e_pcar, "calculate_pcar_custom_bom", None)
+parse_bom_csv = getattr(module_e_pcar, "parse_bom_csv", None)
+parse_bom_json = getattr(module_e_pcar, "parse_bom_json", None)
 OEM_PROFILES = getattr(module_e_pcar, "OEM_PROFILES", {
     "Maruti Suzuki": {"market_share": 0.417, "dependency_ratio": 0.38, "description": "India's largest automaker; high-volume mass-market PV"},
     "Hyundai India": {"market_share": 0.146, "dependency_ratio": 0.42, "description": "Second largest PV maker; higher electronic component density"},
@@ -2754,6 +2757,116 @@ elif active_view == "04 — Impact & PCaR":
             "Worst Case (₹ Cr)": f"₹{format_inr(o_pcar['worst_case_loss_crore'])}",
         })
     st.dataframe(pd.DataFrame(alloc_rows), use_container_width=True, hide_index=True)
+
+    st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
+
+    # 1B. Custom OEM Bill-of-Materials (BOM) Live Calculator
+    with st.expander("📋 Upload Custom OEM Bill of Materials (BOM) — Enterprise Specific PCaR", expanded=False):
+        st.markdown("""
+        **Enterprise Custom Procurement Risk Engine**:
+        Instead of using the macro aggregate UN Comtrade baseline (₹1,33,814 Cr) or static SIAM market-share scaling,
+        upload your enterprise's actual Bill of Materials to compute enterprise-specific Procurement Cost-at-Risk (PCaR).
+        Each component is verified against the **GraphRAG Grounding Graph** topology.
+        """)
+
+        bom_col1, bom_col2 = st.columns([1, 1])
+
+        with bom_col1:
+            bom_input_mode = st.radio(
+                "BOM Data Source",
+                ["Load Sample Tier-1 BOM", "Upload Custom CSV / JSON"],
+                horizontal=True,
+                key="bom_input_mode_radio"
+            )
+
+        SAMPLE_BOMS = {
+            "EV Powertrain & Battery Electronics (Tier-1 OEM)": [
+                {"component_name": "Inverter MCU Microcontroller", "hs_code": "8542", "annual_spend_crore": 340.0},
+                {"component_name": "BMS Battery Management IC", "hs_code": "8542", "annual_spend_crore": 220.0},
+                {"component_name": "SiC MOSFET Power Module", "hs_code": "8541", "annual_spend_crore": 410.0},
+                {"component_name": "DC-DC Converter Controller", "hs_code": "8542", "annual_spend_crore": 95.0},
+                {"component_name": "Gallium Nitride Fast-Charger IC", "hs_code": "8112", "annual_spend_crore": 65.0},
+            ],
+            "ADAS & Telematics Electronic Control Units (SUV Division)": [
+                {"component_name": "Radar Front-End Sensor IC", "hs_code": "8542", "annual_spend_crore": 180.0},
+                {"component_name": "Vision AI Processor SoC", "hs_code": "8542", "annual_spend_crore": 290.0},
+                {"component_name": "ECU Microcontroller 32-bit", "hs_code": "8542", "annual_spend_crore": 450.0},
+                {"component_name": "CAN-Bus Transceiver", "hs_code": "8542", "annual_spend_crore": 85.0},
+                {"component_name": "Automotive Memory LPDDR4", "hs_code": "8542", "annual_spend_crore": 140.0},
+            ],
+            "High-Volume Mass-Market Powertrain (ICE Fleet)": [
+                {"component_name": "Engine Management ECU IC", "hs_code": "8542", "annual_spend_crore": 520.0},
+                {"component_name": "Transmission Controller MCU", "hs_code": "8542", "annual_spend_crore": 310.0},
+                {"component_name": "ABS Brake Control Module", "hs_code": "8542", "annual_spend_crore": 260.0},
+                {"component_name": "Body Control Module Processor", "hs_code": "8542", "annual_spend_crore": 190.0},
+            ]
+        }
+
+        parsed_components = []
+        custom_enterprise_name = "Enterprise Custom OEM"
+
+        if bom_input_mode == "Load Sample Tier-1 BOM":
+            with bom_col2:
+                selected_sample = st.selectbox("Select Sample Architecture", list(SAMPLE_BOMS.keys()))
+                custom_enterprise_name = selected_sample.split(" (")[0]
+            parsed_components = SAMPLE_BOMS[selected_sample]
+        else:
+            with bom_col2:
+                custom_enterprise_name = st.text_input("Enterprise Name", value="My Auto OEM Division")
+            uploaded_bom_file = st.file_uploader(
+                "Upload BOM File (CSV or JSON with columns: component_name, hs_code, annual_spend_crore)",
+                type=["csv", "json"],
+                help="CSV format: component_name, hs_code, annual_spend_crore"
+            )
+            if uploaded_bom_file is not None:
+                content_str = uploaded_bom_file.getvalue().decode("utf-8", errors="ignore")
+                if uploaded_bom_file.name.endswith(".json") and parse_bom_json is not None:
+                    parsed_components = parse_bom_json(content_str)
+                elif parse_bom_csv is not None:
+                    parsed_components = parse_bom_csv(content_str)
+
+        if parsed_components:
+            bom_df = pd.DataFrame(parsed_components)
+            total_spend = bom_df["annual_spend_crore"].sum()
+            st.markdown(f"**BOM Preview ({len(parsed_components)} components — Total Procurement Spend: ₹{total_spend:,.1f} Cr):**")
+            st.dataframe(bom_df, use_container_width=True, hide_index=True)
+
+            if st.button("🚀 Calculate Enterprise PCaR with GraphRAG Grounding", key="btn_run_custom_bom_pcar"):
+                if calculate_pcar_custom_bom is not None:
+                    try:
+                        res = calculate_pcar_custom_bom(
+                            mc_samples=mc_samp,
+                            bom_components=parsed_components,
+                            company_name=custom_enterprise_name,
+                            ground_against_graph=True
+                        )
+                        st.success(f"Calculated enterprise PCaR for **{custom_enterprise_name}** based on actual BOM spend!")
+
+                        m1, m2, m3, m4 = st.columns(4)
+                        m1.metric("BOM Total Spend", f"₹{res['effective_base_crore']:,.1f} Cr")
+                        m2.metric("Mean Loss", f"₹{res['mean_loss_crore']:,.1f} Cr", delta=f"{res['mean_loss_pct']:.1f}%")
+                        m3.metric("95% PCaR (VaR)", f"₹{res['pcar_95_crore']:,.1f} Cr", delta=f"{res['pcar_95_pct']:.1f}%", delta_color="inverse")
+                        m4.metric("Worst-Case Loss", f"₹{res['worst_case_loss_crore']:,.1f} Cr", delta=f"{res['worst_case_pct']:.1f}%", delta_color="inverse")
+
+                        st.markdown("##### 🔍 GraphRAG Component Grounding Breakdown")
+                        grounding_rows = []
+                        for g in res.get("component_grounding", []):
+                            status_badge = "✅ Grounded in Graph" if g.get("grounded") else "⚠️ Topology Unmapped"
+                            grounding_rows.append({
+                                "Component": g.get("component_name"),
+                                "HS Code": g.get("hs_code"),
+                                "Spend (₹ Cr)": f"₹{g.get('annual_spend_crore', 0):,.1f}",
+                                "Graph Grounding": status_badge,
+                                "Matched Node": g.get("matched_graph_node") or "Generic Node",
+                                "Tier": g.get("tier", "Tier-1"),
+                            })
+                        st.dataframe(pd.DataFrame(grounding_rows), use_container_width=True, hide_index=True)
+                    except Exception as e:
+                        st.error(f"Error computing Custom BOM PCaR: {e}")
+                else:
+                    st.error("Custom BOM calculation module not loaded.")
+        else:
+            st.info("Upload a CSV/JSON BOM or select a sample tier-1 BOM architecture above.")
 
     st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
 

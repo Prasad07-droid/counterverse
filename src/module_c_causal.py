@@ -435,7 +435,7 @@ def simulate_causal_impact(signal: dict) -> dict:
 
 def compute_cost_adjusted_recommendation(
     risk_score: float,
-    pcar_mean_crore: float,
+    pcar_mean_crore: float = 0.0,
     mitigation_options: list = None
 ) -> dict:
     """
@@ -498,6 +498,7 @@ def compute_cost_adjusted_recommendation(
     )
     
     return {
+        "recommendation": best["action"],
         "cost_adjusted_best": best["action"],
         "threshold_only_rec": threshold_rec,
         "agreement": best["action"] == threshold_rec,

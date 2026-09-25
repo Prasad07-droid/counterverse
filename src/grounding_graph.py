@@ -667,3 +667,224 @@ def get_graph_summary() -> Dict[str, Any]:
         "node_types": node_types,
         "edge_types": edge_types,
     }
+
+
+# ════════════════════════════════════════════════════════════════
+# PHASE 3: GRAPH PERSISTENCE & DYNAMIC TOPOLOGY
+# ════════════════════════════════════════════════════════════════
+
+from pathlib import Path as _Path
+
+_GRAPH_OVERLAY_PATH = _Path(__file__).resolve().parent.parent / "data" / "processed" / "grounding_graph_custom.json"
+
+
+def save_graph_overlay(G: Optional[nx.DiGraph] = None, path: Optional[str] = None) -> str:
+    """
+    Saves custom nodes/edges (overlay) to a JSON file on disk.
+    Only custom nodes (those with 'custom': True attribute) are persisted.
+    The static default graph is NOT saved — it's reconstructed from code.
+
+    Args:
+        G: Graph to export overlay from (defaults to singleton).
+        path: Custom file path (defaults to _GRAPH_OVERLAY_PATH).
+
+    Returns:
+        Path to saved overlay file.
+    """
+    if G is None:
+        G = get_grounding_graph()
+
+    overlay_path = _Path(path) if path else _GRAPH_OVERLAY_PATH
+    overlay_path.parent.mkdir(parents=True, exist_ok=True)
+
+    custom_nodes = []
+    custom_edges = []
+
+    for node, data in G.nodes(data=True):
+        if data.get("custom", False):
+            custom_nodes.append({"name": node, **{k: v for k, v in data.items()}})
+
+    for src, dst, data in G.edges(data=True):
+        if data.get("custom", False):
+            custom_edges.append({
+                "source": src,
+                "target": dst,
+                **{k: v for k, v in data.items()}
+            })
+
+    overlay = {
+        "version": "1.0",
+        "custom_nodes": custom_nodes,
+        "custom_edges": custom_edges,
+        "default_graph_hash": EXPECTED_GRAPH_HASH,
+    }
+
+    with open(overlay_path, "w", encoding="utf-8") as f:
+        json.dump(overlay, f, indent=2, ensure_ascii=False)
+
+    logger.info(f"Saved graph overlay: {len(custom_nodes)} nodes, {len(custom_edges)} edges → {overlay_path}")
+    return str(overlay_path)
+
+
+def load_graph_overlay(G: Optional[nx.DiGraph] = None, path: Optional[str] = None) -> int:
+    """
+    Loads custom nodes/edges from a JSON overlay file and merges into the graph.
+    Skips nodes/edges that already exist (idempotent).
+
+    Args:
+        G: Target graph (defaults to singleton).
+        path: Custom file path (defaults to _GRAPH_OVERLAY_PATH).
+
+    Returns:
+        Number of new nodes + edges added.
+    """
+    if G is None:
+        G = get_grounding_graph()
+
+    overlay_path = _Path(path) if path else _GRAPH_OVERLAY_PATH
+
+    if not overlay_path.exists():
+        logger.debug(f"No overlay file found at {overlay_path}")
+        return 0
+
+    try:
+        with open(overlay_path, "r", encoding="utf-8") as f:
+            overlay = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        logger.warning(f"Failed to load graph overlay: {e}")
+        return 0
+
+    added = 0
+
+    for node_data in overlay.get("custom_nodes", []):
+        name = node_data.pop("name", None)
+        if name and not G.has_node(name):
+            G.add_node(name, **node_data)
+            added += 1
+
+    for edge_data in overlay.get("custom_edges", []):
+        src = edge_data.pop("source", None)
+        dst = edge_data.pop("target", None)
+        if src and dst and not G.has_edge(src, dst):
+            G.add_edge(src, dst, **edge_data)
+            added += 1
+
+    if added > 0:
+        logger.info(f"Loaded {added} custom elements from graph overlay")
+
+    return added
+
+
+def add_custom_node(
+    name: str,
+    node_type: str = "component",
+    persist: bool = True,
+    **kwargs
+) -> bool:
+    """
+    Adds a custom node to the grounding graph with 'custom': True marker.
+
+    Args:
+        name: Node name (canonical form).
+        node_type: Node type (country, component, company, industry).
+        persist: If True, saves overlay to disk after adding.
+
+    Returns:
+        True if node was added, False if it already existed.
+    """
+    G = get_grounding_graph()
+
+    if G.has_node(name):
+        logger.info(f"Node '{name}' already exists in graph, skipping.")
+        return False
+
+    G.add_node(name, type=node_type, custom=True, **kwargs)
+    logger.info(f"Added custom node: '{name}' (type={node_type})")
+
+    # Add alias for resolution
+    ENTITY_ALIASES[name.strip().lower()] = name
+
+    if persist:
+        save_graph_overlay(G)
+
+    return True
+
+
+def add_custom_edge(
+    source: str,
+    target: str,
+    relationship: str = "depends_on",
+    edge_confidence: float = 1.0,
+    persist: bool = True,
+    **kwargs
+) -> bool:
+    """
+    Adds a custom edge to the grounding graph with 'custom': True marker.
+    Both source and target nodes must exist in the graph.
+
+    Args:
+        source: Source node name.
+        target: Target node name.
+        relationship: Edge relationship type.
+        edge_confidence: Confidence score [0.0, 1.0].
+        persist: If True, saves overlay to disk after adding.
+
+    Returns:
+        True if edge was added, False if it already existed or nodes missing.
+    """
+    G = get_grounding_graph()
+
+    # Resolve aliases
+    src = resolve_entity(source) or source
+    tgt = resolve_entity(target) or target
+
+    if not G.has_node(src):
+        logger.warning(f"Source node '{src}' not found. Add it first with add_custom_node().")
+        return False
+    if not G.has_node(tgt):
+        logger.warning(f"Target node '{tgt}' not found. Add it first with add_custom_node().")
+        return False
+
+    if G.has_edge(src, tgt):
+        logger.info(f"Edge '{src}' → '{tgt}' already exists, skipping.")
+        return False
+
+    G.add_edge(
+        src, tgt,
+        relationship=relationship,
+        edge_confidence=max(0.0, min(1.0, edge_confidence)),
+        custom=True,
+        **kwargs,
+    )
+    logger.info(f"Added custom edge: '{src}' → '{tgt}' ({relationship}, conf={edge_confidence:.2f})")
+
+    if persist:
+        save_graph_overlay(G)
+
+    return True
+
+
+def export_graph_json(G: Optional[nx.DiGraph] = None) -> Dict[str, Any]:
+    """
+    Exports the full graph (static + custom) as a JSON-serializable dict.
+    Useful for API responses and dashboard visualization.
+    """
+    if G is None:
+        G = get_grounding_graph()
+
+    nodes = []
+    for name, data in G.nodes(data=True):
+        nodes.append({"name": name, **{k: v for k, v in data.items()}})
+
+    edges = []
+    for src, dst, data in G.edges(data=True):
+        edges.append({"source": src, "target": dst, **{k: v for k, v in data.items()}})
+
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "total_nodes": G.number_of_nodes(),
+        "total_edges": G.number_of_edges(),
+        "graph_hash": _compute_graph_hash(G),
+    }
+
