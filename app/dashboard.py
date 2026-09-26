@@ -211,418 +211,446 @@ st.set_page_config(
 # ════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-/* ── Google Font ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* ── Google Fonts: Outfit (Display) + Inter (UI) + JetBrains Mono (Financials) ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
-/* ── Root variables (Hybrid Command Theme) ── */
+/* ── Cyber-Intelligence Dark Luxury Theme Root Tokens ── */
 :root {
-    /* Sidebar — dark navy, sidebar ONLY */
-    --sidebar-bg: #111827;
-    --sidebar-bg-hover: #1a2436;
-    --sidebar-text: #cbd5e1;
-    --sidebar-text-muted: #64748b;
-    --sidebar-active-bg: #1e293b;
-    --sidebar-active-indicator: #f97316;  /* orange left-border/dot on active item */
+    /* Canvas & Surfaces */
+    --canvas-bg: #080c14;
+    --canvas-radial: radial-gradient(at 15% 15%, rgba(6, 182, 212, 0.08) 0px, transparent 55%),
+                     radial-gradient(at 85% 85%, rgba(239, 68, 68, 0.06) 0px, transparent 55%),
+                     radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.04) 0px, transparent 65%);
+    --surface-glass: rgba(15, 23, 42, 0.72);
+    --surface-glass-hover: rgba(30, 41, 59, 0.85);
+    --surface-elevated: #111827;
+    --surface-card: #0f172a;
 
-    /* Main content area — stays LIGHT for readability of dense data */
-    --content-bg: #f8f9fa;
-    --content-surface: #ffffff;
-    --content-surface-hover: #f9fafb;
-    --border-subtle: #e5e7eb;
-    --border-hover: #d1d5db;
+    /* Borders & Accents */
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(56, 189, 248, 0.4);
+    --border-glow: 0 0 16px rgba(56, 189, 248, 0.2);
 
-    --text-primary: #111827;
-    --text-secondary: #475569;            /* Slate-600: Upgraded from #4b5563 for AAA compliance */
-    --text-muted: #475569;                /* Upgraded from #6b7280 (7.31:1 ratio for AAA compliance) */
+    /* Typography Colors */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-highlight: #38bdf8;
 
-    /* Disruption / critical accent — reserved STRICTLY for active shocks */
-    --accent-coral: #ef4444;
-    --accent-coral-bright: #dc2626;
-    --accent-coral-bg: #fef2f2;
-    --accent-coral-border: #fecaca;
+    /* Semantic Neon Signals */
+    --neon-cyan: #06b6d4;
+    --neon-cyan-glow: 0 0 20px rgba(6, 182, 212, 0.4);
+    --neon-red: #ef4444;
+    --neon-red-glow: 0 0 20px rgba(239, 68, 68, 0.45);
+    --neon-emerald: #10b981;
+    --neon-emerald-glow: 0 0 20px rgba(16, 185, 129, 0.4);
+    --neon-amber: #f59e0b;
+    --neon-amber-glow: 0 0 20px rgba(245, 158, 11, 0.4);
 
-    /* Verified / evidence / grounded-truth accent */
-    --accent-teal: #0d9488;
-    --accent-teal-bg: #f0fdfa;
-    --accent-teal-border: #99f6e4;
+    /* Sidebar */
+    --sidebar-bg: #090d16;
+    --sidebar-active-indicator: #06b6d4;
 
-    /* Heuristic / analyst-estimate accent */
-    --accent-amber: #d97706;
-    --accent-amber-bg: #fffbeb;
-    --accent-amber-border: #fde68a;
-
-    /* Risk semantic colors */
-    --risk-high: #dc2626;
-    --risk-medium: #d97706;
-    --risk-low: #059669;
-
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-    --radius-standard: 12px;
-    --radius-sm: 6px;
+    /* Radii & Shadows */
+    --radius-standard: 14px;
+    --radius-sm: 8px;
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
 }
 
-/* ── Global overrides ── */
+/* ── Global Canvas Overrides ── */
 .stApp {
-    background: var(--content-bg) !important;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background-color: var(--canvas-bg) !important;
+    background-image: var(--canvas-radial) !important;
+    background-attachment: fixed !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
     color: var(--text-primary) !important;
 }
 
-/* ── Enterprise Dark Command Sidebar Styling ── */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif !important;
+    letter-spacing: -0.02em !important;
+    color: #ffffff !important;
+}
+
+/* ── Hide Default Streamlit Clutter ── */
+header[data-testid="stHeader"] { background: transparent !important; }
+#MainMenu, footer, .stDeployButton { display: none !important; }
+
+/* ── Sidebar: Ultra-Sleek Command Deck ── */
 section[data-testid="stSidebar"] {
     background-color: var(--sidebar-bg) !important;
-    border-right: 1px solid #1f2937 !important;
+    border-right: 1px solid var(--border-subtle) !important;
 }
 section[data-testid="stSidebar"] * {
-    color: var(--sidebar-text) !important;
     font-family: 'Inter', sans-serif !important;
 }
 section[data-testid="stSidebar"] hr {
-    border-color: #1f2937 !important;
+    border-color: var(--border-subtle) !important;
 }
 section[data-testid="stSidebar"] .stRadio label {
-    color: var(--sidebar-text) !important;
+    color: #cbd5e1 !important;
     font-size: 0.88rem !important;
     font-weight: 500 !important;
-    padding: 8px 12px !important;
-    border-radius: 8px !important;
-    transition: all 0.15s ease !important;
+    padding: 10px 14px !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border: 1px solid transparent !important;
+    margin-bottom: 2px !important;
 }
 section[data-testid="stSidebar"] .stRadio label:hover {
-    background-color: var(--sidebar-bg-hover) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
 }
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label[data-checked="true"],
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label:has(input:checked) {
-    background-color: var(--sidebar-active-bg) !important;
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.16) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+    border: 1px solid rgba(6, 182, 212, 0.4) !important;
     border-left: 3px solid var(--sidebar-active-indicator) !important;
     color: #ffffff !important;
     font-weight: 700 !important;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.15) !important;
 }
-
-/* Hide default Streamlit header/footer */
-header[data-testid="stHeader"] {
-    background: transparent !important;
-}
-#MainMenu, footer, .stDeployButton { display: none !important; }
-
-/* ── Sidebar Form Control Dark Styling ── */
 section[data-testid="stSidebar"] div[data-testid="stSelectbox"] > div > div {
-    background: #1f2937 !important;
-    border: 1px solid #374151 !important;
-    color: #f3f4f6 !important;
-}
-section[data-testid="stSidebar"] div[data-testid="stSelectbox"] [data-baseweb="select"] * {
-    color: #f3f4f6 !important;
-    -webkit-text-fill-color: #f3f4f6 !important;
+    background: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-radius: var(--radius-sm) !important;
 }
 section[data-testid="stSidebar"] div[data-testid="stSelectbox"] label,
 section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     color: #94a3b8 !important;
 }
 
-/* ── Active Disruption Incident Banner ── */
+/* ── Live Incident HUD Banner ── */
 .active-incident-banner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 10px 18px;
-    background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%);
-    border: 1px solid var(--accent-coral-border);
-    border-left: 4px solid var(--accent-coral-bright);
+    gap: 14px;
+    padding: 12px 22px;
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.18) 0%, rgba(15, 23, 42, 0.85) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-left: 5px solid #ef4444;
     border-radius: var(--radius-standard);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 16px;
+    box-shadow: 0 4px 24px rgba(239, 68, 68, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+    backdrop-filter: blur(12px);
 }
 .incident-badge-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 .incident-shock-badge {
-    background: var(--accent-coral-bright);
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
     color: #ffffff;
     font-size: 0.72rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    padding: 3px 8px;
-    border-radius: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 .incident-headline-text {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #111827;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f8fafc;
+    letter-spacing: -0.01em;
 }
 .incident-meta-group {
     display: flex;
     align-items: center;
-    gap: 16px;
-    font-size: 0.78rem;
+    gap: 18px;
+    font-size: 0.82rem;
     color: var(--text-secondary);
 }
 .incident-meta-item strong {
-    color: #111827;
+    color: #ffffff;
 }
 
-/* ── Causal Decision Ribbon (Compact 4-Tier Pipeline State) ── */
+/* ── Causal Decision Ribbon (Futuristic 4-Tier HUD) ── */
 .decision-ribbon {
     display: flex;
     align-items: stretch;
-    background: #ffffff;
+    background: var(--surface-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-standard);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 22px;
+    box-shadow: var(--shadow-glass);
+    margin-bottom: 24px;
     overflow: hidden;
+    backdrop-filter: blur(16px);
 }
 .ribbon-tier {
     flex: 1;
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-right: 1px solid var(--border-subtle);
-    background: #ffffff;
+    background: transparent;
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: relative;
-    transition: background-color 0.2s ease;
+    transition: all 0.25s ease;
 }
 .ribbon-tier:last-child {
     border-right: none;
 }
+.ribbon-tier:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
 .ribbon-tier.active-shock {
-    background: #fff8f8;
-    border-left: 3px solid var(--accent-coral-bright);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+    border-left: 3px solid #ef4444;
 }
 .ribbon-tier-label {
-    font-size: 0.68rem;
+    font-size: 0.70rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .ribbon-tier-val {
-    font-size: 1.02rem;
+    font-size: 1.12rem;
     font-weight: 700;
-    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
     line-height: 1.25;
 }
 .ribbon-tier-sub {
-    font-size: 0.74rem;
+    font-size: 0.76rem;
     color: var(--text-secondary);
-    margin-top: 3px;
-    line-height: 1.3;
+    margin-top: 4px;
+    line-height: 1.35;
 }
 .ribbon-pulse-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    background: var(--accent-coral-bright);
+    background: #ef4444;
     display: inline-block;
-    box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0.6);
     animation: ribbonPulse 2s infinite ease-in-out;
 }
 .ribbon-dot-teal {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--accent-teal);
+    background: #10b981;
     display: inline-block;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
 }
 .ribbon-dot-amber {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--accent-amber);
+    background: #f59e0b;
     display: inline-block;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
 }
 .ribbon-dot-blue {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #2563eb;
+    background: #06b6d4;
     display: inline-block;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
 }
 @keyframes ribbonPulse {
-    0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
-    70% { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
     100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* ── Recommended Action Card ── */
+/* ── Executive Directive Card ── */
 .recommended-action-card {
-    background: #ffffff;
-    border: 1px solid #99f6e4;
-    border-left: 4px solid #0d9488;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-left: 5px solid #10b981;
     border-radius: var(--radius-standard);
-    padding: 14px 18px;
-    box-shadow: var(--shadow-sm);
-    margin-top: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    margin-top: 16px;
+    backdrop-filter: blur(12px);
 }
 .action-kicker {
-    font-size: 0.70rem;
+    font-size: 0.72rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #0d9488;
+    letter-spacing: 0.1em;
+    color: #34d399;
 }
 .action-title {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    color: #111827;
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
     margin: 4px 0 6px 0;
 }
 .action-sub {
-    font-size: 0.80rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
+    font-size: 0.84rem;
+    color: #cbd5e1;
+    line-height: 1.45;
 }
 
-/* ── Panels ── */
+/* ── Glassmorphic Panels ── */
 .glass-card {
-    background: #ffffff;
+    background: var(--surface-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-standard);
-    box-shadow: var(--shadow-sm);
-    padding: 32px;
+    box-shadow: var(--shadow-glass);
+    padding: 28px;
     margin-bottom: 24px;
-    transition: all 0.3s ease;
+    backdrop-filter: blur(16px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card:hover {
     border-color: var(--border-hover);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 12px 36px 0 rgba(6, 182, 212, 0.15);
 }
 .glass-card h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 22px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 18px;
     display: flex; align-items: center; gap: 8px;
-    letter-spacing: -0.2px;
-}
-.card-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
 }
 
-/* ── Section header ── */
+/* ── Section Header ── */
 .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-top: 14px;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
 }
 .section-header h3 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #111827;
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
     margin: 0;
-    letter-spacing: -0.2px;
 }
 .section-badge {
     font-size: 11px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    background: #f3f4f6;
+    font-weight: 600;
+    color: #38bdf8;
+    background: rgba(6, 182, 212, 0.12);
     padding: 5px 12px;
-    border-radius: var(--radius-standard);
-    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
 }
 
-/* ── Metric Card ── */
+/* ── Glowing KPI Metric Cards ── */
 .metric-card {
-    background: #ffffff;
+    background: var(--surface-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-standard);
-    box-shadow: var(--shadow-sm);
-    padding: 24px 22px;
+    box-shadow: var(--shadow-card);
+    padding: 20px 22px;
     text-align: left;
-    transition: all 0.25s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 124px;
+    min-height: 128px;
+    backdrop-filter: blur(16px);
+    position: relative;
+    overflow: hidden;
+}
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
 }
 .metric-card:hover {
     border-color: var(--border-hover);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.2);
 }
 .metric-card.critical {
-    border: 1px solid var(--accent-coral-border);
-    background: linear-gradient(180deg, #fff5f5 0%, #ffffff 100%);
+    border-color: rgba(239, 68, 68, 0.4);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%);
+}
+.metric-card.critical::before {
+    background: linear-gradient(90deg, transparent, #ef4444, transparent);
 }
 .metric-card .metric-label {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 0.70rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 0.1em;
     color: var(--text-muted);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .metric-card .metric-value {
-    font-size: 26px;
-    font-weight: 700;
-    color: #111827;
+    font-size: 1.65rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
     line-height: 1.2;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.02em;
 }
 .metric-card .metric-sub {
-    font-size: 12px;
+    font-size: 0.76rem;
     font-weight: 400;
     color: var(--text-secondary);
     margin-top: 8px;
 }
+
+/* ── Semantic Status Badges ── */
 .status-badge-critical {
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    background: var(--accent-coral-bg);
-    color: var(--accent-coral-bright);
-    border: 1px solid var(--accent-coral-border);
-    padding: 2px 8px;
-    border-radius: var(--radius-standard);
+    letter-spacing: 0.08em;
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 .status-badge-warning {
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fde68a;
-    padding: 2px 8px;
-    border-radius: var(--radius-standard);
+    letter-spacing: 0.08em;
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
 }
 .status-badge-optimal {
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    background: #ecfdf5;
-    color: #059669;
-    border: 1px solid #a7f3d0;
-    padding: 2px 8px;
-    border-radius: var(--radius-standard);
+    letter-spacing: 0.08em;
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 }
 
-/* ── Streamlit Form Element Overrides & Placeholders ── */
+/* ── Form Controls & Widget Overrides ── */
 div[data-testid="stSelectbox"] label,
 div[data-testid="stSlider"] label,
 div[data-testid="stNumberInput"] label,
@@ -631,311 +659,202 @@ div[data-testid="stSelectbox"] label p,
 div[data-testid="stSlider"] label p,
 div[data-testid="stNumberInput"] label p,
 div[data-testid="stTextArea"] label p {
-    font-size: 11px !important;
-    font-weight: 600 !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 1.2px !important;
+    letter-spacing: 0.09em !important;
     color: var(--text-muted) !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
 }
 
 div[data-testid="stSelectbox"] > div > div {
-    background: #ffffff !important;
-    border: 1px solid #d1d5db !important;
-    color: #111827 !important;
-    border-radius: var(--radius-standard) !important;
+    background: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-radius: var(--radius-sm) !important;
     font-size: 14px !important;
-    font-weight: 500 !important;
     transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
 }
 div[data-testid="stSelectbox"] > div > div:hover,
 div[data-testid="stSelectbox"] > div > div:focus-within {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 1px #ef4444 !important;
+    border-color: #06b6d4 !important;
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25) !important;
 }
-
-/* Dropdown value, placeholder, and arrow visibility */
 div[data-testid="stSelectbox"] [data-baseweb="select"] {
-    background-color: #ffffff !important;
-    border-radius: var(--radius-standard) !important;
+    background-color: transparent !important;
 }
 div[data-testid="stSelectbox"] [data-baseweb="select"] * {
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
-div[data-testid="stSelectbox"] [data-baseweb="select"] div[role="combobox"] {
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-}
-div[data-testid="stSelectbox"] input {
-    color: #111827 !important;
-    -webkit-text-fill-color: #111827 !important;
-}
-div[data-testid="stSelectbox"] input::placeholder {
-    color: #9ca3af !important;
-    -webkit-text-fill-color: #9ca3af !important;
-    opacity: 1 !important;
-    font-size: 14px !important;
-}
-div[data-testid="stSelectbox"] svg {
-    fill: #4b5563 !important;
-    color: #4b5563 !important;
-}
-
-/* Dropdown popover menu styling */
 ul[data-testid="stSelectboxVirtualDropdown"],
 div[data-baseweb="popover"],
 div[data-baseweb="menu"] {
-    background-color: #ffffff !important;
-    border-radius: var(--radius-standard) !important;
-    box-shadow: var(--shadow-lg) !important;
-    border: 1px solid var(--border-subtle) !important;
+    background-color: #111827 !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 li[role="option"] {
-    color: #111827 !important;
-    font-family: 'Inter', sans-serif !important;
+    color: #f1f5f9 !important;
     font-size: 14px !important;
+    transition: background-color 0.15s ease !important;
 }
 li[role="option"]:hover, li[aria-selected="true"] {
-    background-color: #fef2f2 !important;
-    color: #dc2626 !important;
+    background-color: rgba(6, 182, 212, 0.18) !important;
+    color: #38bdf8 !important;
 }
 
-/* Number input and Text area standard radius and contrast */
-div[data-testid="stNumberInput"] > div > div > input {
-    background: #ffffff !important;
-    border: 1px solid #d1d5db !important;
-    color: #111827 !important;
-    border-radius: var(--radius-standard) !important;
-    font-size: 14px !important;
-    box-shadow: var(--shadow-sm);
-}
-div[data-testid="stNumberInput"] button {
-    color: #4b5563 !important;
-    border-color: #d1d5db !important;
-}
 div[data-testid="stTextArea"] textarea {
-    background: #ffffff !important;
-    border: 1px solid #d1d5db !important;
-    color: #111827 !important;
-    border-radius: var(--radius-standard) !important;
+    background: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #f8fafc !important;
+    border-radius: var(--radius-sm) !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 14px !important;
-    box-shadow: var(--shadow-sm);
+    line-height: 1.5 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+div[data-testid="stTextArea"] textarea:focus {
+    border-color: #06b6d4 !important;
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.3) !important;
 }
 div[data-testid="stTextArea"] textarea::placeholder {
-    color: #9ca3af !important;
-    opacity: 1 !important;
+    color: #64748b !important;
 }
 
-/* Slider styling */
+div[data-testid="stNumberInput"] > div > div > input {
+    background: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+/* ── Sliders ── */
 div[data-testid="stSlider"] > div > div > div {
-    background: #e5e7eb !important;
-    border-radius: var(--radius-standard) !important;
+    background: #1e293b !important;
 }
 div[data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-    background-color: var(--accent-coral) !important;
+    background-color: #06b6d4 !important;
     border: 2px solid #ffffff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
-}
-div[data-testid="stSlider"] [data-testid="stTickBarMin"],
-div[data-testid="stSlider"] [data-testid="stTickBarMax"] {
-    color: var(--text-muted) !important;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.6) !important;
 }
 
-/* Primary button */
+/* ── Primary Action Button (Glowing Crimson) ── */
 .stButton > button[kind="primary"], .stButton > button {
-    background: linear-gradient(135deg, var(--accent-coral), #dc2626) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: var(--radius-standard) !important;
-    padding: 12px 32px !important;
-    font-weight: 600 !important;
-    font-size: 0.92rem !important;
-    letter-spacing: 0.3px;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 12px 28px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.04em !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35) !important;
 }
 .stButton > button:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4) !important;
+    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.55), 0 0 16px rgba(239, 68, 68, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Tabs override */
+/* ── Tabs: Futuristic Floating Pills ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #ffffff !important;
-    border-radius: var(--radius-standard) !important;
-    padding: 4px !important;
+    background: var(--surface-glass) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 6px !important;
     border: 1px solid var(--border-subtle) !important;
-    box-shadow: var(--shadow-sm) !important;
-    gap: 4px !important;
+    gap: 6px !important;
+    backdrop-filter: blur(12px) !important;
 }
 .stTabs [data-baseweb="tab"] {
-    border-radius: var(--radius-standard) !important;
+    border-radius: 6px !important;
     color: var(--text-secondary) !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     font-size: 0.85rem !important;
+    padding: 8px 16px !important;
+    transition: all 0.2s ease !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.04) !important;
 }
 .stTabs [aria-selected="true"] {
-    background: var(--accent-coral-bg) !important;
-    color: var(--accent-coral-bright) !important;
+    background: rgba(6, 182, 212, 0.18) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(6, 182, 212, 0.35) !important;
+    box-shadow: 0 2px 10px rgba(6, 182, 212, 0.2) !important;
 }
-.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
+.stTabs [data-baseweb="tab-highlight"],
 .stTabs [data-baseweb="tab-border"] { display: none !important; }
 
-/* ── GraphRAG Entity Grounding Badges ── */
+/* ── Expanders ── */
+.streamlit-expanderHeader {
+    background: var(--surface-glass) !important;
+    border-radius: var(--radius-sm) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border: 1px solid var(--border-subtle) !important;
+    transition: all 0.2s ease !important;
+}
+.streamlit-expanderHeader:hover {
+    border-color: var(--border-hover) !important;
+    background: var(--surface-glass-hover) !important;
+}
+
+/* ── Alerts & Status Widgets ── */
+.stAlert {
+    border-radius: var(--radius-sm) !important;
+    background: var(--surface-glass) !important;
+    border: 1px solid var(--border-subtle) !important;
+    color: #f8fafc !important;
+    backdrop-filter: blur(12px) !important;
+}
+div[data-testid="stStatusWidget"] {
+    background: var(--surface-glass) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-glass) !important;
+    color: #ffffff !important;
+}
+
+/* ── GraphRAG Entity Badges ── */
 .grounding-badge-verified {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 10px; border-radius: 6px;
-    background: #ecfdf5; color: #059669;
-    font-size: 0.72rem; font-weight: 600;
-    border: 1px solid #a7f3d0;
-    letter-spacing: 0.02em;
+    padding: 4px 12px; border-radius: 6px;
+    background: rgba(16, 185, 129, 0.16); color: #34d399;
+    font-size: 0.74rem; font-weight: 700;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
 }
 .grounding-badge-unverified {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 10px; border-radius: 6px;
-    background: #f3f4f6; color: #6b7280;
-    font-size: 0.72rem; font-weight: 600;
-    border: 1px solid #d1d5db;
-    letter-spacing: 0.02em;
-}
-.grounding-entity-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 14px; margin-bottom: 6px;
-    border-radius: 8px; border: 1px solid #e5e7eb;
-    background: #ffffff;
-    transition: all 0.2s ease;
-}
-.grounding-entity-row:hover {
-    border-color: #d1d5db; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.grounding-entity-name {
-    font-weight: 600; color: #111827; font-size: 0.88rem;
-}
-.grounding-entity-type {
-    font-size: 0.72rem; color: #6b7280; margin-left: 6px;
-}
-.grounding-summary-bar {
-    display: flex; align-items: center; gap: 14px;
-    padding: 10px 16px; border-radius: 8px;
-    background: #f0fdf4; border: 1px solid #bbf7d0;
-    margin-bottom: 14px;
-}
-.grounding-summary-bar.partial {
-    background: #fefce8; border-color: #fde68a;
+    padding: 4px 12px; border-radius: 6px;
+    background: rgba(245, 158, 11, 0.16); color: #fbbf24;
+    font-size: 0.74rem; font-weight: 700;
+    border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-/* Divider */
-hr { border-color: var(--border-subtle) !important; opacity: 1 !important; }
+/* ── Horizontal Grid Gaps ── */
+div[data-testid="stHorizontalBlock"] { gap: 18px !important; }
 
-/* Expander & Alerts */
-.streamlit-expanderHeader {
-    background: #ffffff !important;
-    border-radius: var(--radius-standard) !important;
-    color: #111827 !important;
-    font-weight: 500 !important;
-    border: 1px solid var(--border-subtle) !important;
-}
-.stAlert {
-    border-radius: var(--radius-standard) !important;
-    border: 1px solid var(--border-subtle) !important;
-    background: #ffffff !important;
-    color: #111827 !important;
-}
-
-/* Status container styling */
-div[data-testid="stStatusWidget"] {
-    background: #ffffff !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: var(--radius-standard) !important;
-    box-shadow: var(--shadow-sm) !important;
-    color: #111827 !important;
-}
-
-/* Spinner */
-.stSpinner > div { color: var(--accent-coral) !important; }
-
-/* Column gap - consistent spacing between sibling cards */
-div[data-testid="stHorizontalBlock"] { gap: 20px !important; }
-
-/* ── Staggered Animations ── */
+/* ── Animations ── */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(14px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-.reveal-step-1 {
-    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0s both;
-}
-.reveal-step-2 {
-    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
-}
-.reveal-step-3 {
-    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
-}
+.reveal-step-1 { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0s both; }
+.reveal-step-2 { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both; }
+.reveal-step-3 { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
 
-/* ── Basic Responsive Breakpoints (Issue 4) ── */
-@media (max-width: 900px) {
-    .hero-section {
-        flex-direction: column !important;
-        gap: 20px !important;
-        margin-bottom: 24px !important;
-    }
-    .hero-left {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-    .hero-right {
-        width: 100% !important;
-    }
-    .nav-bar {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 12px !important;
-    }
-    .nav-tabs {
-        flex-wrap: wrap !important;
-        width: 100% !important;
-        gap: 6px !important;
-    }
-    .nav-tab {
-        padding: 6px 10px !important;
-        font-size: 0.78rem !important;
-    }
-    .nav-user {
-        display: none !important;
-    }
-    div[data-testid="stHorizontalBlock"] {
-        flex-wrap: wrap !important;
-        gap: 12px !important;
-    }
-}
-
-/* ── Respect Prefers-Reduced-Motion (Accessibility Standard) ── */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
-    }
-    .reveal-step-1, .reveal-step-2, .reveal-step-3 {
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-    }
-    .ribbon-pulse-dot, .sim-pulse-dot, .flow-particle, #shockRipple {
-        animation: none !important;
-        transform: none !important;
-        box-shadow: none !important;
     }
 }
 </style>
@@ -1059,7 +978,7 @@ def render_animated_flow_graph(disrupted_node="Shanghai Port", severity_pct=75, 
         mx = e["mx"]
         my = e["my"]
 
-        edge_elements.append(f'<path d="{path}" fill="none" stroke="#e5e7eb" stroke-width="5" stroke-linecap="round"/>')
+        edge_elements.append(f'<path d="{path}" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>')
 
         if flow <= 20:
             edge_elements.append(
@@ -1068,8 +987,8 @@ def render_animated_flow_graph(disrupted_node="Shanghai Port", severity_pct=75, 
             )
             badge_elements.append(
                 f'<g transform="translate({mx - 46}, {my - 11})" class="flow-badge">'
-                f'<rect width="92" height="22" rx="11" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>'
-                f'<text x="46" y="15" text-anchor="middle" fill="#dc2626" font-family="Inter,sans-serif" font-size="10" font-weight="700">🚫 0% BLOCKED</text>'
+                f'<rect width="92" height="22" rx="11" fill="rgba(239, 68, 68, 0.25)" stroke="#f87171" stroke-width="1.5"/>'
+                f'<text x="46" y="15" text-anchor="middle" fill="#fca5a5" font-family="Inter,sans-serif" font-size="10" font-weight="700">🚫 0% BLOCKED</text>'
                 f'</g>'
             )
         elif flow < 80:
@@ -1078,35 +997,35 @@ def render_animated_flow_graph(disrupted_node="Shanghai Port", severity_pct=75, 
                 f'stroke-dasharray="8,8" stroke-linecap="round" marker-end="url(#arrow-throttled)" class="conduit-throttled"/>'
             )
             particle_elements.append(
-                f'<circle r="4" fill="#f59e0b" class="flow-particle">'
+                f'<circle r="4" fill="#fbbf24" class="flow-particle">'
                 f'<animateMotion dur="4.2s" repeatCount="indefinite"><mpath href="#{eid}"/></animateMotion>'
                 f'</circle>'
             )
             badge_elements.append(
                 f'<g transform="translate({mx - 42}, {my - 11})" class="flow-badge">'
-                f'<rect width="84" height="22" rx="11" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>'
-                f'<text x="42" y="15" text-anchor="middle" fill="#d97706" font-family="Inter,sans-serif" font-size="10" font-weight="600">⚠️ {flow}% FLOW</text>'
+                f'<rect width="84" height="22" rx="11" fill="rgba(245, 158, 11, 0.25)" stroke="#fbbf24" stroke-width="1.5"/>'
+                f'<text x="42" y="15" text-anchor="middle" fill="#fef08a" font-family="Inter,sans-serif" font-size="10" font-weight="600">⚠️ {flow}% FLOW</text>'
                 f'</g>'
             )
         else:
             edge_elements.append(
-                f'<path id="{eid}" d="{path}" fill="none" stroke="#3b82f6" stroke-width="3.5" '
+                f'<path id="{eid}" d="{path}" fill="none" stroke="#06b6d4" stroke-width="3.5" '
                 f'stroke-linecap="round" marker-end="url(#arrow-active)" class="conduit-active"/>'
             )
             particle_elements.append(
-                f'<circle r="4.5" fill="#10b981" filter="url(#glow)" class="flow-particle">'
+                f'<circle r="4.5" fill="#34d399" filter="url(#glow)" class="flow-particle">'
                 f'<animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#{eid}"/></animateMotion>'
                 f'</circle>'
             )
             particle_elements.append(
-                f'<circle r="4.5" fill="#10b981" filter="url(#glow)" class="flow-particle">'
+                f'<circle r="4.5" fill="#34d399" filter="url(#glow)" class="flow-particle">'
                 f'<animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite"><mpath href="#{eid}"/></animateMotion>'
                 f'</circle>'
             )
             badge_elements.append(
                 f'<g transform="translate({mx - 38}, {my - 10})" class="flow-badge">'
-                f'<rect width="76" height="20" rx="10" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>'
-                f'<text x="38" y="14" text-anchor="middle" fill="#059669" font-family="Inter,sans-serif" font-size="9.5" font-weight="600">100% FLOW</text>'
+                f'<rect width="76" height="20" rx="10" fill="rgba(16, 185, 129, 0.25)" stroke="#34d399" stroke-width="1"/>'
+                f'<text x="38" y="14" text-anchor="middle" fill="#a7f3d0" font-family="Inter,sans-serif" font-size="9.5" font-weight="600">100% FLOW</text>'
                 f'</g>'
             )
 
@@ -1133,42 +1052,42 @@ def render_animated_flow_graph(disrupted_node="Shanghai Port", severity_pct=75, 
             )
             card_border = "#ef4444"
             card_border_w = "2.5"
-            card_bg = "#ffffff"
-            badge_bg = "#fef2f2"
-            badge_border = "#fecaca"
-            badge_text_color = "#dc2626"
+            card_bg = "#111827"
+            badge_bg = "rgba(239, 68, 68, 0.25)"
+            badge_border = "#f87171"
+            badge_text_color = "#fca5a5"
             badge_label = f"🚫 DISRUPTED ({cap}%)"
         elif cap < 40:
             card_border = "#f97316"
             card_border_w = "2"
-            card_bg = "#ffffff"
-            badge_bg = "#fff7ed"
-            badge_border = "#fed7aa"
-            badge_text_color = "#ea580c"
+            card_bg = "#111827"
+            badge_bg = "rgba(249, 115, 22, 0.25)"
+            badge_border = "#fb923c"
+            badge_text_color = "#fed7aa"
             badge_label = f"❌ STARVED ({cap}%)"
         elif cap < 80:
             card_border = "#f59e0b"
             card_border_w = "2"
-            card_bg = "#ffffff"
-            badge_bg = "#fffbeb"
-            badge_border = "#fde68a"
-            badge_text_color = "#d97706"
+            card_bg = "#111827"
+            badge_bg = "rgba(245, 158, 11, 0.25)"
+            badge_border = "#fbbf24"
+            badge_text_color = "#fef08a"
             badge_label = f"⚠️ CONSTRAINED ({cap}%)"
         else:
-            card_border = "#e5e7eb"
+            card_border = "rgba(255, 255, 255, 0.15)"
             card_border_w = "1.5"
-            card_bg = "#ffffff"
-            badge_bg = "#ecfdf5"
-            badge_border = "#a7f3d0"
-            badge_text_color = "#059669"
+            card_bg = "#111827"
+            badge_bg = "rgba(16, 185, 129, 0.25)"
+            badge_border = "#34d399"
+            badge_text_color = "#a7f3d0"
             badge_label = f"✅ OPTIMAL ({cap}%)"
 
         node_card = (
             f'<g class="node-group" data-node="{name}" transform="translate({x - 70}, {y - 32})">'
             f'<rect width="140" height="64" rx="12" fill="{card_bg}" stroke="{card_border}" stroke-width="{card_border_w}" '
             f'filter="url(#shadow-card)" class="node-rect"/>'
-            f'<text x="70" y="20" text-anchor="middle" fill="#111827" font-family="Inter,sans-serif" font-size="11.5" font-weight="700">{icon} {name}</text>'
-            f'<text x="70" y="34" text-anchor="middle" fill="#6b7280" font-family="Inter,sans-serif" font-size="9" font-weight="500">{tier}</text>'
+            f'<text x="70" y="20" text-anchor="middle" fill="#ffffff" font-family="Inter,sans-serif" font-size="11.5" font-weight="700">{icon} {name}</text>'
+            f'<text x="70" y="34" text-anchor="middle" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" font-weight="500">{tier}</text>'
             f'<g transform="translate(18, 41)">'
             f'<rect width="104" height="17" rx="8.5" fill="{badge_bg}" stroke="{badge_border}" stroke-width="1"/>'
             f'<text x="52" y="12" text-anchor="middle" fill="{badge_text_color}" font-family="Inter,sans-serif" font-size="9" font-weight="700">{badge_label}</text>'
@@ -1193,17 +1112,17 @@ def render_animated_flow_graph(disrupted_node="Shanghai Port", severity_pct=75, 
 <head>
 <meta charset="utf-8">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
 * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }}
-body {{ background: #ffffff; overflow: hidden; }}
+body {{ background: transparent; overflow: hidden; }}
 
 .sim-container {{
     width: 100%;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
     padding: 14px 18px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }}
 
 .sim-header {{
@@ -1211,7 +1130,7 @@ body {{ background: #ffffff; overflow: hidden; }}
     justify-content: space-between;
     align-items: center;
     padding-bottom: 12px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     margin-bottom: 8px;
 }}
 .sim-title-group {{
@@ -1235,11 +1154,12 @@ body {{ background: #ffffff; overflow: hidden; }}
 .sim-title {{
     font-size: 14px;
     font-weight: 700;
-    color: #111827;
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
 }}
 .sim-subtitle {{
     font-size: 11px;
-    color: #6b7280;
+    color: #94a3b8;
 }}
 .sim-metrics-bar {{
     display: flex;
@@ -1254,19 +1174,19 @@ body {{ background: #ffffff; overflow: hidden; }}
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    color: #374151;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
 }}
 .telemetry-pill.shock {{
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: #dc2626;
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #fca5a5;
 }}
 .telemetry-pill.throughput {{
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    color: #1d4ed8;
+    background: rgba(6, 182, 212, 0.2);
+    border-color: rgba(6, 182, 212, 0.45);
+    color: #38bdf8;
 }}
 
 .sim-controls {{
@@ -1274,24 +1194,24 @@ body {{ background: #ffffff; overflow: hidden; }}
     gap: 6px;
 }}
 .control-btn {{
-    background: #ffffff;
-    border: 1px solid #d1d5db;
+    background: #1e293b;
+    border: 1px solid #334155;
     border-radius: 6px;
     padding: 4px 10px;
     font-size: 11px;
     font-weight: 600;
-    color: #374151;
+    color: #ffffff;
     cursor: pointer;
     transition: all 0.15s ease;
 }}
 .control-btn:hover {{
-    background: #f3f4f6;
-    border-color: #9ca3af;
+    background: #334155;
+    border-color: #64748b;
 }}
 .control-btn.active {{
-    background: #fee2e2;
-    border-color: #f87171;
-    color: #b91c1c;
+    background: rgba(239, 68, 68, 0.3);
+    border-color: #ef4444;
+    color: #f87171;
 }}
 
 .svg-viewport {{
@@ -1305,7 +1225,7 @@ body {{ background: #ffffff; overflow: hidden; }}
     transition: transform 0.2s ease;
 }}
 .node-group:hover {{
-    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12));
+    filter: drop-shadow(0 6px 14px rgba(6, 182, 212, 0.25));
 }}
 
 .sim-legend {{
@@ -1313,10 +1233,10 @@ body {{ background: #ffffff; overflow: hidden; }}
     justify-content: space-between;
     align-items: center;
     padding-top: 10px;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     margin-top: 6px;
     font-size: 11px;
-    color: #6b7280;
+    color: #94a3b8;
 }}
 .legend-items {{
     display: flex;
@@ -1595,7 +1515,7 @@ def build_supply_chain_graph(disrupted_node="Shanghai Port"):
             ),
             text=f"{icon} {node_name}",
             textposition="bottom center",
-            textfont=dict(size=12, color='#111827', family='Inter', weight='bold' if is_disrupted else 'normal'),
+            textfont=dict(size=12, color='#f8fafc', family='Inter', weight='bold' if is_disrupted else 'normal'),
             hoverinfo='text',
             hovertext=f"<b>{node_name}</b><br>Type: {ntype.title()}<br>{'⚠️ DISRUPTED' if is_disrupted else '✅ Operational'}",
             showlegend=False,
@@ -1609,8 +1529,8 @@ def build_supply_chain_graph(disrupted_node="Shanghai Port"):
             mode='markers',
             marker=dict(
                 size=55,
-                color='rgba(239, 68, 68, 0.12)',
-                line=dict(width=2, color='rgba(239, 68, 68, 0.4)'),
+                color='rgba(239, 68, 68, 0.15)',
+                line=dict(width=2, color='rgba(239, 68, 68, 0.6)'),
             ),
             hoverinfo='none',
             showlegend=False,
@@ -1622,14 +1542,14 @@ def build_supply_chain_graph(disrupted_node="Shanghai Port"):
         annotations=arrow_annotations,
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.02, 1.05]),
         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[0.05, 1.0]),
-        plot_bgcolor='#ffffff',
-        paper_bgcolor='#ffffff',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=10, r=10, t=10, b=10),
         height=420,
         hoverlabel=dict(
-            bgcolor='#ffffff',
-            bordercolor='#e5e7eb',
-            font=dict(family='Inter', size=12, color='#111827'),
+            bgcolor='#1e293b',
+            bordercolor='#334155',
+            font=dict(family='Inter', size=12, color='#f8fafc'),
         ),
     )
     return fig
@@ -1659,18 +1579,18 @@ def build_probability_bars(probs: dict):
         ),
         text=[f"{v:.1f}%" for v in values],
         textposition='outside',
-        textfont=dict(family='Inter', size=13, color='#111827', weight='bold'),
+        textfont=dict(family='Inter', size=13, color='#f8fafc', weight='bold'),
     ))
     fig.update_layout(
         xaxis=dict(
-            title=dict(text="Probability (%)", font=dict(size=12, color='#4b5563')),
+            title=dict(text="Probability (%)", font=dict(size=12, color='#94a3b8')),
             range=[0, max(values) * 1.35 if values and max(values) > 0 else 100],
-            gridcolor='#f3f4f6', color='#4b5563',
-            tickfont=dict(family='Inter', size=12, color='#4b5563'),
+            gridcolor='rgba(255, 255, 255, 0.08)', color='#94a3b8',
+            tickfont=dict(family='Inter', size=12, color='#94a3b8'),
         ),
         yaxis=dict(
-            autorange="reversed", color='#111827',
-            tickfont=dict(family='Inter', size=13, color='#111827', weight='bold'),
+            autorange="reversed", color='#f8fafc',
+            tickfont=dict(family='Inter', size=13, color='#f8fafc', weight='bold'),
         ),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
@@ -1704,26 +1624,26 @@ def build_monte_carlo_histogram(mc_samples):
     ))
 
     # Percentile lines
-    fig.add_vline(x=mean_val, line_dash="dot", line_color="#059669", line_width=2,
+    fig.add_vline(x=mean_val, line_dash="dot", line_color="#10b981", line_width=2,
                   annotation_text=f"Mean ({mean_val:.1f}%)",
-                  annotation_font=dict(color="#059669", size=12, family='Inter', weight='bold'),
+                  annotation_font=dict(color="#34d399", size=12, family='Inter', weight='bold'),
                   annotation_position="top left")
-    fig.add_vline(x=p95, line_dash="dash", line_color="#d97706", line_width=2,
+    fig.add_vline(x=p95, line_dash="dash", line_color="#f59e0b", line_width=2,
                   annotation_text=f"P95 ({p95:.1f}%)",
-                  annotation_font=dict(color="#d97706", size=12, family='Inter', weight='bold'),
+                  annotation_font=dict(color="#fbbf24", size=12, family='Inter', weight='bold'),
                   annotation_position="top right")
-    fig.add_vline(x=p99, line_dash="dashdot", line_color="#dc2626", line_width=2,
+    fig.add_vline(x=p99, line_dash="dashdot", line_color="#ef4444", line_width=2,
                   annotation_text=f"P99 ({p99:.1f}%)",
-                  annotation_font=dict(color="#dc2626", size=12, family='Inter', weight='bold'),
+                  annotation_font=dict(color="#f87171", size=12, family='Inter', weight='bold'),
                   annotation_position="top right")
 
     fig.update_layout(
-        xaxis_title=dict(text="Production Drop (%)", font=dict(size=12, color='#4b5563')),
-        yaxis_title=dict(text="Frequency", font=dict(size=12, color='#4b5563')),
-        xaxis=dict(gridcolor='#f3f4f6', color='#4b5563',
-                   tickfont=dict(family='Inter', size=12, color='#4b5563')),
-        yaxis=dict(gridcolor='#f3f4f6', color='#4b5563',
-                   tickfont=dict(family='Inter', size=12, color='#4b5563')),
+        xaxis_title=dict(text="Production Drop (%)", font=dict(size=12, color='#94a3b8')),
+        yaxis_title=dict(text="Frequency", font=dict(size=12, color='#94a3b8')),
+        xaxis=dict(gridcolor='rgba(255, 255, 255, 0.08)', color='#94a3b8',
+                   tickfont=dict(family='Inter', size=12, color='#94a3b8')),
+        yaxis=dict(gridcolor='rgba(255, 255, 255, 0.08)', color='#94a3b8',
+                   tickfont=dict(family='Inter', size=12, color='#94a3b8')),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=50, r=30, t=30, b=50),
@@ -1739,7 +1659,7 @@ def build_monte_carlo_histogram(mc_samples):
 # ════════════════════════════════════════════════════════════════
 def build_gauge(value, title, max_val=40, color="#ef4444"):
     """
-    Compact gauge chart in clean corporate light style.
+    Compact gauge chart in dark cyber luxury style.
 
     Band thresholds (of the *mean production drop %*):
       • 0 – 5%   → Low risk       (green band)
@@ -1754,24 +1674,24 @@ def build_gauge(value, title, max_val=40, color="#ef4444"):
         domain=dict(x=[0.05, 0.95], y=[0.0, 0.65]),
         title=dict(
             text=f"<b>{band_label}</b>",
-            font=dict(family='Inter', size=16, color=color)
+            font=dict(family='Outfit, Inter, sans-serif', size=16, color=color)
         ),
-        number=dict(suffix="%", font=dict(size=32, family='Inter', color='#111827', weight='bold')),
+        number=dict(suffix="%", font=dict(size=34, family='Outfit, Inter, sans-serif', color='#f8fafc', weight='bold')),
         gauge=dict(
-            axis=dict(range=[0, max_val], tickwidth=1, tickcolor='#d1d5db',
-                      tickfont=dict(size=11, color='#6b7280'),
+            axis=dict(range=[0, max_val], tickwidth=1, tickcolor='#475569',
+                      tickfont=dict(size=11, color='#94a3b8', family='JetBrains Mono, monospace'),
                       tickvals=[0, 5, 15, 25, 40]),
             bar=dict(color=color, thickness=0.65),
-            bgcolor='#f3f4f6',
+            bgcolor='rgba(30, 41, 59, 0.6)',
             borderwidth=0,
             steps=[
-                dict(range=[0, 5], color='rgba(5, 150, 105, 0.12)'),
-                dict(range=[5, 15], color='rgba(217, 119, 6, 0.12)'),
-                dict(range=[15, max_val], color='rgba(220, 38, 38, 0.12)'),
+                dict(range=[0, 5], color='rgba(16, 185, 129, 0.18)'),
+                dict(range=[5, 15], color='rgba(245, 158, 11, 0.18)'),
+                dict(range=[15, max_val], color='rgba(239, 68, 68, 0.22)'),
             ],
             threshold=dict(
-                line=dict(color='#111827', width=2),
-                thickness=0.8,
+                line=dict(color='#f8fafc', width=2.5),
+                thickness=0.85,
                 value=value,
             ),
         ),
@@ -1781,7 +1701,7 @@ def build_gauge(value, title, max_val=40, color="#ef4444"):
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=20, r=20, t=30, b=10),
         height=260,
-        font=dict(family='Inter'),
+        font=dict(family='Outfit, Inter, sans-serif'),
     )
     return fig
 
@@ -1790,7 +1710,7 @@ def build_gauge(value, title, max_val=40, color="#ef4444"):
 # WATERFALL CHART — cost breakdown
 # ════════════════════════════════════════════════════════════════
 def build_waterfall(pcar_metrics):
-    """Waterfall chart showing cost components."""
+    """Waterfall chart showing cost components in dark luxury theme."""
     labels = ["Mean Loss", "Median Loss", "P95 PCaR", "P99 PCaR", "Worst Case"]
     values = [
         pcar_metrics['mean_loss_crore'],
@@ -1800,38 +1720,38 @@ def build_waterfall(pcar_metrics):
         pcar_metrics['worst_case_loss_crore'],
     ]
 
-    colors = ['#2563eb', '#7c3aed', '#d97706', '#ef4444', '#dc2626']
+    colors = ['#38bdf8', '#818cf8', '#fbbf24', '#f87171', '#ef4444']
 
     fig = go.Figure(go.Bar(
         x=labels,
         y=values,
         marker=dict(
             color=colors,
-            line=dict(width=0),
-            cornerradius=12,
+            line=dict(color='rgba(255, 255, 255, 0.15)', width=1),
+            cornerradius=8,
         ),
         text=[f"₹{format_inr(v)} Cr" for v in values],
         textposition='outside',
-        textfont=dict(family='Inter', size=13, color='#111827', weight='bold'),
+        textfont=dict(family='JetBrains Mono, monospace', size=12, color='#f8fafc', weight='bold'),
     ))
 
     fig.update_layout(
         yaxis=dict(
-            title=dict(text="Amount (₹ Crore)", font=dict(size=12, color='#4b5563')),
-            gridcolor='#f3f4f6',
-            color='#4b5563',
-            tickfont=dict(family='Inter', size=12, color='#4b5563'),
+            title=dict(text="Amount (₹ Crore)", font=dict(size=12, color='#94a3b8', family='Outfit, Inter, sans-serif')),
+            gridcolor='rgba(255, 255, 255, 0.06)',
+            color='#94a3b8',
+            tickfont=dict(family='JetBrains Mono, monospace', size=11, color='#94a3b8'),
         ),
         xaxis=dict(
-            color='#111827',
-            tickfont=dict(family='Inter', size=13, color='#111827', weight='bold'),
+            color='#f8fafc',
+            tickfont=dict(family='Outfit, Inter, sans-serif', size=12, color='#f8fafc', weight='bold'),
             automargin=True,
         ),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=60, r=30, t=30, b=60),
         height=320,
-        font=dict(family='Inter'),
+        font=dict(family='Outfit, Inter, sans-serif'),
     )
     return fig
 
@@ -1924,13 +1844,13 @@ def render_comtrade_trade_baseline(expanded: bool = False):
                 textposition='outside'
             ))
             fig_trend.update_layout(
-                title=dict(text="India Semiconductor Imports Growth (HS 8542, ₹ Crore)", font=dict(size=13, color="#1e293b", family="Inter")),
+                title=dict(text="India Semiconductor Imports Growth (HS 8542, ₹ Crore)", font=dict(size=13, color="#f8fafc", family="Outfit, Inter, sans-serif")),
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 height=260,
                 margin=dict(l=20, r=20, t=40, b=20),
-                yaxis=dict(showgrid=True, gridcolor="#f1f5f9", tickfont=dict(color="#64748b")),
-                xaxis=dict(tickfont=dict(color="#1e293b", size=12)),
+                yaxis=dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.06)", tickfont=dict(color="#94a3b8", family="JetBrains Mono, monospace")),
+                xaxis=dict(tickfont=dict(color="#f8fafc", size=12, family="Outfit, Inter, sans-serif")),
             )
             st.plotly_chart(fig_trend, use_container_width=True, config={'displayModeBar': False})
 
@@ -1942,12 +1862,13 @@ def render_comtrade_trade_baseline(expanded: bool = False):
                 labels=labels,
                 values=values,
                 hole=.45,
-                marker=dict(colors=["#ef4444", "#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#64748b", "#06b6d4", "#94a3b8"]),
+                marker=dict(colors=["#ef4444", "#f97316", "#38bdf8", "#10b981", "#818cf8", "#64748b", "#06b6d4", "#94a3b8"]),
                 textinfo='label+percent',
+                textfont=dict(family="JetBrains Mono, monospace", size=11, color="#f8fafc"),
                 insidetextorientation='radial'
             )])
             fig_pie.update_layout(
-                title=dict(text="HS 8542 Import Share by Origin (2022)", font=dict(size=13, color="#1e293b", family="Inter")),
+                title=dict(text="HS 8542 Import Share by Origin (2022)", font=dict(size=13, color="#f8fafc", family="Outfit, Inter, sans-serif")),
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 height=260,
@@ -1983,27 +1904,27 @@ def render_results(signal, probs, mc_samples, pcar_metrics):
 
     if not is_macro:
         st.markdown(f"""
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 8px 14px; margin-bottom: 4px; font-size: 0.82rem; color: #166534; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <div>
-                🏢 <strong>Target Enterprise Allocation:</strong> <span style="font-weight:700;">{company_name}</span> &nbsp;|&nbsp; 
-                SIAM FY24 Market Share: <strong>{pcar_metrics.get('market_share_pct', 0)}%</strong> &nbsp;|&nbsp; 
-                Chain Dependency: <strong>{pcar_metrics.get('dependency_ratio_pct', 0)}%</strong>
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-left: 4px solid #10b981; border-radius: 8px; padding: 10px 16px; margin-bottom: 8px; font-size: 0.84rem; color: #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; backdrop-filter: blur(8px);">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                🏢 <strong style="color:#6ee7b7;">Target Enterprise:</strong> <span style="font-weight:700; color:#f8fafc;">{company_name}</span> &nbsp;|&nbsp; 
+                SIAM FY24 Share: <strong style="color:#34d399; font-family:'JetBrains Mono', monospace;">{pcar_metrics.get('market_share_pct', 0)}%</strong> &nbsp;|&nbsp; 
+                Chain Dependency: <strong style="color:#34d399; font-family:'JetBrains Mono', monospace;">{pcar_metrics.get('dependency_ratio_pct', 0)}%</strong>
             </div>
             <div>
-                Allocated Procurement Base: <strong style="color:#15803d;">₹{format_inr(pcar_metrics.get('effective_base_crore', 0))} Cr</strong> 
-                <span style="color:#64748b; font-size:0.75rem;">(of ₹{format_inr(pcar_metrics.get('industry_baseline_crore', 0))} Cr total)</span>
+                Allocated Base: <strong style="color:#34d399; font-family:'JetBrains Mono', monospace; font-size:0.92rem;">₹{format_inr(pcar_metrics.get('effective_base_crore', 0))} Cr</strong> 
+                <span style="color:#94a3b8; font-size:0.75rem;">(of ₹{format_inr(pcar_metrics.get('industry_baseline_crore', 0))} Cr total)</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
         st.caption(f"Source: UN Comtrade 2022 · 🟡 Cached Fallback · Scaled to {company_name} via SIAM FY24 Market Share ({pcar_metrics.get('market_share_pct', 0)}%) & Dependency Ratio ({pcar_metrics.get('dependency_ratio_pct', 0)}%)")
     else:
         st.markdown(f"""
-        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 6px; padding: 8px 14px; margin-bottom: 4px; font-size: 0.82rem; color: #1e40af; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <div>
-                🌐 <strong>Macro Industry Scope:</strong> Entire Indian Automotive Sourcing Exposure
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-left: 4px solid #38bdf8; border-radius: 8px; padding: 10px 16px; margin-bottom: 8px; font-size: 0.84rem; color: #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; backdrop-filter: blur(8px);">
+            <div style="display:flex; align-items:center; gap:8px;">
+                🌐 <strong style="color:#7dd3fc;">Macro Industry Scope:</strong> Entire Indian Automotive Sourcing Exposure
             </div>
             <div>
-                UN Comtrade Base: <strong>₹{format_inr(pcar_metrics.get('industry_baseline_crore', 0))} Cr</strong>
+                UN Comtrade Base: <strong style="color:#38bdf8; font-family:'JetBrains Mono', monospace; font-size:0.92rem;">₹{format_inr(pcar_metrics.get('industry_baseline_crore', 0))} Cr</strong>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -2456,21 +2377,21 @@ with st.sidebar:
 if selected_company == "Macro (aggregate)":
     oem_display = "All Indian Automakers (Macro Aggregate)"
     allocated_base = SOURCED_HS8542_BASELINE_CRORE
-    base_html = f"Macro Exposure: <strong style='color:#2563eb;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.7rem; color:#94a3b8;'>(UN Comtrade 100% Industry Exposure)</span>"
+    base_html = f"Macro Exposure: <strong style='color:#38bdf8; font-family:JetBrains Mono, monospace;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.72rem; color:#94a3b8;'>(UN Comtrade 100% Industry Exposure)</span>"
 else:
     oem_display = selected_company
     oem_profile = OEM_PROFILES.get(selected_company, OEM_PROFILES["Maruti Suzuki"])
     allocated_base = SOURCED_HS8542_BASELINE_CRORE * oem_profile["market_share"] * oem_profile["dependency_ratio"]
-    base_html = f"Allocated Base: <strong style='color:#2563eb;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.7rem; color:#94a3b8;'>(UN Comtrade Macro: ₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr)</span>"
+    base_html = f"Allocated Base: <strong style='color:#38bdf8; font-family:JetBrains Mono, monospace;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.72rem; color:#94a3b8;'>(UN Comtrade Macro: ₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr)</span>"
 
 st.markdown(f"""
-<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px; padding:6px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:0.78rem;">
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <span style="font-weight:700; color:#1e40af; text-transform:uppercase; letter-spacing:0.04em;">🔒 Scope</span>
-        <span style="background:#dbeafe; color:#1e40af; font-size:0.72rem; padding:1px 6px; border-radius:4px; font-weight:600;">HS 8112 ➔ HS 8542</span>
-        <span style="color:#475569;">Gallium/Germanium ➔ Semiconductor/ICs ➔ Indian Automotive ECU ➔ <strong>{oem_display}</strong></span>
+<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding:8px 18px; background:rgba(15, 23, 42, 0.7); backdrop-filter:blur(12px); border:1px solid rgba(255, 255, 255, 0.08); border-radius:10px; font-size:0.80rem; box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:4px;">🔒 Scope Locked</span>
+        <span style="background:rgba(6, 182, 212, 0.15); color:#22d3ee; border:1px solid rgba(6, 182, 212, 0.3); font-size:0.72rem; padding:2px 8px; border-radius:6px; font-weight:700; font-family:'JetBrains Mono', monospace;">HS 8112 ➔ HS 8542</span>
+        <span style="color:#cbd5e1;">Gallium/Germanium ➔ Semiconductor/ICs ➔ Indian Automotive ECU ➔ <strong style="color:#f8fafc;">{oem_display}</strong></span>
     </div>
-    <div style="color:#64748b; font-size:0.75rem;">
+    <div style="color:#94a3b8; font-size:0.75rem;">
         {base_html}
     </div>
 </div>
