@@ -2309,15 +2309,12 @@ with st.sidebar:
     st.markdown("<div style='font-size:0.70rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#64748b; margin-bottom:6px;'>Navigation Views</div>", unsafe_allow_html=True)
     
     NAV_OPTIONS = [
-        "01 — Decision Room",
-        "02 — Scenarios",
-        "03 — Supply Chain",
-        "04 — Impact & PCaR",
-        "05 — Validation",
-        "06 — Governance",
+        "01 — Executive War Room",
+        "02 — Financial Exposure & PCaR",
+        "03 — Governance & Model Validation",
     ]
     
-    if "active_nav_view" not in st.session_state:
+    if "active_nav_view" not in st.session_state or st.session_state["active_nav_view"] not in NAV_OPTIONS:
         st.session_state["active_nav_view"] = NAV_OPTIONS[0]
         
     active_view = st.sidebar.radio(
@@ -2399,9 +2396,9 @@ st.markdown(f"""
 
 
 # ════════════════════════════════════════════════════════════════
-# VIEW 01: DECISION ROOM (Executive Cockpit)
+# PILLAR 01: EXECUTIVE WAR ROOM (Active Ingestion & Live Causal Flow)
 # ════════════════════════════════════════════════════════════════
-if active_view == "01 — Decision Room":
+if active_view == "01 — Executive War Room":
     if "selected_headline" not in st.session_state:
         st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
     
@@ -2440,7 +2437,7 @@ if active_view == "01 — Decision Room":
     </div>
     """, unsafe_allow_html=True)
 
-    # 2. Causal Decision Ribbon (Compact 4-Tier View with prefers-reduced-motion Safety)
+    # 2. Causal Decision Ribbon
     render_decision_ribbon(
         signal_result=sim_data["signal"],
         probs=sim_data["probs"],
@@ -2457,15 +2454,15 @@ if active_view == "01 — Decision Room":
         new_headline = st.text_area(
             "Headline / Disruption Signal Input:",
             value=st.session_state.get("selected_headline", ""),
-            height=70,
+            height=65,
             key="main_headline_input",
             label_visibility="collapsed"
         )
         if new_headline != st.session_state["selected_headline"]:
             st.session_state["selected_headline"] = new_headline
 
-        # Quick Headline Presets
-        st.markdown("<div style='font-size:0.72rem; color:#64748b; font-weight:600; margin-bottom:4px;'>QUICK SAMPLES:</div>", unsafe_allow_html=True)
+        # Quick Headline Presets & Stress Scenarios
+        st.markdown("<div style='font-size:0.72rem; color:#64748b; font-weight:600; margin-bottom:4px;'>QUICK SAMPLES & STRESS VECTORS:</div>", unsafe_allow_html=True)
         qp1, qp2, qp3 = st.columns(3)
         with qp1:
             if st.button("🇨🇳 China Ga/Ge", use_container_width=True, help="China export curbs on Gallium/Germanium"):
@@ -2479,6 +2476,30 @@ if active_view == "01 — Decision Room":
             if st.button("🌊 Red Sea", use_container_width=True, help="Red Sea maritime corridor disruption"):
                 st.session_state["selected_headline"] = "Houthi missile strikes close Bab-el-Mandeb Strait, diverting Asian semiconductor vessels around Africa."
                 st.rerun()
+
+        # Historical Stress Scenario Selector
+        stress_choice = st.selectbox(
+            "Load Historical Crisis Scenario:",
+            [
+                "— Select Predefined Stress Vector —",
+                "COVID-19 Manufacturing Shutdown (Extreme)",
+                "Global Chip Shortage Peak (Severe)",
+                "Shanghai Port Lockdown (Moderate)",
+                "Red Sea Maritime Blockade (Mild)"
+            ],
+            key="stress_scenario_quick_select",
+            label_visibility="collapsed"
+        )
+        if stress_choice and stress_choice != "— Select Predefined Stress Vector —":
+            if "COVID-19" in stress_choice:
+                st.session_state["selected_headline"] = "Global automotive assembly lines halt as COVID-19 restrictions shut down major semiconductor fabrication facilities worldwide."
+            elif "Chip Shortage" in stress_choice:
+                st.session_state["selected_headline"] = "Automotive microcontrollers face 52-week backorders as wafer fabs allocate capacity to consumer electronics."
+            elif "Shanghai" in stress_choice:
+                st.session_state["selected_headline"] = "Strict pandemic containment protocols suspend container vessel departures at Shanghai maritime hub."
+            elif "Red Sea" in stress_choice:
+                st.session_state["selected_headline"] = "Attacks on commercial vessels force Asian chip cargo carriers to detour around Cape of Good Hope, adding 14 days."
+            st.rerun()
 
         analyze_clicked = st.button("⚡ Analyze Disruption", type="primary", use_container_width=True)
 
@@ -2507,32 +2528,22 @@ if active_view == "01 — Decision Room":
         st.markdown(f"""
         <div class="recommended-action-card">
             <div class="action-kicker">EXECUTIVE CSCO DIRECTIVE</div>
-            <div class="action-title">{cost_rec.get('cost_adjusted_best', 'Dual-Sourcing Qualification')}</div>
+            <div class="action-title">{cost_rec.get('cost_adjusted_best', 'Qualify Dual Source')}</div>
             <div class="action-sub">
                 Avoided Loss: <strong>₹{best_opt.get('avoided_loss_crore', 0):.1f} Cr</strong> &nbsp;|&nbsp; 
-                Net Benefit: <strong style="color:#0d9488;">₹{best_opt.get('net_benefit_crore', 0):.1f} Cr</strong> &nbsp;|&nbsp; 
-                Lead Time: <strong>{best_opt.get('lead_time_weeks', 6)} Wks</strong>
+                Net Benefit: <strong style="color:#34d399;">₹{best_opt.get('net_benefit_crore', 0):.1f} Cr</strong> &nbsp;|&nbsp; 
+                Lead Time: <strong>{best_opt.get('lead_time_weeks', 12)} Wks</strong>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
     with col_right:
-        col_hdr_left, col_hdr_right = st.columns([0.55, 0.45])
-        with col_hdr_left:
-            st.markdown("""
-            <div class="section-header" style="margin-bottom: 0;">
-                <h3>Causal Supply Chain Flow</h3>
-                <span class="section-badge">8 nodes · 9 edges</span>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_hdr_right:
-            graph_view_mode = st.radio(
-                "Graph View Mode",
-                ["🌊 Animated Flow Simulation", "📊 Static Topology"],
-                horizontal=True,
-                label_visibility="collapsed",
-                key="cockpit_graph_mode"
-            )
+        st.markdown("""
+        <div class="section-header" style="margin-bottom: 6px;">
+            <h3>Causal Supply Chain Flow</h3>
+            <span class="section-badge">8 nodes · 9 edges · 60 FPS</span>
+        </div>
+        """, unsafe_allow_html=True)
 
         NODE_TO_UI_GRAPH = {
             "Raw Material Supplier": "Shanghai Port",
@@ -2547,116 +2558,31 @@ if active_view == "01 — Decision Room":
         sev_pct = signal_result.get("severity_pct", 75) if signal_result else 75
         evt_type = signal_result.get("event_type", "Supply Disruption") if signal_result else "Supply Disruption"
 
-        if graph_view_mode == "🌊 Animated Flow Simulation":
-            render_animated_flow_graph(
-                disrupted_node=ui_node,
-                severity_pct=sev_pct,
-                event_type=evt_type,
-                auto_shock=False
-            )
-        else:
-            graph_fig = build_supply_chain_graph(ui_node)
-            st.plotly_chart(graph_fig, use_container_width=True, config={'displayModeBar': False})
+        render_animated_flow_graph(
+            disrupted_node=ui_node,
+            severity_pct=sev_pct,
+            event_type=evt_type,
+            auto_shock=False
+        )
+
+        with st.expander("📐 Multi-Tier Chain Topology Mapping (HS 8112 ➔ HS 8542)", expanded=False):
+            tier_mapping = [
+                {"Tier": "Tier-0 (Maritime Logistics)", "Entity": "Shanghai Port & Busan Port", "Role": "Raw material container freight origin from China/Korea", "HS Code": "HS 8112 / HS 8542"},
+                {"Tier": "Tier-1 (Wafer & Substrate)", "Entity": "Tier-1 Supplier A & B", "Role": "Semiconductor wafer fab & packaging plant (TSMC/Renesas/Infineon)", "HS Code": "HS 8542"},
+                {"Tier": "Tier-2 (Component Mfg)", "Entity": "Tier-2 Component Mfg", "Role": "Automotive ECU & sensor assembly (Bosch / Continental / Denso)", "HS Code": "HS 8708"},
+                {"Tier": "Tier-3 (Assembly Hub)", "Entity": "Assembly Hub (India)", "Role": "Indian OEM final vehicle assembly lines (Gurugram / Pune / Chennai)", "HS Code": "HS 8703"},
+                {"Tier": "Tier-4 (Commercial Retail)", "Entity": "Distribution Center & OE Retailer", "Role": "Dealer dispatch network & final automotive customer fulfillment", "HS Code": "Domestic"},
+            ]
+            st.dataframe(pd.DataFrame(tier_mapping), use_container_width=True, hide_index=True)
 
     # 4. Results Section: KPIs, Gauges, Probability Bars, Histogram & Waterfall
     render_results(sim_data["signal"], sim_data["probs"], sim_data["mc_samples"], sim_data["pcar_metrics"])
 
 
 # ════════════════════════════════════════════════════════════════
-# VIEW 02: SCENARIOS (Predefined Stress Testing Vectors)
+# PILLAR 02: FINANCIAL EXPOSURE & PCAR
 # ════════════════════════════════════════════════════════════════
-elif active_view == "02 — Scenarios":
-    st.markdown("### 🎯 Predefined Disruption Scenarios & Stress Tests")
-    st.info(
-        "📅 Grounding Graph Vintage: Current as of 2023–2024 corporate annual report disclosures and verified supply chain filings. "
-        "Node/edge topology reflects: TSMC, Renesas, Bosch, Infineon, NXP, Samsung Foundry, China Minmetals, Maruti Suzuki, Tata Motors, "
-        "Mahindra, Hyundai India disclosures through FY2024."
-    )
-
-    scenario = st.selectbox(
-        "Select a Predefined Stress Scenario:",
-        [
-            "COVID-19 Manufacturing Shutdown (Extreme)",
-            "Global Chip Shortage Peak (Severe)",
-            "Shanghai Lockdown (Moderate)",
-            "Red Sea Shipping Crisis (Mild)"
-        ]
-    )
-
-    if st.button("▶ Run Stress Scenario", type="primary", use_container_width=True):
-        if "Extreme" in scenario:
-            mock_signal = {"component": "semiconductor", "region": "Global", "severity": 3, "severity_pct": 95, "lead_time_weeks": 12, "affected_node": "Semiconductor Fab"}
-        elif "Severe" in scenario:
-            mock_signal = {"component": "semiconductor", "region": "Global", "severity": 3, "severity_pct": 85, "lead_time_weeks": 8, "affected_node": "Tier-1 Supplier A"}
-        elif "Moderate" in scenario:
-            mock_signal = {"component": "semiconductor maritime transit", "region": "Asia", "severity": 2, "severity_pct": 60, "lead_time_weeks": 4, "affected_node": "Shanghai Port"}
-        else:
-            mock_signal = {"component": "semiconductor maritime transit", "region": "Red Sea", "severity": 1, "severity_pct": 35, "lead_time_weeks": 2, "affected_node": "Busan Port"}
-
-        with st.status("⚡ Running scenario simulation pipeline...", expanded=False) as status:
-            probs = cached_simulate_causal_impact(mock_signal)
-            mc_samples = run_monte_carlo(probs, n_samples=10000, random_seed=42)
-            pcar_metrics = compute_pcar_for_selection(mc_samples, selected_company)
-            st.session_state["sim_results"] = {
-                "signal": mock_signal,
-                "probs": probs,
-                "mc_samples": mc_samples,
-                "pcar_metrics": pcar_metrics,
-                "company": selected_company
-            }
-            status.update(label=f"✅ Scenario simulation complete ({selected_company})", state="complete", expanded=False)
-
-        render_results(mock_signal, probs, mc_samples, pcar_metrics)
-
-
-# ════════════════════════════════════════════════════════════════
-# VIEW 03: SUPPLY CHAIN (Dedicated Flow Simulator & Topology)
-# ════════════════════════════════════════════════════════════════
-elif active_view == "03 — Supply Chain":
-    st.markdown("### 🌊 Supply Chain Topology & Interactive Material Flow Simulator")
-    st.caption("Live discrete component pulses across 8 multi-tier network nodes with deterministic fluid flow physics (60 FPS).")
-
-    sim_data = st.session_state.get("sim_results", {})
-    sig = sim_data.get("signal", {"affected_node": "Shanghai Port", "severity_pct": 75, "event_type": "Port Closure"})
-
-    col_view_opt, col_node_sel, col_sev_slider = st.columns([1, 1.2, 1.8])
-    with col_view_opt:
-        sc_mode = st.radio("Simulation Mode", ["🌊 Animated Flow (60 FPS)", "📊 Static Topology Graph"], horizontal=True)
-    with col_node_sel:
-        sc_node = st.selectbox(
-            "Choke Node",
-            ["Shanghai Port", "Busan Port", "Tier-1 Supplier A", "Tier-1 Supplier B", "Tier-2 Component Mfg", "Assembly Hub", "Distribution Center", "OE Retailer"],
-            index=0
-        )
-    with col_sev_slider:
-        sc_sev = st.slider("Disruption Severity %", 0, 100, 75)
-
-    if sc_mode == "🌊 Animated Flow (60 FPS)":
-        render_animated_flow_graph(
-            disrupted_node=sc_node,
-            severity_pct=sc_sev,
-            event_type="Active Disruption"
-        )
-    else:
-        fig_topo = build_supply_chain_graph(sc_node)
-        st.plotly_chart(fig_topo, use_container_width=True, config={'displayModeBar': False})
-
-    # Tier Mapping Table
-    st.markdown("#### 📐 Locked Multi-Tier Chain Entities")
-    tier_mapping = [
-        {"Tier": "Tier-0 (Maritime Logistics)", "Entity": "Shanghai Port & Busan Port", "Role": "Raw material container freight origin from China/Korea", "HS Code": "HS 8112 / HS 8542"},
-        {"Tier": "Tier-1 (Wafer & Substrate)", "Entity": "Tier-1 Supplier A & B", "Role": "Semiconductor wafer fab & packaging plant (TSMC/Renesas/Infineon)", "HS Code": "HS 8542"},
-        {"Tier": "Tier-2 (Component Mfg)", "Entity": "Tier-2 Component Mfg", "Role": "Automotive ECU & sensor assembly (Bosch / Continental / Denso)", "HS Code": "HS 8708"},
-        {"Tier": "Tier-3 (Assembly Hub)", "Entity": "Assembly Hub (India)", "Role": "Indian OEM final vehicle assembly lines (Gurugram / Pune / Chennai)", "HS Code": "HS 8703"},
-        {"Tier": "Tier-4 (Commercial Retail)", "Entity": "Distribution Center & OE Retailer", "Role": "Dealer dispatch network & final automotive customer fulfillment", "HS Code": "Domestic"},
-    ]
-    st.dataframe(pd.DataFrame(tier_mapping), use_container_width=True, hide_index=True)
-
-
-# ════════════════════════════════════════════════════════════════
-# VIEW 04: IMPACT & PCAR (Deep Financial Risk Breakdown)
-# ════════════════════════════════════════════════════════════════
-elif active_view == "04 — Impact & PCaR":
+elif active_view == "02 — Financial Exposure & PCaR":
     st.markdown("### 💰 Financial Exposure Breakdown & Procurement Cost-at-Risk (PCaR)")
     st.caption("Deep balance sheet allocation across all 4 Indian OEMs + Macro aggregate based on official SIAM FY24 market shares.")
 
@@ -2794,7 +2720,7 @@ elif active_view == "04 — Impact & PCaR":
     # 2. Sourced Trade Baseline
     render_comtrade_trade_baseline(expanded=True)
 
-    # 3. Provenance Table: Empirical Teal vs Heuristic Amber
+    # 3. Provenance Table
     st.markdown("#### 🧪 Parameter Provenance: Empirical Baseline vs. Analyst Heuristic")
     provenance_data = [
         {"Category": "Empirical Trade Data (Teal)", "Parameter": "HS 8542 Import Value", "Value": "$16.12B USD (₹1,33,814 Cr)", "Source": "UN Comtrade Database (2022 full calendar year)", "Confidence": "100% Audited"},
@@ -2807,13 +2733,13 @@ elif active_view == "04 — Impact & PCaR":
 
 
 # ════════════════════════════════════════════════════════════════
-# VIEW 05: VALIDATION (SIAM 2021 Backtest & Table 5 Benchmark)
+# PILLAR 03: GOVERNANCE & MODEL VALIDATION
 # ════════════════════════════════════════════════════════════════
-elif active_view == "05 — Validation":
-    st.markdown("### 📈 Model Calibration & Multi-Agent Pipeline Benchmark")
+elif active_view == "03 — Governance & Model Validation":
+    st.markdown("### 🛡️ Model Governance, Operational Boundaries & Empirical Validation")
     st.caption("Empirical backtesting against SIAM September 2021 actuals + Table 5 evaluation replicating AlMahri et al. (2026).")
 
-    v_tab1, v_tab2 = st.tabs(["📈 SIAM 2021 Historical Backtest", "🔬 Pipeline Benchmark (Table 5)"])
+    v_tab1, v_tab2, v_tab3 = st.tabs(["📈 SIAM 2021 Historical Backtest", "🔬 Pipeline Benchmark (Table 5)", "🏛️ Operational Governance & Constraints"])
 
     with v_tab1:
         st.warning(
@@ -2853,7 +2779,7 @@ elif active_view == "05 — Validation":
         with c_res2:
             st.markdown(f'<div class="metric-card"><div class="metric-label">Model Predicted Mean Drop</div><div class="metric-value">{model_pred_drop:.1f}%</div><div class="metric-sub">Live 10,000 Monte Carlo Runs (seed=42)</div></div>', unsafe_allow_html=True)
         with c_res3:
-            st.markdown(f'<div class="metric-card"><div class="metric-label">Prediction Gap (Delta)</div><div class="metric-value" style="color: #dc2626;">{prediction_gap:+.1f}pp</div><div class="metric-sub">Empirical underestimation gap</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><div class="metric-label">Prediction Gap (Delta)</div><div class="metric-value" style="color: #ef4444;">{prediction_gap:+.1f}pp</div><div class="metric-sub">Empirical underestimation gap</div></div>', unsafe_allow_html=True)
         with c_res4:
             st.markdown(f'<div class="metric-card"><div class="metric-label">95% Worst-Case Drop</div><div class="metric-value">{p95_worst_case:.1f}%</div><div class="metric-sub">P95 Tail Upper Bound (P99: {p99_worst_case:.1f}%)</div></div>', unsafe_allow_html=True)
 
@@ -2863,18 +2789,20 @@ elif active_view == "05 — Validation":
         comp_fig.add_trace(go.Bar(
             x=["SIAM Sep 2021 Capacity Drop<br>(Empirical Ground Truth)", "CounterVerse Model<br>(Live Simulated Mean)", "CounterVerse Model<br>(P95 Worst-Case Tail)", "Maruti Suzuki Peak Drop<br>(Historical Actual)"],
             y=[siam_actual_drop, model_pred_drop, p95_worst_case, maruti_actual_drop],
-            marker_color=["#ef4444", "#2563eb", "#8b5cf6", "#f97316"],
+            marker_color=["#ef4444", "#38bdf8", "#818cf8", "#fb923c"],
             text=[f"{siam_actual_drop:.1f}% (Actual)", f"{model_pred_drop:.1f}% (Live Mean)", f"{p95_worst_case:.1f}% (P95 Tail)", f"{maruti_actual_drop:.1f}% (Actual)"],
-            textposition='outside'
+            textposition='outside',
+            textfont=dict(family="JetBrains Mono, monospace", size=11, color="#f8fafc")
         ))
         comp_fig.update_layout(
-            title=dict(text="Empirical Ground Truth vs. CounterVerse Live Predicted Disruption Magnitude", font=dict(size=13, color="#1e293b", family="Inter")),
+            title=dict(text="Empirical Ground Truth vs. CounterVerse Live Predicted Disruption Magnitude", font=dict(size=13, color="#f8fafc", family="Outfit, Inter, sans-serif")),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             height=320,
             margin=dict(l=20, r=20, t=40, b=20),
-            yaxis=dict(title="Production Drop %", showgrid=True, gridcolor="#f1f5f9", range=[0, 65]),
-            font=dict(family="Inter")
+            yaxis=dict(title="Production Drop %", showgrid=True, gridcolor="rgba(255, 255, 255, 0.06)", range=[0, 65], tickfont=dict(color="#94a3b8")),
+            xaxis=dict(tickfont=dict(color="#f8fafc", size=12, family="Outfit, Inter, sans-serif")),
+            font=dict(family="Outfit, Inter, sans-serif")
         )
         st.plotly_chart(comp_fig, use_container_width=True, config={'displayModeBar': False})
 
@@ -2915,69 +2843,50 @@ elif active_view == "05 — Validation":
         ]
         st.dataframe(pd.DataFrame(table5_data), use_container_width=True, hide_index=True)
 
+    with v_tab3:
+        gov_col1, gov_col2, gov_col3, gov_col4 = st.columns(4)
+        with gov_col1:
+            st.markdown('<div class="metric-card"><div class="metric-label">Identified Constraints</div><div class="metric-value">15 Gaps</div><div class="metric-sub">Formally Documented</div></div>', unsafe_allow_html=True)
+        with gov_col2:
+            st.markdown('<div class="metric-card"><div class="metric-label">Pillar A: Simulation Bounds</div><div class="metric-value">7 Limits</div><div class="metric-sub">Internal Graph & Stats Engine</div></div>', unsafe_allow_html=True)
+        with gov_col3:
+            st.markdown('<div class="metric-card"><div class="metric-label">Pillar B: Deployment Risks</div><div class="metric-value">8 Risks</div><div class="metric-sub">External Commercial Friction</div></div>', unsafe_allow_html=True)
+        with gov_col4:
+            st.markdown('<div class="metric-card"><div class="metric-label">Roadmap Resolution</div><div class="metric-value">v2.0</div><div class="metric-sub">Full Enterprise Blueprint</div></div>', unsafe_allow_html=True)
 
-# ════════════════════════════════════════════════════════════════
-# VIEW 06: GOVERNANCE (15 Limitations & Production Roadmap)
-# ════════════════════════════════════════════════════════════════
-elif active_view == "06 — Governance":
-    st.markdown("### 🛡️ Model Governance, Operational Boundaries & Real-World Risks")
-    st.caption("Critical evaluation of CounterVerse across 15 core dimensions (Pillar A: Simulation Bounds, Pillar B: Deployment Risks).")
+        st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
 
-    gov_col1, gov_col2, gov_col3, gov_col4 = st.columns(4)
-    with gov_col1:
-        st.markdown('<div class="metric-card"><div class="metric-label">Identified Constraints</div><div class="metric-value">15 Gaps</div><div class="metric-sub">Formally Documented</div></div>', unsafe_allow_html=True)
-    with gov_col2:
-        st.markdown('<div class="metric-card"><div class="metric-label">Pillar A: Simulation Bounds</div><div class="metric-value">7 Limits</div><div class="metric-sub">Internal Graph & Stats Engine</div></div>', unsafe_allow_html=True)
-    with gov_col3:
-        st.markdown('<div class="metric-card"><div class="metric-label">Pillar B: Deployment Risks</div><div class="metric-value">8 Risks</div><div class="metric-sub">External Commercial Friction</div></div>', unsafe_allow_html=True)
-    with gov_col4:
-        st.markdown('<div class="metric-card"><div class="metric-label">Roadmap Resolution</div><div class="metric-value">v2.0</div><div class="metric-sub">Full Enterprise Blueprint</div></div>', unsafe_allow_html=True)
+        with st.expander("📌 Category 1: Internal Simulation Validity & Engineering Fixes", expanded=True):
+            st.markdown("""
+            | # | Simulation Constraint | Real-World Phenomenon | Proposed Enterprise Engineering Fix |
+            |---|---|---|---|
+            | **1** | **Graph Oversimplification** | Clean 4-tier chain ignores alternate routing, cyclic sub-assemblies, and dual-sourcing. | **Bipartite Neo4j Knowledge Graph** with dynamic edge impedance reflecting AEC-Q100 qualification lag. |
+            | **2** | **Missing Inventory Buffers** | Shocks take 60–120 days to traverse safety stocks, ocean transit, and wafer fab WIP cycles. | **SimPy Discrete-Event Engine** with differential stock-and-flow conservation. |
+            | **3** | **Monte Carlo Sensitivity** | 10k runs give uniform distribution heuristics. | **Global Sensitivity Analysis (Sobol Indices & Morris Method)** + empirical priors fitted to ICIS spot indices. |
+            | **4** | **Cross-Industry Elasticity** | Auto sector uses ~15% of gallium; defense radar & 5G outbid auto buyers in spot shortages. | **Cross-Industry Elasticity Term** accounting for higher willingness to pay in defense/aerospace. |
+            | **5** | **Model Reflexivity** | Predicting a shortage triggers panic-buying and double-ordering, magnifying the crisis. | **Multi-Agent Reinforcement Learning (MARL)** simulating bounded-rational inventory hoarding games. |
+            | **6** | **Discrete Timing Scalar** | Disruption duration is rarely fixed ($D=45$ days); policies face rolling exemptions and delays. | **Stochastic Survival Function (Cox Proportional Hazard Model)** updated via regulatory filings. |
+            | **7** | **Static Graph Topology** | Supply chains adapt within weeks by qualifying secondary refiners and alternative chip packages. | **Dynamic Topology Rewiring:** activate alternative supplier edges when primary cost exceeds threshold $\\theta$. |
+            """)
 
-    st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
-
-    with st.expander("📌 Category 1: Internal Simulation Validity & Engineering Fixes", expanded=True):
-        st.markdown("""
-        | # | Simulation Constraint | Real-World Phenomenon | Proposed Enterprise Engineering Fix |
-        |---|---|---|---|
-        | **1** | **Graph Oversimplification** | Clean 4-tier chain ignores alternate routing, cyclic sub-assemblies, and dual-sourcing. | **Bipartite Neo4j Knowledge Graph** with dynamic edge impedance reflecting AEC-Q100 qualification lag. |
-        | **2** | **Missing Inventory Buffers** | Shocks take 60–120 days to traverse safety stocks, ocean transit, and wafer fab WIP cycles. | **SimPy Discrete-Event Engine** with differential stock-and-flow conservation. |
-        | **3** | **Monte Carlo "Precision Theater"** | 10k runs give false precision if input distributions use uniform heuristics. | **Global Sensitivity Analysis (Sobol Indices & Morris Method)** + empirical priors fitted to ICIS spot indices. |
-        | **4** | **Closed-System Fallacy** | Auto sector uses ~15% of gallium; defense radar & 5G outbid auto buyers in spot shortages. | **Cross-Industry Elasticity Term** accounting for higher willingness to pay in defense/aerospace. |
-        | **5** | **Model Reflexivity** | Predicting a shortage triggers panic-buying and double-ordering, magnifying the crisis. | **Multi-Agent Reinforcement Learning (MARL)** simulating bounded-rational inventory hoarding games. |
-        | **6** | **Discrete Timing Scalar** | Disruption duration is rarely fixed ($D=45$ days); policies face rolling exemptions and delays. | **Stochastic Survival Function (Cox Proportional Hazard Model)** updated via regulatory filings. |
-        | **7** | **Static Graph Topology** | Supply chains adapt within weeks by qualifying secondary refiners and alternative chip packages. | **Dynamic Topology Rewiring:** activate alternative supplier edges when primary cost exceeds threshold $\\theta$. |
-        """)
-
-    with st.expander("📌 Category 2: Real-World Deployment Risks & Solutions", expanded=True):
-        st.markdown("""
-        | # | Deployment Risk | Real-World Phenomenon | Proposed Enterprise Engineering Fix |
-        |---|---|---|---|
-        | **8** | **Macro Comtrade Lag** | Annual HS 8542 data is months old and lumps all microcontrollers together. | **High-Frequency Customs EDI Telemetry:** weekly port container TEUs and fab lead-time indices. |
-        | **9** | **Proprietary BOM Privacy** | OEMs consider parts lists and supplier margins confidential trade secrets. | **Confidential Enclaves (AWS Nitro / Intel SGX)** + **Federated Zero-Knowledge Proofs (ZKP)**. |
-        | **10** | **AI Extraction Fragility** | GDELT headline noise, syndications, and zero-shot SLM sentiment ambiguity. | **Triangulated Multi-Agent RAG:** consensus verification across 3 tier-1 sources. |
-        | **11** | **Single-Event Calibration** | 2021 SIAM backtest proves parameter plausibility, not generalized out-of-sample validity. | **Multi-Crisis Benchmark Suite:** cross-testing on 2011 Fukushima, 2023 Red Sea, and 2024 Noto Japan earthquakes. |
-        | **12** | **The Actionability Gap** | A financial loss figure alone does not tell a procurement officer what operational play to execute. | **Mixed-Integer Linear Programming (MILP):** prescriptive optimizer generating exact buffer ramps and hedging contracts. |
-        | **13** | **Diplomatic / Lobbying Friction** | Backchannel trade diplomacy and conglomerate exemptions override graph physics. | **Geopolitical Bilateral Exemption Bayesian Prior** conditioned on strategic trade treaties. |
-        | **14** | **Model Risk & Liability** | Unnecessary spot commitments from false alarms create direct corporate financial harm. | **Asymmetric Loss Function Calibration:** explicitly weight False Positives vs. False Negatives ($C_{\\text{FN}} \\approx 10 \\times C_{\\text{FP}}$). |
-        | **15** | **Latency & Adversarial Disinformation** | Commodity desks react hours before press releases; bad actors can plant spoofed headlines. | **Direct EDI 856 Telemetry** + **Adversarial Cryptographic News Provenance**. |
-        """)
-
-    with st.expander("🎓 Academic Defense / Viva Cheat Sheet (Key Questions & Answers)", expanded=False):
-        st.markdown("""
-        **Q1: "Isn't your Monte Carlo PCaR just precision theater based on arbitrary distributions?"**  
-        *Answer:* Exactly. That is Limitation #3 in our governance documentation. In this prototype, our objective is demonstrating the computational architecture—connecting unstructured NLP signals to a causal DAG and stochastic loss estimation. In production, we mandate Sobol Variance Sensitivity Analysis and fitting to ICIS/spot commodity distributions.
-
-        **Q2: "How can you estimate Maruti Suzuki's exposure without having their actual BOM?"**  
-        *Answer:* We explicitly clarify this as a top-down macroeconomic allocation using official SIAM FY24 market shares (41.7%) and industry-average ECU silicon intensity (38%) derived from UN Comtrade HS 8542. As detailed in Limitation #9, enterprise deployment requires on-premise confidential enclaves operating directly over private ERP line items.
-
-        **Q3: "Why is SIAM 2021 labeled a calibration case study rather than validation?"**  
-        *Answer:* Because model parameters were calibrated with knowledge of the historical 2021 event. Labeling this validation would be circular. As stated in Limitation #11, authentic validation requires testing against independent, held-out historical events without parameter tuning.
-        """)
+        with st.expander("📌 Category 2: Real-World Deployment Risks & Solutions", expanded=True):
+            st.markdown("""
+            | # | Deployment Risk | Real-World Phenomenon | Proposed Enterprise Engineering Fix |
+            |---|---|---|---|
+            | **8** | **Macro Comtrade Lag** | Annual HS 8542 data is months old and lumps all microcontrollers together. | **High-Frequency Customs EDI Telemetry:** weekly port container TEUs and fab lead-time indices. |
+            | **9** | **Proprietary BOM Privacy** | OEMs consider parts lists and supplier margins confidential trade secrets. | **Confidential Enclaves (AWS Nitro / Intel SGX)** + **Federated Zero-Knowledge Proofs (ZKP)**. |
+            | **10** | **AI Extraction Fragility** | GDELT headline noise, syndications, and zero-shot SLM sentiment ambiguity. | **Triangulated Multi-Agent RAG:** consensus verification across 3 tier-1 sources. |
+            | **11** | **Single-Event Calibration** | 2021 SIAM backtest proves parameter plausibility, not generalized out-of-sample validity. | **Multi-Crisis Benchmark Suite:** cross-testing on 2011 Fukushima, 2023 Red Sea, and 2024 Noto Japan earthquakes. |
+            | **12** | **The Actionability Gap** | A financial loss figure alone does not tell a procurement officer what operational play to execute. | **Mixed-Integer Linear Programming (MILP):** prescriptive optimizer generating exact buffer ramps and hedging contracts. |
+            | **13** | **Diplomatic / Lobbying Friction** | Backchannel trade diplomacy and conglomerate exemptions override graph physics. | **Geopolitical Bilateral Exemption Bayesian Prior** conditioned on strategic trade treaties. |
+            | **14** | **Model Risk & Liability** | Unnecessary spot commitments from false alarms create direct corporate financial harm. | **Asymmetric Loss Function Calibration:** explicitly weight False Positives vs. False Negatives ($C_{\\text{FN}} \\approx 10 \\times C_{\\text{FP}}$). |
+            | **15** | **Latency & Adversarial Disinformation** | Commodity desks react hours before press releases; bad actors can plant spoofed headlines. | **Direct EDI 856 Telemetry** + **Adversarial Cryptographic News Provenance**. |
+            """)
 
 
 # ── Global Clean Footer ──
 st.markdown("""
-<div style="text-align:center; padding:32px 0 16px; color:var(--text-muted); font-size:0.75rem; border-top:1px solid #e5e7eb; margin-top:32px;">
+<div style="text-align:center; padding:32px 0 16px; color:#64748b; font-size:0.75rem; border-top:1px solid rgba(255, 255, 255, 0.08); margin-top:32px; font-family:'Outfit, Inter', sans-serif;">
     ⚡ <strong>CounterVerse</strong> · Causal AI Supply Chain Disruption Simulator · Indian Automotive Sourcing (HS 8112 ➔ HS 8542) · Decision Intelligence v2.0
 </div>
 """, unsafe_allow_html=True)
