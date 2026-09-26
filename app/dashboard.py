@@ -2028,8 +2028,10 @@ $$\text{Structural Exposure Score} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR}
 *Data Source: UN Comtrade Database (HS 8542 & HS 8112 Indian Import Concentration: China 31.4% direct + 24.6% HK conduit = 56.0%, South Korea 14.0%, Taiwan 6.3%, China Gallium direct 36.2%).*
         """)
 
-        with st.expander("🔬 Dependency Ratio (DR) Exact Derivation Function (Priority 2.2 Traceability)", expanded=False):
-            st.markdown(r"""
+        st.markdown(r"""
+---
+#### 🔬 Dependency Ratio (DR) Exact Derivation Function (Priority 2.2 Traceability)
+
 ```python
 def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty=0.0,
                              transit_corridor_share=0.0, unhedged_exposure_weight=0.75):
@@ -2041,28 +2043,29 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
     return min(1.0, round(effective_direct + monopoly_markup, 3))
 ```
 **Traceable Inputs from UN Comtrade Baseline & Disclosed Assumption ($W_{\text{unhedged}} = 0.75$):**
-- **Gallium/Germanium (HS 8112)**: China direct $36.2\%$ ($S_{\text{direct}}=0.362$), Upstream refining monopoly penalty $C_{\text{upstream}}=0.900$, $W=0.75$ $\rightarrow$ **$DR = 0.793$** *(was 0.862 with back-solved weight)*
+- **Gallium/Germanium (HS 8112)**: China direct $36.2\%$ ($S_{\text{direct}}=0.362$), Upstream refining monopoly penalty $C_{\text{upstream}}=0.900$, $W=0.75$ $\rightarrow$ **$DR = 0.793$**
 - **Semiconductors (HS 8542) from China**: China direct $31.4\%$ + Hong Kong re-export conduit $24.6\%$ $\rightarrow$ **$DR = 0.560$**
-- **Semiconductors (HS 8542) from Taiwan**: Taiwan direct $6.3\%$ ($S_{\text{direct}}=0.063$), TSMC automotive MCU foundry concentration $C_{\text{upstream}}=0.700$, $W=0.75$ $\rightarrow$ **$DR = 0.555$** *(was 0.523 with back-solved weight)*
-- **Semiconductors (HS 8542) from South Korea**: Korea direct $14.0\%$ ($S_{\text{direct}}=0.140$), Memory/automotive IC concentration $C_{\text{upstream}}=0.450$, $W=0.75$ $\rightarrow$ **$DR = 0.430$** *(was 0.454 with back-solved weight)*
-            """)
+- **Semiconductors (HS 8542) from Taiwan**: Taiwan direct $6.3\%$ ($S_{\text{direct}}=0.063$), TSMC automotive MCU foundry concentration $C_{\text{upstream}}=0.700$, $W=0.75$ $\rightarrow$ **$DR = 0.555$**
+- **Semiconductors (HS 8542) from South Korea**: Korea direct $14.0\%$ ($S_{\text{direct}}=0.140$), Memory/automotive IC concentration $C_{\text{upstream}}=0.450$, $W=0.75$ $\rightarrow$ **$DR = 0.430$**
 
-        with st.expander("💼 Cost-Adjusted Recommendation (Decision Support)", expanded=False):
-            cost_rec = compute_cost_adjusted_recommendation(
-                risk_score=r_score,
-                pcar_mean_crore=pcar_metrics.get("mean_loss_crore", 0.0)
-            )
-            st.markdown(f"**Cost-Adjusted Best Action:** `{cost_rec['cost_adjusted_best']}` *(Threshold-only: `{cost_rec['threshold_only_rec']}` — Agreement: {'✅ Yes' if cost_rec['agreement'] else '⚠️ Diverges'})*")
-            opt_table_rows = [
-                f"| {'**' if opt['action'] == cost_rec['cost_adjusted_best'] else ''}{opt['action']}{' (Recommended)**' if opt['action'] == cost_rec['cost_adjusted_best'] else ''} | ₹{opt['impl_cost_crore']:.1f} Cr | ₹{opt['avoided_loss_crore']:.2f} Cr | **₹{opt['net_benefit_crore']:.2f} Cr** | {opt['lead_time_weeks']} wks |"
-                for opt in cost_rec["options_ranked"]
-            ]
-            st.markdown(
-                "| Action | Impl Cost | Avoided Loss | Net Benefit | Lead Time |\n"
-                "| :--- | :---: | :---: | :---: | :---: |\n" +
-                "\n".join(opt_table_rows) +
-                "\n\n*Note: Implementation costs are assumed illustrative values for decision support demonstration.*"
-            )
+---
+#### 💼 Cost-Adjusted Recommendation (Decision Support)
+""")
+        cost_rec = compute_cost_adjusted_recommendation(
+            risk_score=r_score,
+            pcar_mean_crore=pcar_metrics.get("mean_loss_crore", 0.0)
+        )
+        st.markdown(f"**Cost-Adjusted Best Action:** `{cost_rec['cost_adjusted_best']}` *(Threshold-only: `{cost_rec['threshold_only_rec']}` — Agreement: {'✅ Yes' if cost_rec['agreement'] else '⚠️ Diverges'})*")
+        opt_table_rows = [
+            f"| {'**' if opt['action'] == cost_rec['cost_adjusted_best'] else ''}{opt['action']}{' (Recommended)**' if opt['action'] == cost_rec['cost_adjusted_best'] else ''} | ₹{opt['impl_cost_crore']:.1f} Cr | ₹{opt['avoided_loss_crore']:.2f} Cr | **₹{opt['net_benefit_crore']:.2f} Cr** | {opt['lead_time_weeks']} wks |"
+            for opt in cost_rec["options_ranked"]
+        ]
+        st.markdown(
+            "| Action | Impl Cost | Avoided Loss | Net Benefit | Lead Time |\n"
+            "| :--- | :---: | :---: | :---: | :---: |\n" +
+            "\n".join(opt_table_rows) +
+            "\n\n*Note: Implementation costs are assumed illustrative values for decision support demonstration.*"
+        )
 
     # ── UN Comtrade Real Trade Data Panel ──
     render_comtrade_trade_baseline(expanded=False)
