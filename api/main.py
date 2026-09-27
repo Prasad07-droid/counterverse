@@ -22,6 +22,33 @@ import time
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
+# ── Auth, metrics, rate-limiting ──
+try:
+    from src.auth import create_access_token, authenticate_user, AUTH_AVAILABLE, oauth2_scheme
+except ImportError:
+    AUTH_AVAILABLE = False
+    oauth2_scheme = None
+    def create_access_token(data, expires_delta=None): return "no-auth"
+    def authenticate_user(u, p): return None
+
+try:
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+    _limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
+    _SLOWAPI_AVAILABLE = True
+except ImportError:
+    _limiter = None
+    _SLOWAPI_AVAILABLE = False
+
+try:
+    from src.metrics import PROMETHEUS_AVAILABLE, RISK_SCORE_GAUGE, PCAR_GAUGE
+    from prometheus_client import make_asgi_app as _make_metrics_app
+except ImportError:
+    PROMETHEUS_AVAILABLE = False
+    RISK_SCORE_GAUGE = PCAR_GAUGE = None
+    _make_metrics_app = None
+
 # ── Path setup ──
 _API_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _API_DIR.parent
@@ -208,9 +235,10 @@ app = FastAPI(
     title="CounterVerse API",
     description=(
         "Causal AI supply chain disruption simulator for Indian automotive semiconductors. "
-        "Headline → GraphRAG → Risk Score → Monte Carlo → Procurement Cost at Risk (PCaR)."
+        "Headline → GraphRAG → Risk Score → Monte Carlo → Procurement Cost at Risk (PCaR). "
+        "Enterprise-grade: OAuth2/JWT auth, Prometheus metrics, rate-limiting."
     ),
-    version="1.0.0",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -222,6 +250,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Rate-limiter state ──
+if _SLOWAPI_AVAILABLE and _limiter:
+    app.state.limiter = _limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# ── Prometheus /metrics endpoint ──
+if PROMETHEUS_AVAILABLE and _make_metrics_app:
+    app.mount("/metrics", _make_metrics_app())
 
 
 # ════════════════════════════════════════════════════════════════
@@ -505,8 +542,43 @@ async def health():
         graph_hash=graph_hash,
         baseline_crore=float(SOURCED_HS8542_BASELINE_CRORE),
         usd_inr_rate=USD_INR_RATE,
-        version="1.0.0",
+        version="2.0.0",
     )
+
+
+# ── Auth token endpoint ──────────────────────────────────────────
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+@app.post("/api/v1/token", response_model=TokenResponse, tags=["Auth"])
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Obtain a JWT Bearer token.
+    Default credentials (dev mode): username=admin, password=changeme.
+    Set COUNTERVERSE_ADMIN_PASSWORD env var to change.
+    """
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    token = create_access_token(data={"sub": form_data.username})
+    return TokenResponse(access_token=token, token_type="bearer")
+
+
+# ── Currency conversion helper ───────────────────────────────────
+CURRENCY_RATES = {
+    "INR": 1.0,
+    "USD": 1.0 / USD_INR_RATE,
+    "EUR": 1.0 / (USD_INR_RATE * 1.08),  # approximate EUR/INR via USD/EUR 1.08
+}
+
+@app.get("/api/v1/currencies", tags=["Utilities"])
+async def get_supported_currencies():
+    """Returns supported output currencies for PCaR and their INR conversion rates."""
+    return {"supported": list(CURRENCY_RATES.keys()), "base": "INR"}
 
 
 # ════════════════════════════════════════════════════════════════

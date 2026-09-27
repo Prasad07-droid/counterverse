@@ -1,0 +1,30 @@
+# requirements-py39.txt
+# ─────────────────────────────────────────────────────────────
+# ONLY the NEW v2 upgrade dependencies, pinned for Python 3.9.
+# Run: pip install -r requirements-py39.txt
+#
+# The main requirements-local.txt contains ALL deps but some
+# packages (torch, scipy, sklearn) were installed separately.
+# ─────────────────────────────────────────────────────────────
+
+# --- Dev / Test ---
+pytest>=7.4.0
+
+# --- Multilingual news ingest ---
+langdetect>=1.0.9
+feedparser>=6.0.11
+# tweepy>=4.14.0   # optional — needs Twitter/X API keys
+
+# --- Graph DB (Neo4j optional) ---
+# py2neo>=2021.2.3  # optional — needs Neo4j running
+
+# --- API Security ---
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+# bcrypt 5.x breaks passlib 1.7.4 (removes __about__ + 72-byte limit change)
+bcrypt>=4.0.0,<5.0.0
+python-multipart>=0.0.9
+slowapi>=0.1.9
+
+# --- Monitoring ---
+prometheus-client>=0.20.0

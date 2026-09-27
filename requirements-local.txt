@@ -1,18 +1,18 @@
-# Windows + RTX 3050 Ti + Python 3.14.7. Pins are exact where tested.
-# STEP 1: Python 3.14 venv (system 3.9.13 is too old for current torch).
-# STEP 2: install CUDA torch from the official index, THEN this file.
+# Windows + RTX 3050 Ti + Python 3.9.x (system Python)
+# STEP 1: Install CUDA torch from the official index FIRST:
 #   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+# STEP 2: Install remaining deps from this file:
+#   pip install -r requirements-local.txt
 #
-# Installed by torch (do NOT re-pin here — let torch's deps win):
-#   torch==2.11.0+cu128   torchvision==0.26.0+cu128   torchaudio==2.11.0+cu128
-#   numpy==2.5.2   networkx==3.6.1   sympy==1.14.0   filelock==3.32.3
-#   jinja2==3.1.6  typing-extensions==4.16.0  pillow==12.3.0
+# Python 3.9 compatibility notes:
+#   scipy:        max 1.13.x  (1.14+ requires Py 3.10)
+#   statsmodels:  max 0.14.x  (0.15+ requires Py 3.10)
+#   scikit-learn: max 1.6.x   (1.7+ requires Py 3.10)
+#   matplotlib:   max 3.9.x   (3.10+ requires Py 3.10)
+#   numba:        max 0.59.x  (0.60+ requires Py 3.10)
+# After full install succeeds: pip freeze > requirements-local-frozen.txt
 #
-# NOTE: Many old exact pins (e.g. pandas==2.2.3) have no Python 3.14 wheel.
-# Updated to versions with 3.14 wheels or removed exact pins where needed.
-# After full pip install succeeds, run: pip freeze > requirements-local-frozen.txt
-#
-# ---------- remaining project deps (install via this file) ----------
+# ---------- remaining project deps ----------
 
 # --- Data handling ---
 pandas>=2.3.0
@@ -25,14 +25,16 @@ python-dateutil>=2.9.0
 tqdm>=4.66.5
 
 # --- Visualization ---
-matplotlib>=3.10.0
+matplotlib>=3.7.0,<3.10.0
 plotly>=5.24.0
 
 # --- ML / Stats (CPU) ---
 pgmpy>=0.1.25
-scikit-learn>=1.6.0
-scipy>=1.15.0
-statsmodels>=0.14.4
+scikit-learn>=1.6.0,<1.7.0
+# scipy 1.14+ requires Python 3.10; max for Py3.9 is 1.13.x
+scipy>=1.11.0,<1.14.0
+# statsmodels 0.15+ requires Python 3.10; max for Py3.9 is 0.14.x
+statsmodels>=0.14.0,<0.15.0
 
 # --- SLM (GPU) ---
 transformers>=4.46.3
@@ -53,13 +55,38 @@ streamlit>=1.39.0
 
 # --- Dev / Test ---
 jsonschema>=4.23.0
-pytest>=8.3.3
+# pytest: install manually if not present: pip install pytest
+pytest>=7.4.0
 
 # --- API Server ---
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
 pydantic-settings>=2.5.0
 httpx>=0.27.0
+
+# --- Multilingual news ingest ---
+langdetect>=1.0.9
+feedparser>=6.0.11
+tweepy>=4.14.0
+
+# --- Graph DB (Neo4j optional backend) ---
+py2neo>=2021.2.3
+
+# --- API Security (OAuth2 + JWT + rate-limiting) ---
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.9
+slowapi>=0.1.9
+
+# --- Monitoring (Prometheus) ---
+prometheus-client>=0.20.0
+
+# --- PDF report export ---
+# weasyprint>=60.0  # optional — requires GTK system libs; uncomment if needed
+
+# --- Numba JIT (Monte Carlo speedup) ---
+# numba 0.57-0.59 supports Python 3.9; 0.60+ requires Python 3.10+
+numba>=0.57.0,<0.60.0
 
 # --- Optional (install if needed in Phase 2) ---
 # nbformat>=5.10.4

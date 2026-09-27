@@ -110,6 +110,11 @@ from src.data_sources import (
     fetch_live_gdelt_headlines,
     SIAM_2021_GROUND_TRUTH,
 )
+from src.news_scraper import (
+    scrape_live_supply_chain_news,
+    auto_extract_top_disruption_headline,
+    calculate_disruption_score
+)
 
 # Model loading — cache the resource (shared across all users/sessions)
 @st.cache_resource(show_spinner="Loading analysis engine...")
@@ -200,174 +205,174 @@ def classify_structural_risk(score: float) -> tuple[str, str, str]:
 # PAGE CONFIG
 # ════════════════════════════════════════════════════════════════
 st.set_page_config(
-    page_title="CounterVerse · Decision Intelligence",
+    page_title="CounterVerse · Supply Chain Intelligence",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# -- Load external CSS design system (dark-mode + glassmorphism) --
+_css_path = _app_dir / "assets" / "style.css"
+if _css_path.exists():
+    with open(_css_path, encoding="utf-8") as _f:
+        st.markdown("<style>" + _f.read() + "</style>", unsafe_allow_html=True)
+
 
 # ════════════════════════════════════════════════════════════════
 # CLEAN LIGHT / CORPORATE THEME  — custom CSS injection
 # ════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-/* ── Google Fonts: Outfit (Display) + Inter (UI) + JetBrains Mono (Financials) ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+/* ── Vercel Typography & Font Imports: Geist + Inter + Geist Mono ── */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ── Cyber-Intelligence Dark Luxury Theme Root Tokens ── */
+/* ── Vercel Pure Monochrome & High-Contrast Design Tokens ── */
 :root {
-    /* Canvas & Surfaces */
-    --canvas-bg: #080c14;
-    --canvas-radial: radial-gradient(at 15% 15%, rgba(6, 182, 212, 0.08) 0px, transparent 55%),
-                     radial-gradient(at 85% 85%, rgba(239, 68, 68, 0.06) 0px, transparent 55%),
-                     radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.04) 0px, transparent 65%);
-    --surface-glass: rgba(15, 23, 42, 0.72);
-    --surface-glass-hover: rgba(30, 41, 59, 0.85);
-    --surface-elevated: #111827;
-    --surface-card: #0f172a;
+    --canvas-bg: #000000;
+    --canvas-radial: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.15), transparent 80%),
+                     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    --surface-glass: #0a0a0a;
+    --surface-glass-hover: #121212;
+    --surface-elevated: #111111;
+    --surface-card: #0a0a0a;
 
-    /* Borders & Accents */
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(56, 189, 248, 0.4);
-    --border-glow: 0 0 16px rgba(56, 189, 248, 0.2);
+    --border-subtle: #222222;
+    --border-hover: rgba(255, 255, 255, 0.22);
+    --border-glow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 
-    /* Typography Colors */
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --text-highlight: #38bdf8;
+    --text-primary: #ededed;
+    --text-secondary: #a1a1a1;
+    --text-muted: #707070;
+    --text-highlight: #ffffff;
 
-    /* Semantic Neon Signals */
-    --neon-cyan: #06b6d4;
-    --neon-cyan-glow: 0 0 20px rgba(6, 182, 212, 0.4);
-    --neon-red: #ef4444;
-    --neon-red-glow: 0 0 20px rgba(239, 68, 68, 0.45);
-    --neon-emerald: #10b981;
-    --neon-emerald-glow: 0 0 20px rgba(16, 185, 129, 0.4);
-    --neon-amber: #f59e0b;
-    --neon-amber-glow: 0 0 20px rgba(245, 158, 11, 0.4);
+    --neon-cyan: #0070f3;
+    --neon-cyan-glow: 0 0 16px rgba(0, 112, 243, 0.25);
+    --neon-red: #ee0000;
+    --neon-red-glow: 0 0 16px rgba(238, 0, 0, 0.25);
+    --neon-emerald: #00df8f;
+    --neon-emerald-glow: 0 0 16px rgba(0, 223, 143, 0.25);
+    --neon-amber: #f5a623;
+    --neon-amber-glow: 0 0 16px rgba(245, 166, 35, 0.25);
 
-    /* Sidebar */
-    --sidebar-bg: #090d16;
-    --sidebar-active-indicator: #06b6d4;
+    --sidebar-bg: #050505;
+    --sidebar-active-indicator: #ffffff;
 
-    /* Radii & Shadows */
-    --radius-standard: 14px;
-    --radius-sm: 8px;
-    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-    --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    --radius-standard: 8px;
+    --radius-sm: 6px;
+    --shadow-glass: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.7);
+    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Global Canvas Overrides ── */
 .stApp {
-    background-color: var(--canvas-bg) !important;
+    background-color: #000000 !important;
     background-image: var(--canvas-radial) !important;
+    background-size: 100% 100%, 32px 32px, 32px 32px !important;
     background-attachment: fixed !important;
-    font-family: 'Inter', -apple-system, sans-serif !important;
+    font-family: 'Geist', 'Inter', -apple-system, sans-serif !important;
     color: var(--text-primary) !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif !important;
-    letter-spacing: -0.02em !important;
-    color: #ffffff !important;
+    font-family: 'Geist', 'Inter', sans-serif !important;
+    letter-spacing: -0.03em !important;
+    color: #ededed !important;
+    font-weight: 700 !important;
 }
 
 /* ── Hide Default Streamlit Clutter ── */
 header[data-testid="stHeader"] { background: transparent !important; }
 #MainMenu, footer, .stDeployButton { display: none !important; }
 
-/* ── Sidebar: Ultra-Sleek Command Deck ── */
+/* ── Sidebar: Vercel Sleek Panel ── */
 section[data-testid="stSidebar"] {
     background-color: var(--sidebar-bg) !important;
-    border-right: 1px solid var(--border-subtle) !important;
+    border-right: 1px solid #1a1a1a !important;
 }
 section[data-testid="stSidebar"] * {
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'Geist', 'Inter', sans-serif !important;
 }
 section[data-testid="stSidebar"] hr {
-    border-color: var(--border-subtle) !important;
+    border-color: #1a1a1a !important;
 }
 section[data-testid="stSidebar"] .stRadio label {
-    color: #cbd5e1 !important;
-    font-size: 0.88rem !important;
+    color: #888888 !important;
+    font-size: 0.85rem !important;
     font-weight: 500 !important;
-    padding: 10px 14px !important;
+    padding: 8px 12px !important;
     border-radius: var(--radius-sm) !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 0.15s ease !important;
     border: 1px solid transparent !important;
     margin-bottom: 2px !important;
 }
 section[data-testid="stSidebar"] .stRadio label:hover {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: #111111 !important;
     color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: #222222 !important;
 }
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label[data-checked="true"],
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label:has(input:checked) {
-    background: linear-gradient(90deg, rgba(6, 182, 212, 0.16) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
-    border: 1px solid rgba(6, 182, 212, 0.4) !important;
-    border-left: 3px solid var(--sidebar-active-indicator) !important;
+    background: #171717 !important;
+    border: 1px solid #333333 !important;
+    border-left: 2px solid #ffffff !important;
     color: #ffffff !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.15) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
 }
 section[data-testid="stSidebar"] div[data-testid="stSelectbox"] > div > div {
-    background: #111827 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: #0a0a0a !important;
+    border: 1px solid #222222 !important;
     color: #ffffff !important;
     border-radius: var(--radius-sm) !important;
 }
 section[data-testid="stSidebar"] div[data-testid="stSelectbox"] label,
 section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
-    color: #94a3b8 !important;
+    color: #888888 !important;
 }
 
-/* ── Live Incident HUD Banner ── */
+/* ── Live Incident HUD Banner (Vercel Style) ── */
 .active-incident-banner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 14px;
-    padding: 12px 22px;
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.18) 0%, rgba(15, 23, 42, 0.85) 100%);
-    border: 1px solid rgba(239, 68, 68, 0.4);
-    border-left: 5px solid #ef4444;
+    gap: 12px;
+    padding: 12px 20px;
+    background: #0d0606;
+    border: 1px solid rgba(238, 0, 0, 0.3);
+    border-left: 3px solid #ee0000;
     border-radius: var(--radius-standard);
-    box-shadow: 0 4px 24px rgba(239, 68, 68, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.5);
     margin-bottom: 20px;
-    backdrop-filter: blur(12px);
 }
 .incident-badge-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 .incident-shock-badge {
-    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    background: #ee0000;
     color: #ffffff;
-    font-size: 0.72rem;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 4px 10px;
-    border-radius: 6px;
-    box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .incident-headline-text {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #f8fafc;
-    letter-spacing: -0.01em;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #ededed;
 }
 .incident-meta-group {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
     font-size: 0.82rem;
     color: var(--text-secondary);
 }
@@ -375,7 +380,7 @@ section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     color: #ffffff;
 }
 
-/* ── Causal Decision Ribbon (Futuristic 4-Tier HUD) ── */
+/* ── Causal Decision Ribbon (Vercel Modular HUD) ── */
 .decision-ribbon {
     display: flex;
     align-items: stretch;
@@ -385,34 +390,33 @@ section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     box-shadow: var(--shadow-glass);
     margin-bottom: 24px;
     overflow: hidden;
-    backdrop-filter: blur(16px);
 }
 .ribbon-tier {
     flex: 1;
-    padding: 14px 20px;
+    padding: 14px 18px;
     border-right: 1px solid var(--border-subtle);
     background: transparent;
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: relative;
-    transition: all 0.25s ease;
+    transition: all 0.15s ease;
 }
 .ribbon-tier:last-child {
     border-right: none;
 }
 .ribbon-tier:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: #111111;
 }
 .ribbon-tier.active-shock {
-    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
-    border-left: 3px solid #ef4444;
+    background: #100808;
+    border-left: 2px solid #ee0000;
 }
 .ribbon-tier-label {
-    font-size: 0.70rem;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.06em;
     color: var(--text-muted);
     margin-bottom: 6px;
     display: flex;
@@ -420,108 +424,103 @@ section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     justify-content: space-between;
 }
 .ribbon-tier-val {
-    font-size: 1.12rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: 'Geist', 'Inter', sans-serif;
     color: #ffffff;
     line-height: 1.25;
 }
 .ribbon-tier-sub {
-    font-size: 0.76rem;
+    font-size: 12px;
     color: var(--text-secondary);
     margin-top: 4px;
     line-height: 1.35;
 }
 .ribbon-pulse-dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #ef4444;
+    background: #ee0000;
     display: inline-block;
-    box-shadow: 0 0 0 rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 0 rgba(238, 0, 0, 0.6);
     animation: ribbonPulse 2s infinite ease-in-out;
 }
 .ribbon-dot-teal {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: #10b981;
+    background: #00df8f;
     display: inline-block;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
 }
 .ribbon-dot-amber {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: #f59e0b;
+    background: #f5a623;
     display: inline-block;
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
 }
 .ribbon-dot-blue {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: #06b6d4;
+    background: #0070f3;
     display: inline-block;
-    box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
 }
 @keyframes ribbonPulse {
-    0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
-    70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-    100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(238, 0, 0, 0.8); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(238, 0, 0, 0); }
+    100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(238, 0, 0, 0); }
 }
 
 /* ── Executive Directive Card ── */
 .recommended-action-card {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    border-left: 5px solid #10b981;
+    background: #090e0c;
+    border: 1px solid rgba(0, 223, 143, 0.25);
+    border-left: 3px solid #00df8f;
     border-radius: var(--radius-standard);
     padding: 16px 20px;
-    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     margin-top: 16px;
-    backdrop-filter: blur(12px);
 }
 .action-kicker {
-    font-size: 0.72rem;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #34d399;
+    letter-spacing: 0.08em;
+    color: #00df8f;
 }
 .action-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
+    font-size: 1.10rem;
+    font-weight: 600;
+    font-family: 'Geist', 'Inter', sans-serif;
     color: #ffffff;
     margin: 4px 0 6px 0;
 }
 .action-sub {
     font-size: 0.84rem;
-    color: #cbd5e1;
+    color: #a1a1a1;
     line-height: 1.45;
 }
 
-/* ── Glassmorphic Panels ── */
+/* ── Vercel Panels (.glass-card) ── */
 .glass-card {
     background: var(--surface-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-standard);
     box-shadow: var(--shadow-glass);
-    padding: 28px;
-    margin-bottom: 24px;
-    backdrop-filter: blur(16px);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card:hover {
     border-color: var(--border-hover);
-    box-shadow: 0 12px 36px 0 rgba(6, 182, 212, 0.15);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 8px 30px rgba(0, 0, 0, 0.8);
 }
 .glass-card h3 {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: #ffffff;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     display: flex; align-items: center; gap: 8px;
 }
 
@@ -531,66 +530,55 @@ section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     align-items: center;
     justify-content: space-between;
     margin-top: 14px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 .section-header h3 {
-    font-size: 1.15rem;
+    font-size: 1.10rem;
     font-weight: 700;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Geist', 'Inter', sans-serif;
     color: #ffffff;
     margin: 0;
 }
 .section-badge {
     font-size: 11px;
-    font-weight: 600;
-    color: #38bdf8;
-    background: rgba(6, 182, 212, 0.12);
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(6, 182, 212, 0.3);
+    font-weight: 500;
+    color: #a1a1a1;
+    background: #111111;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    border: 1px solid #262626;
 }
 
-/* ── Glowing KPI Metric Cards ── */
+/* ── Vercel Minimalist KPI Cards ── */
 .metric-card {
     background: var(--surface-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-standard);
     box-shadow: var(--shadow-card);
-    padding: 20px 22px;
+    padding: 18px 20px;
     text-align: left;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 128px;
-    backdrop-filter: blur(16px);
+    min-height: 120px;
     position: relative;
     overflow: hidden;
 }
-.metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
-}
 .metric-card:hover {
     border-color: var(--border-hover);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.7);
 }
 .metric-card.critical {
-    border-color: rgba(239, 68, 68, 0.4);
-    background: linear-gradient(180deg, rgba(239, 68, 68, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%);
-}
-.metric-card.critical::before {
-    background: linear-gradient(90deg, transparent, #ef4444, transparent);
+    border-color: rgba(238, 0, 0, 0.35);
+    background: linear-gradient(180deg, rgba(238, 0, 0, 0.08) 0%, #0a0a0a 100%);
 }
 .metric-card .metric-label {
-    font-size: 0.70rem;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
     color: var(--text-muted);
     margin-bottom: 8px;
     display: flex;
@@ -598,56 +586,53 @@ section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     justify-content: space-between;
 }
 .metric-card .metric-value {
-    font-size: 1.65rem;
-    font-weight: 800;
-    font-family: 'Outfit', sans-serif;
-    color: #ffffff;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    font-size: 1.85rem;
+    font-weight: 700;
+    font-family: 'Geist', 'Inter', sans-serif;
+    color: #ededed;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
 }
 .metric-card .metric-sub {
-    font-size: 0.76rem;
+    font-size: 12px;
     font-weight: 400;
     color: var(--text-secondary);
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 /* ── Semantic Status Badges ── */
 .status-badge-critical {
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.5);
-    padding: 3px 10px;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    letter-spacing: 0.06em;
+    background: rgba(238, 0, 0, 0.1);
+    color: #ff4d4d;
+    border: 1px solid rgba(238, 0, 0, 0.35);
+    padding: 2px 8px;
+    border-radius: 9999px;
 }
 .status-badge-warning {
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    background: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.5);
-    padding: 3px 10px;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    letter-spacing: 0.06em;
+    background: rgba(245, 166, 35, 0.1);
+    color: #f5a623;
+    border: 1px solid rgba(245, 166, 35, 0.35);
+    padding: 2px 8px;
+    border-radius: 9999px;
 }
 .status-badge-optimal {
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.5);
-    padding: 3px 10px;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    letter-spacing: 0.06em;
+    background: rgba(0, 223, 143, 0.1);
+    color: #00df8f;
+    border: 1px solid rgba(0, 223, 143, 0.35);
+    padding: 2px 8px;
+    border-radius: 9999px;
 }
 
 /* ── Form Controls & Widget Overrides ── */
@@ -659,26 +644,26 @@ div[data-testid="stSelectbox"] label p,
 div[data-testid="stSlider"] label p,
 div[data-testid="stNumberInput"] label p,
 div[data-testid="stTextArea"] label p {
-    font-size: 0.72rem !important;
-    font-weight: 700 !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.09em !important;
+    letter-spacing: 0.06em !important;
     color: var(--text-muted) !important;
     margin-bottom: 6px !important;
 }
 
 div[data-testid="stSelectbox"] > div > div {
-    background: #111827 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: #0a0a0a !important;
+    border: 1px solid #222222 !important;
     color: #ffffff !important;
     border-radius: var(--radius-sm) !important;
-    font-size: 14px !important;
-    transition: all 0.2s ease;
+    font-size: 13.5px !important;
+    transition: all 0.15s ease;
 }
 div[data-testid="stSelectbox"] > div > div:hover,
 div[data-testid="stSelectbox"] > div > div:focus-within {
-    border-color: #06b6d4 !important;
-    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) !important;
 }
 div[data-testid="stSelectbox"] [data-baseweb="select"] {
     background-color: transparent !important;
@@ -690,165 +675,164 @@ div[data-testid="stSelectbox"] [data-baseweb="select"] * {
 ul[data-testid="stSelectboxVirtualDropdown"],
 div[data-baseweb="popover"],
 div[data-baseweb="menu"] {
-    background-color: #111827 !important;
+    background-color: #0a0a0a !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #222222 !important;
 }
 li[role="option"] {
-    color: #f1f5f9 !important;
-    font-size: 14px !important;
+    color: #ededed !important;
+    font-size: 13.5px !important;
     transition: background-color 0.15s ease !important;
 }
 li[role="option"]:hover, li[aria-selected="true"] {
-    background-color: rgba(6, 182, 212, 0.18) !important;
-    color: #38bdf8 !important;
+    background-color: #171717 !important;
+    color: #ffffff !important;
 }
 
 div[data-testid="stTextArea"] textarea {
-    background: #111827 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    color: #f8fafc !important;
+    background: #0a0a0a !important;
+    border: 1px solid #222222 !important;
+    color: #ededed !important;
     border-radius: var(--radius-sm) !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 14px !important;
+    font-family: 'Geist', 'Inter', sans-serif !important;
+    font-size: 13.5px !important;
     line-height: 1.5 !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.15s ease !important;
 }
 div[data-testid="stTextArea"] textarea:focus {
-    border-color: #06b6d4 !important;
-    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) !important;
 }
 div[data-testid="stTextArea"] textarea::placeholder {
-    color: #64748b !important;
+    color: #555555 !important;
 }
 
 div[data-testid="stNumberInput"] > div > div > input {
-    background: #111827 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: #0a0a0a !important;
+    border: 1px solid #222222 !important;
     color: #ffffff !important;
     border-radius: var(--radius-sm) !important;
 }
 
 /* ── Sliders ── */
 div[data-testid="stSlider"] > div > div > div {
-    background: #1e293b !important;
+    background: #1e1e1e !important;
 }
 div[data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-    background-color: #06b6d4 !important;
+    background-color: #ffffff !important;
     border: 2px solid #ffffff !important;
-    box-shadow: 0 0 12px rgba(6, 182, 212, 0.6) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* ── Primary Action Button (Glowing Crimson) ── */
+/* ── Vercel Primary Action Button (Solid White) ── */
 .stButton > button[kind="primary"], .stButton > button {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
     border-radius: var(--radius-sm) !important;
-    padding: 12px 28px !important;
-    font-family: 'Outfit', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    letter-spacing: 0.04em !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35) !important;
+    padding: 10px 24px !important;
+    font-family: 'Geist', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    letter-spacing: -0.01em !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
 .stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.55), 0 0 16px rgba(239, 68, 68, 0.4) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    background: #eaeaea !important;
+    border-color: #eaeaea !important;
+    color: #000000 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.25) !important;
 }
 
-/* ── Tabs: Futuristic Floating Pills ── */
+/* ── Tabs: Vercel Sleek Underline ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: var(--surface-glass) !important;
-    border-radius: var(--radius-sm) !important;
-    padding: 6px !important;
-    border: 1px solid var(--border-subtle) !important;
-    gap: 6px !important;
-    backdrop-filter: blur(12px) !important;
+    background: transparent !important;
+    border-bottom: 1px solid #222222 !important;
+    padding: 0 !important;
+    gap: 8px !important;
 }
 .stTabs [data-baseweb="tab"] {
-    border-radius: 6px !important;
-    color: var(--text-secondary) !important;
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    padding: 8px 16px !important;
-    transition: all 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    color: #888888 !important;
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    padding: 10px 16px !important;
+    transition: all 0.15s ease !important;
 }
 .stTabs [data-baseweb="tab"]:hover {
     color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: transparent !important;
 }
 .stTabs [aria-selected="true"] {
-    background: rgba(6, 182, 212, 0.18) !important;
-    color: #38bdf8 !important;
-    border: 1px solid rgba(6, 182, 212, 0.35) !important;
-    box-shadow: 0 2px 10px rgba(6, 182, 212, 0.2) !important;
+    color: #ffffff !important;
+    border-bottom: 2px solid #ffffff !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 .stTabs [data-baseweb="tab-highlight"],
 .stTabs [data-baseweb="tab-border"] { display: none !important; }
 
 /* ── Expanders ── */
 .streamlit-expanderHeader {
-    background: var(--surface-glass) !important;
+    background: #0a0a0a !important;
     border-radius: var(--radius-sm) !important;
-    color: #ffffff !important;
+    color: #ededed !important;
     font-weight: 600 !important;
-    border: 1px solid var(--border-subtle) !important;
-    transition: all 0.2s ease !important;
+    border: 1px solid #222222 !important;
+    transition: all 0.15s ease !important;
 }
 .streamlit-expanderHeader:hover {
-    border-color: var(--border-hover) !important;
-    background: var(--surface-glass-hover) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    background: #111111 !important;
 }
 
 /* ── Alerts & Status Widgets ── */
 .stAlert {
     border-radius: var(--radius-sm) !important;
-    background: var(--surface-glass) !important;
-    border: 1px solid var(--border-subtle) !important;
-    color: #f8fafc !important;
-    backdrop-filter: blur(12px) !important;
+    background: #0a0a0a !important;
+    border: 1px solid #222222 !important;
+    color: #ededed !important;
 }
 div[data-testid="stStatusWidget"] {
-    background: var(--surface-glass) !important;
-    border: 1px solid var(--border-subtle) !important;
+    background: #0a0a0a !important;
+    border: 1px solid #222222 !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: var(--shadow-glass) !important;
     color: #ffffff !important;
 }
 
 /* ── GraphRAG Entity Badges ── */
 .grounding-badge-verified {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 12px; border-radius: 6px;
-    background: rgba(16, 185, 129, 0.16); color: #34d399;
-    font-size: 0.74rem; font-weight: 700;
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    padding: 2px 8px; border-radius: 9999px;
+    background: rgba(0, 223, 143, 0.1); color: #00df8f;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid rgba(0, 223, 143, 0.3);
 }
 .grounding-badge-unverified {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 12px; border-radius: 6px;
-    background: rgba(245, 158, 11, 0.16); color: #fbbf24;
-    font-size: 0.74rem; font-weight: 700;
-    border: 1px solid rgba(245, 158, 11, 0.4);
+    padding: 2px 8px; border-radius: 9999px;
+    background: rgba(245, 166, 35, 0.1); color: #f5a623;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid rgba(245, 166, 35, 0.3);
 }
 
 /* ── Horizontal Grid Gaps ── */
-div[data-testid="stHorizontalBlock"] { gap: 18px !important; }
+div[data-testid="stHorizontalBlock"] { gap: 16px !important; }
 
 /* ── Animations ── */
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.reveal-step-1 { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0s both; }
-.reveal-step-2 { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both; }
-.reveal-step-3 { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
+.reveal-step-1 { animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s both; }
+.reveal-step-2 { animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both; }
+.reveal-step-3 { animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both; }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -1827,7 +1811,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
                 "Data Completeness & Status": note
             })
         df_trade = pd.DataFrame(table_rows)
-        st.dataframe(df_trade, use_container_width=True, hide_index=True)
+        st.dataframe(df_trade, width='stretch', hide_index=True)
 
         # Plot trend
         col_tchart1, col_tchart2 = st.columns([1.2, 1])
@@ -1852,7 +1836,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
                 yaxis=dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.06)", tickfont=dict(color="#94a3b8", family="JetBrains Mono, monospace")),
                 xaxis=dict(tickfont=dict(color="#f8fafc", size=12, family="Outfit, Inter, sans-serif")),
             )
-            st.plotly_chart(fig_trend, use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(fig_trend, width='stretch', config={'displayModeBar': False})
 
         with col_tchart2:
             partner_shares = comtrade_data.get("partner_shares_2022_8542", {})
@@ -1875,7 +1859,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
                 showlegend=False,
                 margin=dict(l=10, r=10, t=40, b=10),
             )
-            st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(fig_pie, width='stretch', config={'displayModeBar': False})
 
         st.caption("📌 **Citation**: Source: UN Comtrade, HS 8542/8112, 2026-09-05. Converted at stated exchange rate 1 USD = ₹83.0 INR. Reporter: India, Flow: Imports.")
         st.caption("⚠️ **Notice on Data Completeness**: 2023 trade reports in the UN Comtrade public preview tier remain partial (only select trading months indexed); 2024 full data is pending official release. Sourced full-year 2022 baseline is adopted to maintain absolute quantitative integrity rather than falling back to assumed figures.")
@@ -2087,7 +2071,7 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
         """, unsafe_allow_html=True)
         mean_drop = float(np.mean(mc_samples))
         gauge_fig = build_gauge(round(mean_drop, 1), "Mean Production Drop")
-        st.plotly_chart(gauge_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(gauge_fig, width='stretch', config={'displayModeBar': False})
         st.caption("ℹ️ Measures simulated network-level vehicle assembly loss via Bayesian causal inference & 10,000 Monte Carlo iterations (Minor <5%, Moderate 5-15%, Severe >15%).")
 
         with st.expander("ℹ️ Formula Reliability Note", expanded=False):
@@ -2116,7 +2100,7 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
         </div>
         """, unsafe_allow_html=True)
         prob_fig = build_probability_bars(probs)
-        st.plotly_chart(prob_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(prob_fig, width='stretch', config={'displayModeBar': False})
 
     # ── Charts Row 2: Histogram + Waterfall (Stagger 3) ──
     col_hist, col_water = st.columns(2)
@@ -2131,7 +2115,7 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
         </div>
         """, unsafe_allow_html=True)
         hist_fig = build_monte_carlo_histogram(mc_samples)
-        st.plotly_chart(hist_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(hist_fig, width='stretch', config={'displayModeBar': False})
 
     with col_water:
         st.markdown("""
@@ -2143,7 +2127,7 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
         </div>
         """, unsafe_allow_html=True)
         water_fig = build_waterfall(pcar_metrics)
-        st.plotly_chart(water_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(water_fig, width='stretch', config={'displayModeBar': False})
         st.caption("⚠️ **Tail-Risk Limitation Disclosure (PCaR Spot-Premium Multiplier)**: Spot-market premiums during acute supply shortages routinely exhibit extreme non-linear price spikes (e.g. during the 2021 automotive chip crisis, Bloomberg/Japan Times Aug 2021 reported brokers trading $1.50 microcontrollers at 10× to 30× base price, representing 1,000%–3,000% markups). The $U[1.3\\times, 2.8\\times]$ parameter in this model is an illustrative, conservative modeling baseline for planned dual-sourcing contracts, not an empirical estimate of emergency broker spot spikes. Figures should be read as a conservative lower-bound estimate during severe market disruptions.")
 
     # ── Lightweight Count-Up Script Injection ──
@@ -2295,16 +2279,17 @@ def render_decision_ribbon(signal_result, probs=None, mc_samples=None, pcar_metr
 # ════════════════════════════════════════════════════════════════
 with st.sidebar:
     st.markdown("""
-    <div style="padding: 10px 4px 16px 4px; border-bottom: 1px solid #1f2937; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #f97316; font-size: 1.4rem;">⚡</span>
+    <div style="padding: 10px 4px 16px 4px; border-bottom: 1px solid #1a1a1a; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 28px; height: 28px; background: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000000; font-weight: 900; font-size: 14px; box-shadow: 0 0 14px rgba(255,255,255,0.25);">▲</div>
             <div>
-                <div style="color: #ffffff; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em;">CounterVerse</div>
-                <div style="color: #94a3b8; font-size: 0.70rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;">Decision Intelligence</div>
+                <div style="color: #ededed; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.03em;">CounterVerse</div>
+                <div style="color: #707070; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">Supply Chain Intelligence</div>
             </div>
         </div>
-        <div style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; color: #38bdf8; font-weight: 600;">
-            <span>🔒 Scope: HS 8112 ➔ HS 8542</span>
+        <div style="margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; background: #0e0e0e; border: 1px solid #222222; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; color: #a1a1a1; font-weight: 500;">
+            <span style="color: #00df8f; font-size: 8px;">●</span>
+            <span>Locked Scope: HS 8112 ➔ HS 8542</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2377,15 +2362,15 @@ with st.sidebar:
 if selected_company == "Macro (aggregate)":
     oem_display = "All Indian Automakers (Macro Aggregate)"
     allocated_base = SOURCED_HS8542_BASELINE_CRORE
-    base_html = f"Macro Exposure: <strong style='color:#38bdf8; font-family:JetBrains Mono, monospace;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.72rem; color:#94a3b8;'>(UN Comtrade 100% Industry Exposure)</span>"
+    base_html = f"Macro Exposure: <strong style='color:#ffffff; font-family:JetBrains Mono, monospace;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.72rem; color:#94a3b8;'>(UN Comtrade 100% Industry Exposure)</span>"
 else:
     oem_display = selected_company
     oem_profile = OEM_PROFILES.get(selected_company, OEM_PROFILES["Maruti Suzuki"])
     allocated_base = SOURCED_HS8542_BASELINE_CRORE * oem_profile["market_share"] * oem_profile["dependency_ratio"]
-    base_html = f"Allocated Base: <strong style='color:#38bdf8; font-family:JetBrains Mono, monospace;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.72rem; color:#94a3b8;'>(UN Comtrade Macro: ₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr)</span>"
+    base_html = f"Allocated Base: <strong style='color:#ffffff; font-family:JetBrains Mono, monospace;'>₹{format_inr(allocated_base)} Cr</strong> <span style='font-size:0.72rem; color:#94a3b8;'>(UN Comtrade Macro: ₹{format_inr(SOURCED_HS8542_BASELINE_CRORE)} Cr)</span>"
 
 st.markdown(f"""
-<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding:8px 18px; background:rgba(15, 23, 42, 0.7); backdrop-filter:blur(12px); border:1px solid rgba(255, 255, 255, 0.08); border-radius:10px; font-size:0.80rem; box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding:10px 18px; background:#0a0a0a; border:1px solid #222222; border-radius:8px; font-size:0.80rem; box-shadow:0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0,0,0,0.6);">
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <span style="font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:4px;">🔒 Scope Locked</span>
         <span style="background:rgba(6, 182, 212, 0.15); color:#22d3ee; border:1px solid rgba(6, 182, 212, 0.3); font-size:0.72rem; padding:2px 8px; border-radius:6px; font-weight:700; font-family:'JetBrains Mono', monospace;">HS 8112 ➔ HS 8542</span>
@@ -2454,6 +2439,83 @@ if active_view == "01 — Executive War Room":
 
     with col_left:
         st.markdown("### 📰 Ingest Disruption Signal")
+
+        # ── Real-Time Web Scraper Controls ──
+        st.markdown("""
+        <div style="background:#0a0f1d; border:1px solid #1e293b; border-radius:8px; padding:12px 14px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.5);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:0.75rem; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:6px;">
+                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#00df8f; box-shadow:0 0 8px #00df8f;"></span>
+                    Automated Web Scraper Ingestion
+                </span>
+                <span style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); font-size:0.68rem; padding:1px 6px; border-radius:4px; font-family:'JetBrains Mono', monospace;">
+                    LIVE EXTRACT
+                </span>
+            </div>
+            <p style="font-size:0.72rem; color:#94a3b8; margin:0 0 10px 0; line-height:1.4;">
+                Automatically scrapes live supply chain & chip disruption news from global web feeds (Google News RSS & GDELT 2.0) and evaluates disruption severity.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        sc1, sc2 = st.columns(2)
+        with sc1:
+            if st.button("🕷️ Scrape Live Web", width='stretch', help="Scrape latest supply chain news from web in real-time"):
+                with st.spinner("Scraping live global supply chain feeds..."):
+                    scrape_res = scrape_live_supply_chain_news(max_total=8)
+                    st.session_state["scraped_news_feed"] = scrape_res.get("articles", [])
+                    st.toast(f"✅ Successfully scraped {len(st.session_state['scraped_news_feed'])} live news articles!", icon="🌐")
+                    st.rerun()
+
+        with sc2:
+            if st.button("⚡ Auto-Extract & Simulate", type="primary", width='stretch', help="Auto-scrapes web, identifies highest disruption threat, and immediately simulates impact"):
+                with st.spinner("Scraping web & selecting highest-impact disruption..."):
+                    top_headline = auto_extract_top_disruption_headline()
+                    st.session_state["selected_headline"] = top_headline
+                    # Immediately trigger simulation
+                    active_engine = st.session_state.get("extraction_engine", "slm" if SLM_AVAILABLE else "fast")
+                    sig_res = cached_extract_signal_grounded(top_headline.strip(), engine=active_engine)
+                    probs = cached_simulate_causal_impact(sig_res)
+                    mc_samples = run_monte_carlo(probs, n_samples=10000, random_seed=42)
+                    pcar_metrics = compute_pcar_for_selection(mc_samples, selected_company)
+                    st.session_state["sim_results"] = {
+                        "signal": sig_res,
+                        "probs": probs,
+                        "mc_samples": mc_samples,
+                        "pcar_metrics": pcar_metrics,
+                        "company": selected_company
+                    }
+                    st.toast("⚡ Top critical news auto-extracted and simulated!", icon="🚀")
+                    st.rerun()
+
+        # Display interactive Scraped News Feed drawer if articles exist
+        scraped_feed = st.session_state.get("scraped_news_feed", [])
+        if scraped_feed:
+            with st.expander(f"📡 Scraped Live Disruption Feed ({len(scraped_feed)} articles found)", expanded=True):
+                for idx, art in enumerate(scraped_feed):
+                    score = art.get("disruption_score", 50)
+                    severity = art.get("severity", "MEDIUM")
+                    badge_color = "#ef4444" if severity == "HIGH" else "#f59e0b" if severity == "MEDIUM" else "#10b981"
+                    
+                    st.markdown(f"""
+                    <div style="background:#090d16; border:1px solid #1e293b; border-left:3px solid {badge_color}; border-radius:6px; padding:8px 10px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                            <span style="font-size:0.68rem; font-weight:700; color:{badge_color}; text-transform:uppercase;">
+                                {severity} · SCORE {score}%
+                            </span>
+                            <span style="font-size:0.65rem; color:#64748b;">{art.get('source', 'Web')}</span>
+                        </div>
+                        <div style="font-size:0.75rem; font-weight:600; color:#f1f5f9; line-height:1.3; margin-bottom:4px;">
+                            {art.get('title', '')}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if st.button(f"👉 Ingest This News (Article #{idx+1})", key=f"btn_ingest_scraped_{idx}", width='stretch'):
+                        st.session_state["selected_headline"] = art["title"]
+                        st.rerun()
+
+        st.markdown("<div style='font-size:0.72rem; color:#64748b; font-weight:600; margin-top:8px; margin-bottom:4px;'>ACTIVE INPUT HEADLINE:</div>", unsafe_allow_html=True)
         new_headline = st.text_area(
             "Headline / Disruption Signal Input:",
             value=st.session_state.get("selected_headline", ""),
@@ -2468,15 +2530,15 @@ if active_view == "01 — Executive War Room":
         st.markdown("<div style='font-size:0.72rem; color:#64748b; font-weight:600; margin-bottom:4px;'>QUICK SAMPLES & STRESS VECTORS:</div>", unsafe_allow_html=True)
         qp1, qp2, qp3 = st.columns(3)
         with qp1:
-            if st.button("🇨🇳 China Ga/Ge", use_container_width=True, help="China export curbs on Gallium/Germanium"):
+            if st.button("🇨🇳 China Ga/Ge", width='stretch', help="China export curbs on Gallium/Germanium"):
                 st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
                 st.rerun()
         with qp2:
-            if st.button("🇹🇼 TSMC Fab", use_container_width=True, help="Taiwan TSMC Fab shutdown"):
+            if st.button("🇹🇼 TSMC Fab", width='stretch', help="Taiwan TSMC Fab shutdown"):
                 st.session_state["selected_headline"] = "Magnitude 7.2 earthquake halts production at TSMC automotive microcontroller fab lines in Hsinchu."
                 st.rerun()
         with qp3:
-            if st.button("🌊 Red Sea", use_container_width=True, help="Red Sea maritime corridor disruption"):
+            if st.button("🌊 Red Sea", width='stretch', help="Red Sea maritime corridor disruption"):
                 st.session_state["selected_headline"] = "Houthi missile strikes close Bab-el-Mandeb Strait, diverting Asian semiconductor vessels around Africa."
                 st.rerun()
 
@@ -2504,7 +2566,7 @@ if active_view == "01 — Executive War Room":
                 st.session_state["selected_headline"] = "Attacks on commercial vessels force Asian chip cargo carriers to detour around Cape of Good Hope, adding 14 days."
             st.rerun()
 
-        analyze_clicked = st.button("⚡ Analyze Disruption", type="primary", use_container_width=True)
+        analyze_clicked = st.button("⚡ Analyze Disruption", type="primary", width='stretch')
 
         if analyze_clicked:
             with st.spinner("Executing Causal Pipeline + 10,000 Monte Carlo draws..."):
@@ -2576,7 +2638,7 @@ if active_view == "01 — Executive War Room":
                 {"Tier": "Tier-3 (Assembly Hub)", "Entity": "Assembly Hub (India)", "Role": "Indian OEM final vehicle assembly lines (Gurugram / Pune / Chennai)", "HS Code": "HS 8703"},
                 {"Tier": "Tier-4 (Commercial Retail)", "Entity": "Distribution Center & OE Retailer", "Role": "Dealer dispatch network & final automotive customer fulfillment", "HS Code": "Domestic"},
             ]
-            st.dataframe(pd.DataFrame(tier_mapping), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(tier_mapping), width='stretch', hide_index=True)
 
     # 4. Results Section: KPIs, Gauges, Probability Bars, Histogram & Waterfall
     render_results(sim_data["signal"], sim_data["probs"], sim_data["mc_samples"], sim_data["pcar_metrics"])
@@ -2606,7 +2668,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
             "95% PCaR (₹ Cr)": f"₹{format_inr(o_pcar['pcar_95_crore'])}",
             "Worst Case (₹ Cr)": f"₹{format_inr(o_pcar['worst_case_loss_crore'])}",
         })
-    st.dataframe(pd.DataFrame(alloc_rows), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(alloc_rows), width='stretch', hide_index=True)
 
     st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
 
@@ -2679,7 +2741,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
             bom_df = pd.DataFrame(parsed_components)
             total_spend = bom_df["annual_spend_crore"].sum()
             st.markdown(f"**BOM Preview ({len(parsed_components)} components — Total Procurement Spend: ₹{total_spend:,.1f} Cr):**")
-            st.dataframe(bom_df, use_container_width=True, hide_index=True)
+            st.dataframe(bom_df, width='stretch', hide_index=True)
 
             if st.button("🚀 Calculate Enterprise PCaR with GraphRAG Grounding", key="btn_run_custom_bom_pcar"):
                 if calculate_pcar_custom_bom is not None:
@@ -2710,7 +2772,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
                                 "Matched Node": g.get("matched_graph_node") or "Generic Node",
                                 "Tier": g.get("tier", "Tier-1"),
                             })
-                        st.dataframe(pd.DataFrame(grounding_rows), use_container_width=True, hide_index=True)
+                        st.dataframe(pd.DataFrame(grounding_rows), width='stretch', hide_index=True)
                     except Exception as e:
                         st.error(f"Error computing Custom BOM PCaR: {e}")
                 else:
@@ -2732,7 +2794,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
         {"Category": "Analyst Heuristic (Amber)", "Parameter": "ECU Component Dependency", "Value": "30% – 38%", "Source": "Industry expert consensus", "Confidence": "Heuristic Estimate"},
         {"Category": "Analyst Heuristic (Amber)", "Parameter": "Spot-Premium Multiplier", "Value": "U[1.3×, 2.8×]", "Source": "Dual-sourcing contract baseline", "Confidence": "Lower-bound Estimate"},
     ]
-    st.dataframe(pd.DataFrame(provenance_data), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(provenance_data), width='stretch', hide_index=True)
 
 
 # ════════════════════════════════════════════════════════════════
@@ -2807,7 +2869,7 @@ elif active_view == "03 — Governance & Model Validation":
             xaxis=dict(tickfont=dict(color="#f8fafc", size=12, family="Outfit, Inter, sans-serif")),
             font=dict(family="Outfit, Inter, sans-serif")
         )
-        st.plotly_chart(comp_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(comp_fig, width='stretch', config={'displayModeBar': False})
 
         st.markdown(f"""
         > ⚠️ **Methodological & Calibration Integrity:**  
@@ -2844,7 +2906,7 @@ elif active_view == "03 — Governance & Model Validation":
             {"Agent / Pipeline Stage": "Stage 4: CSCO Decision Strategy Alignment", "Precision": f"{m['csco_decision']['precision']:.3f}", "Recall": f"{m['csco_decision']['recall']:.3f}", "F1 Score": f"{m['csco_decision']['f1']:.3f}"},
             {"Agent / Pipeline Stage": "🎯 Pipeline Macro Average", "Precision": f"{m['macro_average']['precision']:.3f}", "Recall": f"{m['macro_average']['recall']:.3f}", "F1 Score": f"{m['macro_average']['f1']:.3f}"},
         ]
-        st.dataframe(pd.DataFrame(table5_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(table5_data), width='stretch', hide_index=True)
 
     with v_tab3:
         gov_col1, gov_col2, gov_col3, gov_col4 = st.columns(4)

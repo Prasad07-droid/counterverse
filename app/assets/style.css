@@ -1,0 +1,485 @@
+/* ==========================================================================
+   CounterVerse — Vercel-Grade Design System & Telemetry HUD
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Vercel Root Tokens ── */
+:root {
+  --vercel-bg: #000000;
+  --vercel-canvas: #000000;
+  --vercel-surface: #0a0a0a;
+  --vercel-surface-hover: #121212;
+  --vercel-surface-card: #0c0c0c;
+  --vercel-surface-glass: rgba(10, 10, 10, 0.85);
+  --vercel-border: rgba(255, 255, 255, 0.08);
+  --vercel-border-subtle: #1e1e1e;
+  --vercel-border-hover: rgba(255, 255, 255, 0.22);
+  --vercel-border-active: #ffffff;
+  
+  --vercel-text-primary: #ededed;
+  --vercel-text-secondary: #a1a1a1;
+  --vercel-text-muted: #707070;
+  --vercel-text-disabled: #444444;
+
+  --vercel-blue: #0070f3;
+  --vercel-blue-subtle: rgba(0, 112, 243, 0.12);
+  --vercel-blue-glow: 0 0 24px rgba(0, 112, 243, 0.3);
+
+  --vercel-success: #00df8f;
+  --vercel-success-subtle: rgba(0, 223, 143, 0.12);
+  --vercel-success-border: rgba(0, 223, 143, 0.3);
+
+  --vercel-warning: #f5a623;
+  --vercel-warning-subtle: rgba(245, 166, 35, 0.12);
+  --vercel-warning-border: rgba(245, 166, 35, 0.3);
+
+  --vercel-error: #ee0000;
+  --vercel-error-subtle: rgba(238, 0, 0, 0.12);
+  --vercel-error-border: rgba(238, 0, 0, 0.35);
+
+  --vercel-radius: 8px;
+  --vercel-radius-sm: 6px;
+  --vercel-radius-lg: 12px;
+  --vercel-radius-full: 9999px;
+
+  --vercel-font: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --vercel-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+
+  --vercel-shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 10px rgba(0, 0, 0, 0.8);
+  --vercel-shadow-hover: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 8px 30px rgba(0, 0, 0, 0.9);
+
+  /* Legacy mapping for backward compatibility */
+  --cv-bg-deep: var(--vercel-bg);
+  --cv-bg-card: var(--vercel-surface-card);
+  --cv-border: var(--vercel-border);
+  --cv-text-primary: var(--vercel-text-primary);
+  --cv-text-secondary: var(--vercel-text-secondary);
+  --cv-text-muted: var(--vercel-text-muted);
+}
+
+/* ── Global Reset & Canvas ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--vercel-bg);
+  color: var(--vercel-text-primary);
+  font-family: var(--vercel-font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Streamlit App Frame: Vercel Signature Pitch-Black Grid ── */
+.stApp {
+  background-color: #000000 !important;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.15), transparent 80%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 32px 32px, 32px 32px !important;
+  background-attachment: fixed !important;
+  color: var(--vercel-text-primary) !important;
+  font-family: var(--vercel-font) !important;
+}
+
+/* ── Streamlit Clutter Cleanup ── */
+header[data-testid="stHeader"] {
+  background: transparent !important;
+}
+#MainMenu, footer, .stDeployButton {
+  display: none !important;
+}
+
+/* ── Headings ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--vercel-font) !important;
+  letter-spacing: -0.03em !important;
+  color: #ededed !important;
+  font-weight: 700 !important;
+}
+
+/* ── Vercel Sleek Sidebar ── */
+section[data-testid="stSidebar"] {
+  background-color: #050505 !important;
+  border-right: 1px solid #1a1a1a !important;
+}
+
+section[data-testid="stSidebar"] * {
+  font-family: var(--vercel-font) !important;
+}
+
+section[data-testid="stSidebar"] hr {
+  border-color: #1a1a1a !important;
+}
+
+section[data-testid="stSidebar"] .stRadio label {
+  color: #888888 !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  padding: 8px 12px !important;
+  border-radius: var(--vercel-radius-sm) !important;
+  transition: all 0.15s ease !important;
+  border: 1px solid transparent !important;
+  margin-bottom: 2px !important;
+}
+
+section[data-testid="stSidebar"] .stRadio label:hover {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #222222 !important;
+}
+
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label[data-checked="true"],
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label:has(input:checked) {
+  background: #171717 !important;
+  border: 1px solid #333333 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Vercel Card Standards (.cv-glass-card, .glass-card) ── */
+.cv-glass-card, .glass-card {
+  background: #0a0a0a !important;
+  border: 1px solid #222222 !important;
+  border-radius: var(--vercel-radius) !important;
+  padding: 24px !important;
+  margin-bottom: 20px !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.cv-glass-card:hover, .glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 8px 30px rgba(0, 0, 0, 0.8) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Vercel Metric Card (.metric-card, .cv-metric) ── */
+.metric-card, .cv-metric {
+  background: #0a0a0a !important;
+  border: 1px solid #222222 !important;
+  border-radius: var(--vercel-radius) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  padding: 18px 20px !important;
+  text-align: left !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 120px !important;
+  position: relative !important;
+}
+
+.metric-card:hover, .cv-metric:hover {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.7) !important;
+}
+
+.metric-card.critical {
+  border-color: rgba(238, 0, 0, 0.35) !important;
+  background: linear-gradient(180deg, rgba(238, 0, 0, 0.08) 0%, #0a0a0a 100%) !important;
+}
+
+.metric-card .metric-label, .cv-metric__label {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--vercel-text-muted) !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.metric-card .metric-value, .cv-metric__value {
+  font-size: 1.85rem !important;
+  font-weight: 700 !important;
+  font-family: var(--vercel-font) !important;
+  letter-spacing: -0.03em !important;
+  color: #ededed !important;
+  line-height: 1.15 !important;
+}
+
+.metric-card .metric-sub, .cv-metric__delta {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  color: var(--vercel-text-secondary) !important;
+  margin-top: 6px !important;
+}
+
+/* ── Vercel Action Buttons (.stButton > button, .cv-btn) ── */
+.stButton > button[kind="primary"], .stButton > button, .cv-btn--primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+  border-radius: var(--vercel-radius-sm) !important;
+  padding: 10px 22px !important;
+  font-family: var(--vercel-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: -0.01em !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+.stButton > button:hover, .cv-btn--primary:hover {
+  background: #eaeaea !important;
+  border-color: #eaeaea !important;
+  color: #000000 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.25) !important;
+}
+
+.cv-btn--ghost {
+  background: #0a0a0a !important;
+  color: var(--vercel-text-primary) !important;
+  border: 1px solid #2e2e2e !important;
+  border-radius: var(--vercel-radius-sm) !important;
+  padding: 10px 22px !important;
+  font-family: var(--vercel-font) !important;
+  font-weight: 500 !important;
+  font-size: 0.88rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.cv-btn--ghost:hover {
+  background: #171717 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* ── Vercel Tabs (.stTabs) ── */
+.stTabs [data-baseweb="tab-list"] {
+  background: transparent !important;
+  border-bottom: 1px solid #222222 !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  color: #888888 !important;
+  font-weight: 500 !important;
+  font-size: 0.88rem !important;
+  padding: 10px 16px !important;
+  transition: all 0.15s ease !important;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+.stTabs [aria-selected="true"] {
+  color: #ffffff !important;
+  border-bottom: 2px solid #ffffff !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stTabs [data-baseweb="tab-highlight"],
+.stTabs [data-baseweb="tab-border"] {
+  display: none !important;
+}
+
+/* ── Vercel Form Controls ── */
+div[data-testid="stSelectbox"] > div > div,
+div[data-testid="stNumberInput"] > div > div > input,
+div[data-testid="stTextArea"] textarea {
+  background: #0a0a0a !important;
+  border: 1px solid #222222 !important;
+  color: #ededed !important;
+  border-radius: var(--vercel-radius-sm) !important;
+  font-family: var(--vercel-font) !important;
+  font-size: 13.5px !important;
+  transition: all 0.15s ease !important;
+}
+
+div[data-testid="stSelectbox"] > div > div:hover,
+div[data-testid="stSelectbox"] > div > div:focus-within,
+div[data-testid="stTextArea"] textarea:focus,
+div[data-testid="stNumberInput"] > div > div > input:focus {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+}
+
+div[data-testid="stSelectbox"] label,
+div[data-testid="stSlider"] label,
+div[data-testid="stNumberInput"] label,
+div[data-testid="stTextArea"] label {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--vercel-text-muted) !important;
+  margin-bottom: 6px !important;
+}
+
+/* ── Vercel Status Badges ── */
+.status-badge-critical, .cv-badge--high {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(238, 0, 0, 0.1);
+  color: #ff4d4d;
+  border: 1px solid rgba(238, 0, 0, 0.35);
+  padding: 2px 8px;
+  border-radius: var(--vercel-radius-full);
+}
+
+.status-badge-warning, .cv-badge--medium {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(245, 166, 35, 0.1);
+  color: #f5a623;
+  border: 1px solid rgba(245, 166, 35, 0.35);
+  padding: 2px 8px;
+  border-radius: var(--vercel-radius-full);
+}
+
+.status-badge-optimal, .cv-badge--low {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(0, 223, 143, 0.1);
+  color: #00df8f;
+  border: 1px solid rgba(0, 223, 143, 0.35);
+  padding: 2px 8px;
+  border-radius: var(--vercel-radius-full);
+}
+
+/* ── Active Incident Banner ── */
+.active-incident-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 20px;
+  background: #0d0606;
+  border: 1px solid rgba(238, 0, 0, 0.3);
+  border-left: 3px solid #ee0000;
+  border-radius: var(--vercel-radius);
+  margin-bottom: 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.incident-shock-badge {
+  background: #ee0000;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.incident-headline-text {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #ededed;
+}
+
+/* ── Causal Decision Ribbon (Vercel Modular Tile Bar) ── */
+.decision-ribbon {
+  display: flex;
+  align-items: stretch;
+  background: #0a0a0a;
+  border: 1px solid #222222;
+  border-radius: var(--vercel-radius);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.ribbon-tier {
+  flex: 1;
+  padding: 14px 18px;
+  border-right: 1px solid #222222;
+  transition: all 0.15s ease;
+}
+
+.ribbon-tier:last-child {
+  border-right: none;
+}
+
+.ribbon-tier:hover {
+  background: #111111;
+}
+
+.ribbon-tier.active-shock {
+  background: #100808;
+  border-left: 2px solid #ee0000;
+}
+
+.ribbon-tier-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vercel-text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ribbon-tier-val {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.ribbon-tier-sub {
+  font-size: 12px;
+  color: var(--vercel-text-secondary);
+  margin-top: 4px;
+}
+
+/* ── Custom Vercel Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+
+/* ── Accessibility ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

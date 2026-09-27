@@ -16,6 +16,9 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+# Load additional configuration constants
+from .extra_config import *
+
 logger = logging.getLogger(__name__)
 
 # ── Project Root Detection ──
