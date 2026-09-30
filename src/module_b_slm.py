@@ -26,6 +26,7 @@ import re
 import logging
 import threading
 import random
+import hashlib
 from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
@@ -215,8 +216,8 @@ def _map_fast_params(
     Deterministically maps news headline to simulation parameters:
     - affected_node: strictly within ALLOWED_AFFECTED_NODES
     - event_type: strictly within ALLOWED_EVENT_TYPES
-    - severity_pct: 0-100 derived via seeded PRNG (random.Random(hash(headline)))
-    - duration_days: 1-90 derived via seeded PRNG (random.Random(hash(headline)))
+    - severity_pct: 0-100 derived via a SHA-256-seeded local PRNG
+    - duration_days: 1-90 derived via the same stable local PRNG
     """
     headline_lower = headline.lower()
     
@@ -246,8 +247,12 @@ def _map_fast_params(
     else:
         sev_str = "HIGH"
 
-    # 4. Seeded deterministic PRNG derived strictly from headline hash
-    rng = random.Random(hash(headline))
+    # 4. Stable deterministic PRNG derived from headline content.
+    # Python's built-in hash() is process-randomized, so use a fixed SHA-256
+    # digest prefix to preserve values across processes and machines.
+    digest = hashlib.sha256(headline.encode("utf-8")).digest()
+    stable_seed = int.from_bytes(digest[:8], byteorder="big", signed=False)
+    rng = random.Random(stable_seed)
 
     if not is_disruption or (sev_str == "LOW" and severity == 0):
         severity_pct = 0

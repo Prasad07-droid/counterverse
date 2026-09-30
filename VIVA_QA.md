@@ -52,7 +52,7 @@ Yes for a given explicit seed and environment. `run_monte_carlo()` uses a seeded
 
 ## 13. Is headline-derived severity reproducible across separate Python processes?
 
-Not reliably under the current implementation unless `PYTHONHASHSEED` is fixed. `_map_fast_params()` seeds `random.Random(hash(headline))`, while Python string hashes are process-randomized. The golden harness fixes `PYTHONHASHSEED=0`; replacing this mechanism is a Tier C change requiring approval.
+Yes after the explicitly approved Tier C hardening change. `_map_fast_params()` derives a stable integer seed from the first eight bytes of `SHA-256(headline)` and passes it to a local `random.Random` instance. Tests execute extraction under different `PYTHONHASHSEED` values and require identical severity and duration.
 
 ## 14. Why are there two SIAM numbers in the repository?
 

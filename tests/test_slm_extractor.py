@@ -1,4 +1,14 @@
+import json
+import os
+import subprocess
+import sys
 import unittest
+from pathlib import Path
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 from src.module_b_slm import extract_signal
 from src.module_c_causal import compute_dependency_ratio, calculate_deterministic_risk_score
 
@@ -122,6 +132,30 @@ class TestSLMExtractor(unittest.TestCase):
         self.assertEqual(overridden["affected_node"], default_signal["affected_node"])
         self.assertEqual(overridden["event_type"], default_signal["event_type"])
         self.assertEqual(overridden["is_disruption"], default_signal["is_disruption"])
+
+    def test_severity_and_duration_are_stable_across_process_hash_seeds(self):
+        headline = "Taiwan semiconductor foundry reports severe wafer line delays"
+        code = (
+            "import json; "
+            "from src.module_b_slm import extract_signal_fast; "
+            f"s=extract_signal_fast({headline!r}); "
+            "print(json.dumps([s['severity_pct'], s['duration_days']]))"
+        )
+        project_root = Path(__file__).resolve().parent.parent
+        outputs = []
+        for hash_seed in ("1", "999"):
+            env = os.environ.copy()
+            env["PYTHONHASHSEED"] = hash_seed
+            completed = subprocess.run(
+                [sys.executable, "-c", code],
+                cwd=project_root,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            outputs.append(json.loads(completed.stdout))
+        self.assertEqual(outputs[0], outputs[1])
 
     def test_node_to_graph_id_fallback_and_edge_cases(self):
         """

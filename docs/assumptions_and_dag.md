@@ -167,12 +167,16 @@ To replace manual UI sliders while maintaining rigorous reproducibility, `src/mo
   - `"Demand shock"`: *demand, sales, earnings, recession*
   - *Fallback:* Defaults strictly to `"Logistics delay"`.
 
-### 2. Seeded PRNG Determinism (`hash(headline)`)
+### 2. Stable SHA-256-Seeded PRNG Determinism
 
-To guarantee that the exact same headline produces identical disruption severity and duration across separate invocations without state persistence, parameters are seeded via:
+To guarantee that the same headline produces identical disruption severity and duration across Python processes without state persistence, the approved hardening path derives a fixed integer seed from the first eight bytes of the headline's SHA-256 digest:
 ```python
-rng = random.Random(hash(headline))
+digest = hashlib.sha256(headline.encode("utf-8")).digest()
+stable_seed = int.from_bytes(digest[:8], byteorder="big", signed=False)
+rng = random.Random(stable_seed)
 ```
+
+This replaces Python's process-randomized `hash()` seed. It changes the generated severity/duration values relative to the pre-hardening baseline, but leaves their documented ranges and optional override behavior unchanged.
 
 Severity and duration ranges are governed by the classified disruption level:
 
