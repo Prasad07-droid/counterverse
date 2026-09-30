@@ -821,7 +821,7 @@ div[data-testid="stStatusWidget"] {
     color: #ffffff !important;
 }
 
-/* ── GraphRAG Entity Badges ── */
+/* ── Graph-grounded Entity Verification Badges ── */
 .grounding-badge-verified {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 4px 12px; border-radius: 6px;
@@ -2616,7 +2616,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
         **Enterprise Custom Procurement Risk Engine**:
         Instead of using the macro aggregate UN Comtrade baseline (₹1,33,814 Cr) or static SIAM market-share scaling,
         upload your enterprise's actual Bill of Materials to compute enterprise-specific Procurement Cost-at-Risk (PCaR).
-        Each component is verified against the **GraphRAG Grounding Graph** topology.
+        Each component is verified against the **graph-grounded entity-verification graph** topology.
         """)
 
         bom_col1, bom_col2 = st.columns([1, 1])
@@ -2681,7 +2681,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
             st.markdown(f"**BOM Preview ({len(parsed_components)} components — Total Procurement Spend: ₹{total_spend:,.1f} Cr):**")
             st.dataframe(bom_df, use_container_width=True, hide_index=True)
 
-            if st.button("🚀 Calculate Enterprise PCaR with GraphRAG Grounding", key="btn_run_custom_bom_pcar"):
+            if st.button("🚀 Calculate Enterprise PCaR with Graph-Grounded Verification", key="btn_run_custom_bom_pcar"):
                 if calculate_pcar_custom_bom is not None:
                     try:
                         res = calculate_pcar_custom_bom(
@@ -2698,7 +2698,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
                         m3.metric("95% PCaR (VaR)", f"₹{res['pcar_95_crore']:,.1f} Cr", delta=f"{res['pcar_95_pct']:.1f}%", delta_color="inverse")
                         m4.metric("Worst-Case Loss", f"₹{res['worst_case_loss_crore']:,.1f} Cr", delta=f"{res['worst_case_pct']:.1f}%", delta_color="inverse")
 
-                        st.markdown("##### 🔍 GraphRAG Component Grounding Breakdown")
+                        st.markdown("##### 🔍 Graph-Grounded Component Verification Breakdown")
                         grounding_rows = []
                         for g in res.get("component_grounding", []):
                             status_badge = "✅ Grounded in Graph" if g.get("grounded") else "⚠️ Topology Unmapped"

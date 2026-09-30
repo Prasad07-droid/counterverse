@@ -120,9 +120,9 @@ This distinction is explicitly labeled in the dashboard UI as "Structural Risk F
 
 ---
 
-## GraphRAG vs. Static Graph Lookup — Terminology Clarification
+## Graph-Grounded Entity Verification — Terminology Clarification
 
-The component labeled "GraphRAG grounding" in this project 
+The graph-grounded entity-verification component in this project
 (`src/grounding_graph.py`) implements:
 
 **What it IS:**
@@ -139,12 +139,8 @@ The component labeled "GraphRAG grounding" in this project
 - A generative retrieval-augmented generation pipeline in the 
   standard LangChain/LlamaIndex sense
 
-**Why "GraphRAG" is used:**
-The term follows AlMahri et al. (2026)'s own framing — using a 
-knowledge graph as a structured retrieval mechanism to ground 
-LLM outputs. This is consistent with the reference paper's 
-methodology, which also uses a static enterprise knowledge graph 
-(Neo4j) for entity verification, not a vector retrieval system.
+**Terminology used here:**
+The implementation is described as graph-grounded entity verification because it performs deterministic lookup against a static graph. It is not presented as a full retrieval-augmented generation system.
 
 **Genuine RAG (Future Work):**
 A full RAG implementation would embed the GDELT headline corpus 

@@ -1,7 +1,7 @@
 # CounterVerse — Causal AI Supply Chain Disruption Simulator
 
 > **Scenario-based causal simulation** for Indian automotive semiconductor supply chains.  
-> Headline intelligence → GraphRAG entity grounding → deterministic risk scoring → Monte Carlo → Procurement Cost at Risk (PCaR).
+> Headline intelligence → graph-grounded entity verification → deterministic risk scoring → Monte Carlo → Procurement Cost at Risk (PCaR).
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?logo=streamlit)](https://streamlit.io)
@@ -25,7 +25,7 @@ It does **not** predict the future from time-series data, access proprietary OEM
 ```mermaid
 flowchart LR
     A["📰 News Headlines<br/>(GDELT · RSS · Custom)"] --> B["🤖 Module B: SLM<br/>Qwen2.5-0.5B<br/>(GPU bf16)"]
-    B --> G["🕸️ GraphRAG<br/>30-Node DiGraph<br/>(Entity Grounding)"]
+    B --> G["🕸️ Graph-grounded<br/>Entity Verification<br/>(30-Node DiGraph)"]
     G --> C["⚖️ Module C: Risk Engine<br/>Deterministic 5-Factor<br/>AlMahri Formula"]
     C --> D["🎲 Module D: Monte Carlo<br/>10,000 Draws<br/>(Stochastic Sampling)"]
     D --> E["💰 Module E: PCaR<br/>₹ Crore VaR<br/>(Balance Sheet)"]
@@ -49,7 +49,7 @@ flowchart LR
 | Layer | Technology | Purpose |
 |---|---|---|
 | **SLM Inference** | Qwen2.5-0.5B-Instruct, PyTorch bf16 | Headline → structured disruption signal |
-| **Entity Grounding** | NetworkX DiGraph (30 nodes, 69 edges) | GraphRAG entity verification |
+| **Entity Grounding** | NetworkX DiGraph (30 nodes, 69 edges) | graph-grounded entity verification |
 | **Risk Scoring** | Deterministic 5-factor weighted formula | AlMahri et al. (2026) Section 3.2.5 |
 | **Stochastic Engine** | NumPy Monte Carlo (10K draws) | Production drop distribution |
 | **Financial Engine** | UN Comtrade HS 8542/8112 baselines | Procurement Cost at Risk (PCaR) in ₹ Crore |
@@ -105,7 +105,7 @@ cp .env.example .env
 
 ```bash
 python scripts/check_gpu.py        # Verify CUDA & VRAM
-python test_grounding.py           # Verify GraphRAG entity verification
+python test_grounding.py           # Verify graph-grounded entity verification
 pytest tests/ -v                   # Run full test suite
 ```
 
@@ -137,7 +137,7 @@ docker compose up --build
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/v1/analyze-headline` | Full pipeline: SLM → GraphRAG → Risk Score → Directive |
+| `POST` | `/api/v1/analyze-headline` | Full pipeline: SLM → graph-grounded verification → Risk Score → Directive |
 | `POST` | `/api/v1/simulate-risk` | Monte Carlo simulation with custom parameters |
 | `POST` | `/api/v1/calculate-pcar` | PCaR for predefined OEM or custom BOM |
 | `GET`  | `/api/v1/health` | System status, GPU availability, graph integrity |
@@ -150,7 +150,7 @@ See interactive docs at `http://localhost:8000/docs` after launching the API.
 
 | View | Description |
 |---|---|
-| **01 — Decision Room** | Headline analysis, GraphRAG grounding, risk score, CSCO directive |
+| **01 — Decision Room** | Headline analysis, graph-grounded entity verification, risk score, CSCO directive |
 | **02 — Scenarios** | 10 pre-calibrated benchmark scenarios |
 | **03 — Supply Chain** | Interactive 30-node supply chain graph |
 | **04 — Impact & PCaR** | Multi-OEM financial risk allocation & Monte Carlo histograms |
@@ -169,7 +169,7 @@ See interactive docs at `http://localhost:8000/docs` after launching the API.
 ├── src/                    # Core pipeline modules
 │   ├── config.py           # Centralized settings (pydantic-settings)
 │   ├── data_sources.py     # GDELT + RSS + SQLite + Comtrade data layer
-│   ├── grounding_graph.py  # GraphRAG entity verification (30 nodes, 69 edges)
+│   ├── grounding_graph.py  # graph-grounded entity verification (30 nodes, 69 edges)
 │   ├── module_b_slm.py     # SLM signal extractor (Qwen2.5-0.5B)
 │   ├── module_c_causal.py  # Deterministic risk engine (AlMahri formula)
 │   ├── module_d_mc.py      # Monte Carlo scenario engine (10K draws)
