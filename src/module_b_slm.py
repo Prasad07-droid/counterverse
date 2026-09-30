@@ -204,7 +204,13 @@ FAST_EVENT_MAPPING = {
     "recession": "Demand shock",
 }
 
-def _map_fast_params(headline: str, severity: Any = "HIGH", is_disruption: bool = True) -> dict:
+def _map_fast_params(
+    headline: str,
+    severity: Any = "HIGH",
+    is_disruption: bool = True,
+    severity_pct_override: Any = None,
+    duration_days_override: Any = None,
+) -> dict:
     """
     Deterministically maps news headline to simulation parameters:
     - affected_node: strictly within ALLOWED_AFFECTED_NODES
@@ -258,6 +264,13 @@ def _map_fast_params(headline: str, severity: Any = "HIGH", is_disruption: bool 
     else:  # LOW
         severity_pct = rng.randint(10, 30)
         duration_days = rng.randint(5, 14)
+
+    # Optional caller overrides are additive. Defaults preserve the current
+    # hash-seeded behavior exactly; changing that mechanism is out of scope.
+    if severity_pct_override is not None:
+        severity_pct = severity_pct_override
+    if duration_days_override is not None:
+        duration_days = duration_days_override
 
     # Clamping guarantees within contract
     severity_pct = max(0, min(100, int(severity_pct)))
@@ -336,7 +349,11 @@ def get_slm_model(timeout_seconds: int = 45):
     return model_container[0]
 
 
-def extract_signal_qwen(headline: str) -> Dict[str, Any]:
+def extract_signal_qwen(
+    headline: str,
+    severity_pct_override: Any = None,
+    duration_days_override: Any = None,
+) -> Dict[str, Any]:
     """
     Executes real SLM inference using local Qwen2.5-0.5B-Instruct on GPU.
     Formats the input using the Appendix A2 system persona and prompt.
@@ -348,7 +365,13 @@ def extract_signal_qwen(headline: str) -> Dict[str, Any]:
     slm_tuple = get_slm_model()
     if slm_tuple is None:
         logger.warning("SLM model unavailable or timed out. Falling back to Fast Mode.")
-        return extract_signal(headline, simulate_delay=False, engine="fast")
+        return extract_signal(
+            headline,
+            simulate_delay=False,
+            engine="fast",
+            severity_pct_override=severity_pct_override,
+            duration_days_override=duration_days_override,
+        )
     tokenizer, model, device = slm_tuple
     
     prompt = f"""You are an expert supply-chain disruption monitoring system.
@@ -480,7 +503,13 @@ JSON:"""
             parsed = json.loads(raw_response)
     except Exception as e:
         logger.warning(f"Failed to parse SLM JSON output directly: {e}. Raw: {raw_response}")
-        parsed = extract_signal(headline, simulate_delay=False, engine="fast")
+        parsed = extract_signal(
+            headline,
+            simulate_delay=False,
+            engine="fast",
+            severity_pct_override=severity_pct_override,
+            duration_days_override=duration_days_override,
+        )
     
     # Ensure is_disruption boolean is extracted first
     is_disruption = bool(parsed.get("is_disruption", True))
@@ -618,7 +647,13 @@ JSON:"""
     confidence = max(0.0, min(1.0, round(confidence, 2)))
 
     # Parameter extraction with deterministic seeded derivation
-    fast_fallback = _map_fast_params(headline, severity, is_disruption=is_disruption)
+    fast_fallback = _map_fast_params(
+        headline,
+        severity,
+        is_disruption=is_disruption,
+        severity_pct_override=severity_pct_override,
+        duration_days_override=duration_days_override,
+    )
     affected_node = parsed.get("affected_node")
     if affected_node not in ALLOWED_AFFECTED_NODES:
         affected_node = fast_fallback["affected_node"]
@@ -669,7 +704,13 @@ JSON:"""
 
 from src.data_sources import sanitize_headline
 
-def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fast") -> Dict[str, Any]:
+def extract_signal(
+    headline: str,
+    simulate_delay: bool = True,
+    engine: str = "fast",
+    severity_pct_override: Any = None,
+    duration_days_override: Any = None,
+) -> Dict[str, Any]:
     """
     Extracts structured disruption signal from a news headline.
 
@@ -681,6 +722,8 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         headline: The news headline or text string.
         simulate_delay: Whether to add a brief delay for UI/demo realism.
         engine: "fast" (default) or "slm".
+        severity_pct_override: Optional 0-100 override; None preserves extraction.
+        duration_days_override: Optional 1-90 day override; None preserves extraction.
 
     Returns:
         Structured dictionary adhering strictly to the Appendix A2 JSON schema.
@@ -696,7 +739,11 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     headline = sanitized_headline  # use sanitized from here on
 
     if engine.lower() == "slm":
-        return extract_signal_qwen(headline)
+        return extract_signal_qwen(
+            headline,
+            severity_pct_override=severity_pct_override,
+            duration_days_override=duration_days_override,
+        )
 
     logger.info(f"Extracting disruption signal (Fast Mode) from headline: '{headline}'")
     if simulate_delay:
@@ -720,7 +767,13 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     is_false_positive = any(bk in text_lower for bk in benign_keywords)
 
     if is_false_positive:
-        benign_params = _map_fast_params(headline, severity=0, is_disruption=False)
+        benign_params = _map_fast_params(
+            headline,
+            severity=0,
+            is_disruption=False,
+            severity_pct_override=severity_pct_override,
+            duration_days_override=duration_days_override,
+        )
         benign_matches = sum(1 for bk in benign_keywords if bk in text_lower)
         confidence = round(min(0.98, max(0.80, 0.85 + 0.04 * benign_matches)), 2)
         return {
@@ -855,7 +908,13 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         f"Prepare counterfactual sourcing alternatives for critical {component} inputs."
     ]
 
-    fast_params = _map_fast_params(headline, severity, is_disruption=True)
+    fast_params = _map_fast_params(
+        headline,
+        severity,
+        is_disruption=True,
+        severity_pct_override=severity_pct_override,
+        duration_days_override=duration_days_override,
+    )
     confidence_reason = f"Identified {disruption_type} affecting {component} in {region} ({cue_matches} critical disruption cues detected)"
 
     result = {
@@ -887,14 +946,32 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     return result
 
 
-def extract_signal_fast(headline: str) -> Dict[str, Any]:
+def extract_signal_fast(
+    headline: str,
+    severity_pct_override: Any = None,
+    duration_days_override: Any = None,
+) -> Dict[str, Any]:
     """
     Fast deterministic rule-based signal extraction without SLM/GPU.
     Conforms strictly to the Appendix A2 JSON schema.
     """
-    res = extract_signal(headline, simulate_delay=False, engine="fast")
+    res = extract_signal(
+        headline,
+        simulate_delay=False,
+        engine="fast",
+        severity_pct_override=severity_pct_override,
+        duration_days_override=duration_days_override,
+    )
     if "affected_node" not in res:
-        res.update(_map_fast_params(headline, res.get("severity", 2), is_disruption=res.get("is_disruption", True)))
+        res.update(
+            _map_fast_params(
+                headline,
+                res.get("severity", 2),
+                is_disruption=res.get("is_disruption", True),
+                severity_pct_override=severity_pct_override,
+                duration_days_override=duration_days_override,
+            )
+        )
     return res
 
 
@@ -912,7 +989,13 @@ def extract_signal_fast(headline: str) -> Dict[str, Any]:
 # Entities NOT found → "Unverified (SLM inference only)" — NOT discarded.
 # ════════════════════════════════════════════════════════════════
 
-def extract_signal_with_grounding(headline: str, simulate_delay: bool = True, engine: str = "fast") -> Dict[str, Any]:
+def extract_signal_with_grounding(
+    headline: str,
+    simulate_delay: bool = True,
+    engine: str = "fast",
+    severity_pct_override: Any = None,
+    duration_days_override: Any = None,
+) -> Dict[str, Any]:
     """
     Extracts structured disruption signal AND grounds entities against the
     static knowledge graph (GraphRAG-style verification).
@@ -921,6 +1004,8 @@ def extract_signal_with_grounding(headline: str, simulate_delay: bool = True, en
         headline: The news headline or text string.
         simulate_delay: Whether to add a brief delay for UI/demo realism.
         engine: "fast" (default) or "slm" (local Qwen2.5-0.5B-Instruct on GPU).
+        severity_pct_override: Optional 0-100 override; None preserves extraction.
+        duration_days_override: Optional 1-90 day override; None preserves extraction.
 
     Returns:
         Same dict as extract_signal(), plus a "grounding" key with:
@@ -929,7 +1014,13 @@ def extract_signal_with_grounding(headline: str, simulate_delay: bool = True, en
         - summary: verification rate statistics
     """
     # Step 1: Run SLM or fast extraction
-    signal = extract_signal(headline, simulate_delay=simulate_delay, engine=engine)
+    signal = extract_signal(
+        headline,
+        simulate_delay=simulate_delay,
+        engine=engine,
+        severity_pct_override=severity_pct_override,
+        duration_days_override=duration_days_override,
+    )
 
     # Step 2: Ground extracted entities against static knowledge graph
     # This is a deterministic lookup — no LLM calls, no hallucination risk

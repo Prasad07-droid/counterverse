@@ -104,6 +104,18 @@ class HeadlineRequest(BaseModel):
         description="Target OEM for PCaR calculation"
     )
     mc_samples: int = Field(default=10000, ge=100, le=500000, description="Monte Carlo sample count")
+    severity_pct_override: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="Optional extracted severity-percent override; omitted preserves current behavior",
+    )
+    duration_days_override: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=90,
+        description="Optional extracted duration-days override; omitted preserves current behavior",
+    )
 
 class HeadlineResponse(BaseModel):
     """Response for /analyze-headline."""
@@ -267,16 +279,41 @@ async def analyze_headline(req: HeadlineRequest):
     engine_used = req.engine
     if req.engine == "slm" and SLM_AVAILABLE:
         try:
-            signal = extract_signal(req.headline, engine="slm")
+            signal = extract_signal(
+                req.headline,
+                engine="slm",
+                severity_pct_override=req.severity_pct_override,
+                duration_days_override=req.duration_days_override,
+            )
         except Exception as e:
             logger.warning(f"SLM inference failed: {e}. Falling back to fast.")
-            signal = extract_signal_fast(req.headline) if extract_signal_fast else _fallback_signal(req.headline)
+            signal = (
+                extract_signal_fast(
+                    req.headline,
+                    severity_pct_override=req.severity_pct_override,
+                    duration_days_override=req.duration_days_override,
+                )
+                if extract_signal_fast
+                else _fallback_signal(
+                    req.headline,
+                    severity_pct_override=req.severity_pct_override,
+                    duration_days_override=req.duration_days_override,
+                )
+            )
             engine_used = "fast (fallback)"
     elif extract_signal_fast:
-        signal = extract_signal_fast(req.headline)
+        signal = extract_signal_fast(
+            req.headline,
+            severity_pct_override=req.severity_pct_override,
+            duration_days_override=req.duration_days_override,
+        )
         engine_used = "fast"
     else:
-        signal = _fallback_signal(req.headline)
+        signal = _fallback_signal(
+            req.headline,
+            severity_pct_override=req.severity_pct_override,
+            duration_days_override=req.duration_days_override,
+        )
         engine_used = "fallback"
 
     # 2. GraphRAG grounding
@@ -575,12 +612,17 @@ async def health():
 # HELPERS
 # ════════════════════════════════════════════════════════════════
 
-def _fallback_signal(headline: str) -> dict:
+def _fallback_signal(
+    headline: str,
+    severity_pct_override: Optional[int] = None,
+    duration_days_override: Optional[int] = None,
+) -> dict:
     """Minimal signal when no SLM or heuristic is available."""
     return {
         "event_type": "supply_disruption",
         "severity": 3,
-        "duration_days": 30,
+        "severity_pct": severity_pct_override if severity_pct_override is not None else 75,
+        "duration_days": duration_days_override if duration_days_override is not None else 30,
         "recovery_time_days": 30,
         "affected_regions": [],
         "component": "Integrated Circuits",

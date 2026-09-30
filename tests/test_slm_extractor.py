@@ -106,6 +106,23 @@ class TestSLMExtractor(unittest.TestCase):
         self.assertEqual(sig1["duration_days"], sig2["duration_days"])
         self.assertEqual(sig1["confidence"], sig2["confidence"])
 
+    def test_optional_severity_and_duration_overrides(self):
+        headline = "Taiwan semiconductor foundry reports severe wafer line delays"
+        default_signal = extract_signal(headline, simulate_delay=False, engine="fast")
+        overridden = extract_signal(
+            headline,
+            simulate_delay=False,
+            engine="fast",
+            severity_pct_override=17,
+            duration_days_override=9,
+        )
+
+        self.assertEqual(overridden["severity_pct"], 17)
+        self.assertEqual(overridden["duration_days"], 9)
+        self.assertEqual(overridden["affected_node"], default_signal["affected_node"])
+        self.assertEqual(overridden["event_type"], default_signal["event_type"])
+        self.assertEqual(overridden["is_disruption"], default_signal["is_disruption"])
+
     def test_node_to_graph_id_fallback_and_edge_cases(self):
         """
         Verifies that unmapped or edge-case node strings do not raise a KeyError,

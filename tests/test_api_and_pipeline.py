@@ -349,6 +349,19 @@ class TestFastAPI:
         assert "pcar_metrics" in data
         assert data["pipeline_time_ms"] > 0
 
+    def test_analyze_headline_with_optional_overrides(self):
+        resp = self.client.post("/api/v1/analyze-headline", json={
+            "headline": "Taiwan semiconductor foundry reports severe wafer line delays",
+            "engine": "fast",
+            "mc_samples": 500,
+            "severity_pct_override": 17,
+            "duration_days_override": 9,
+        })
+        assert resp.status_code == 200
+        signal = resp.json()["signal"]
+        assert signal["severity_pct"] == 17
+        assert signal["duration_days"] == 9
+
     def test_simulate_risk(self):
         resp = self.client.post("/api/v1/simulate-risk", json={
             "severity": 4,
