@@ -32,7 +32,7 @@ Where:
 2. **$\text{DR}$ (Dependency Ratio, 25%)**: OEM reliance on the disrupted supplier/corridor, partially data-informed by measured trade shares, with assumed upstream-concentration penalties ($C_{\text{upstream}}$) and an assumed unhedged-exposure weight ($W_{\text{unhedged}}=0.75$).
 3. **$\text{DC}$ (Downstream Criticality, 20%)**: Essentiality of component to assembly line continuity (ECU/Chip = 0.95, Auto parts = 0.65, Logistics = 0.60, Hardware = 0.40).
 4. **$\text{TC}$ (Tier-1 Centrality, 10%)**: Degree connectivity of exposed Tier-1 nodes across OEM vehicle models.
-5. **$\text{ED}$ (Exposure Depth, 10%)**: Normalized tier depth of disruption origin ($\text{Tier} / 4.0$).
+5. **$\text{ED}$ (Exposure Depth, 10%)**: Discrete component-class lookup used by the code: raw material = 1.00; integrated circuit/wafer/microcontroller/ECU = 0.75; automotive sensor = 0.25; unverified fallback = 0.50. This is not computed as $\text{Tier}/4.0$.
 
 ### Thresholds & Action Directives (Section 3.2.5 & 3.2.6):
 - **$\text{Risk Score} \ge 0.60$ (HIGH Risk)**: Replace supplier / Qualify dual-sourcing immediately.

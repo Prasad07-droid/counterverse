@@ -63,7 +63,7 @@ This section documents whether any input variable feeding the Bayesian priors or
 | DR (Dependency Ratio) | 25% | UN Comtrade bilateral shares plus upstream-concentration adjustment | Partially data-informed — trade shares are measured; $C_{\text{upstream}}$ and $W_{\text{unhedged}}=0.75$ are assumptions |
 | DC (Downstream Criticality) | 20% | Domain assertion — automotive ECU literature | No — asserted constant |
 | TC (Tier-1 Centrality) | 10% | Graph degree centrality (NetworkX) | Partial — topological, not economic |
-| ED (Exposure Depth) | 10% | Tier depth normalized (Tier/4.0) | Partial — structural, not economic |
+| ED (Exposure Depth) | 10% | Discrete component-class lookup: raw material 1.00; IC/wafer/MCU/ECU 0.75; automotive sensor 0.25; unverified fallback 0.50 | Structural assumption, not a continuous tier formula |
 
 **Summary: the score is partially data-informed, not 25% empirically measured. DR uses measured UN Comtrade bilateral shares, but its upstream-concentration term $C_{\text{upstream}}$ and unhedged-exposure weight $W_{\text{unhedged}}=0.75$ are modeling assumptions. EB, DC, TC, and ED also contain asserted or structural inputs.**
 

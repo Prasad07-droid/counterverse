@@ -2021,7 +2021,7 @@ $$\text{Structural Exposure Score} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR}
 | **Dependency Ratio** | `dependency_ratio` | **25%** | `{bd.get('dependency_ratio', {}).get('value', 0):.3f}` | **`{bd.get('dependency_ratio', {}).get('contribution', 0):.4f}`** | {bd.get('dependency_ratio', {}).get('desc', 'Derived from UN Comtrade HS 8542/8112 import shares')} |
 | **Downstream Criticality** | `downstream_criticality` | **20%** | `{bd.get('downstream_criticality', {}).get('value', 0):.3f}` | **`{bd.get('downstream_criticality', {}).get('contribution', 0):.4f}`** | Essentiality of microcontrollers/chips to vehicle ECU assembly continuity |
 | **Tier-1 Centrality** | `tier1_centrality` | **10%** | `{bd.get('tier1_centrality', {}).get('value', 0):.3f}` | **`{bd.get('tier1_centrality', {}).get('contribution', 0):.4f}`** | Degree connectivity of exposed Tier-1 electronic nodes |
-| **Exposure Depth** | `exposure_depth` | **10%** | `{bd.get('exposure_depth', {}).get('value', 0):.3f}` | **`{bd.get('exposure_depth', {}).get('contribution', 0):.4f}`** | Normalized origin tier depth in supply chain (Tier-4=1.0, Tier-1=0.25) |
+| **Exposure Depth** | `exposure_depth` | **10%** | `{bd.get('exposure_depth', {}).get('value', 0):.3f}` | **`{bd.get('exposure_depth', {}).get('contribution', 0):.4f}`** | Discrete component-class depth lookup (raw material=1.00, IC/wafer/MCU/ECU=0.75, sensor=0.25, fallback=0.50) |
 | **Supplier Structural Exposure** | — | **100%** | — | **`{r_score:.3f}`** | **Classification: {r_level}** |
 
 **Executive CSCO Decision Directive:** {r_action}  
