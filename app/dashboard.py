@@ -1818,7 +1818,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
             str_8542_inr = f"₹{format_inr(val_8542_inr)} Cr" if val_8542_inr else "—"
             str_8112_inr = f"₹{format_inr(val_8112_inr)} Cr" if val_8112_inr else "—"
             
-            note = "✅ Complete (Adopted Baseline)" if y == "2022" else ("✅ Complete" if val_8542_usd and val_8542_usd > 1e8 else ("⚠️ Partial / Incomplete in UN Comtrade public tier" if y == "2023" else "⏳ Pending Official Release"))
+            note = "✅ Complete (Adopted Baseline)" if y == "2022" else ("✅ Complete" if val_8542_usd and val_8542_usd > 1e8 else ("⚠️ Partial / Incomplete in UN Comtrade public tier" if y == "2023" else "ℹ️ Not captured in repository baseline"))
             table_rows.append({
                 "Year": y,
                 "HS 8542 Imports (USD)": str_8542_usd,
@@ -1878,7 +1878,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
             st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
 
         st.caption("📌 **Citation**: Source: UN Comtrade, HS 8542/8112, 2026-09-05. Converted at stated exchange rate 1 USD = ₹83.0 INR. Reporter: India, Flow: Imports.")
-        st.caption("⚠️ **Notice on Data Completeness**: 2023 trade reports in the UN Comtrade public preview tier remain partial (only select trading months indexed); 2024 full data is pending official release. Sourced full-year 2022 baseline is adopted to maintain absolute quantitative integrity rather than falling back to assumed figures.")
+        st.caption("⚠️ **Notice on Data Vintage**: The repository uses 2022 because it is the latest complete full-year HS 8542/8112 extraction that was fetched, checked, and stored in this project. Later full-year data has not been ingested and audited here; this is not a claim that 2024 UN Comtrade data is unreleased. The baseline also predates China's August 2023 gallium/germanium export controls.")
 
 
 # ════════════════════════════════════════════════════════════════

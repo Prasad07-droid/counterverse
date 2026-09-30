@@ -92,7 +92,7 @@ DEFAULT_COMTRADE_DATA = {
             "2021": {"usd_value": 12391531711.14, "inr_crore": 102849.71, "status": "Complete"},
             "2022": {"usd_value": 16122209275.13, "inr_crore": 133814.34, "status": "Complete"},
             "2023": {"usd_value": 105693865.00, "inr_crore": 877.26, "status": "Partial (UN Comtrade public tier incomplete)"},
-            "2024": {"usd_value": None, "inr_crore": None, "status": "Unreleased / Pending Official Release"}
+            "2024": {"usd_value": None, "inr_crore": None, "status": "Not captured / not audited in this repository"}
         },
         "8112": {
             "2019": {"usd_value": 21400205.30, "inr_crore": 177.62, "status": "Complete"},
@@ -100,7 +100,7 @@ DEFAULT_COMTRADE_DATA = {
             "2021": {"usd_value": 22571385.56, "inr_crore": 187.34, "status": "Complete"},
             "2022": {"usd_value": 66606995.90, "inr_crore": 552.84, "status": "Complete"},
             "2023": {"usd_value": 27297.86, "inr_crore": 0.23, "status": "Partial (UN Comtrade public tier incomplete)"},
-            "2024": {"usd_value": None, "inr_crore": None, "status": "Unreleased / Pending Official Release"}
+            "2024": {"usd_value": None, "inr_crore": None, "status": "Not captured / not audited in this repository"}
         }
     },
     "partner_shares_2022_8542": {
