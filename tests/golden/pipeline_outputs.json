@@ -1,0 +1,2268 @@
+{
+  "graph": {
+    "hash": "31f67108669b9208",
+    "integrity": true,
+    "summary": {
+      "edge_types": {
+        "belongs_to": 12,
+        "depends_on": 8,
+        "exports": 9,
+        "imports_from": 4,
+        "operates_in": 14,
+        "requires": 8,
+        "supplies": 14
+      },
+      "node_types": {
+        "company": 12,
+        "component": 7,
+        "country": 7,
+        "industry": 4
+      },
+      "total_edges": 69,
+      "total_nodes": 30
+    }
+  },
+  "metadata": {
+    "engine": "fast",
+    "evaluation_results_sha256": "14bcbcf07b30825abf7fd6ad6c77d5dee0237ecec8d50ba43c98696bc7180f60",
+    "monte_carlo_samples": 10000,
+    "monte_carlo_seed": 42,
+    "python_hash_seed": 0,
+    "schema_version": 1
+  },
+  "scenarios": [
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "US enacts strict export controls on advanced semiconductor lithography equipment to China, halting wafer production",
+      "id": "SCEN-01",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 23.197632871912358,
+        "median_drop": 28.94147528971181,
+        "n_samples": 10000,
+        "p95_drop": 36.3599105687141,
+        "p99_drop": 38.83714805152764,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 3540.72,
+            "median_loss_crore": 3900.19,
+            "pcar_95_crore": 5938.76,
+            "pcar_99_crore": 6565.48,
+            "worst_case_loss_crore": 7929.04
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 2845.51,
+            "median_loss_crore": 3134.4,
+            "pcar_95_crore": 4772.7,
+            "pcar_99_crore": 5276.37,
+            "worst_case_loss_crore": 6372.19
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 9149.75,
+            "median_loss_crore": 10078.68,
+            "pcar_95_crore": 15346.63,
+            "pcar_99_crore": 16966.18,
+            "worst_case_loss_crore": 20489.81
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 3611.75,
+            "median_loss_crore": 3978.43,
+            "pcar_95_crore": 6057.88,
+            "pcar_99_crore": 6697.18,
+            "worst_case_loss_crore": 8088.08
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 57741.72952291933,
+          "median_loss_crore": 63603.962770137776,
+          "pcar_95_crore": 96848.60026423149,
+          "pcar_99_crore": 107069.16816345831,
+          "worst_case_loss_crore": 129305.87632711526
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.782,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to China.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical semiconductor inputs."
+        ],
+        "affected_node": "Semiconductor Fab",
+        "affected_regions": [
+          "China"
+        ],
+        "companies": [],
+        "component": "semiconductor",
+        "confidence": 0.75,
+        "confidence_level": "Medium",
+        "confidence_pct": 75,
+        "confidence_reason": "Identified Trade Policy affecting semiconductor in China (1 critical disruption cues detected)",
+        "disruption_type": "Trade Policy",
+        "duration_days": 33,
+        "engine": "Fast Deterministic Parser",
+        "event": "US enacts strict export controls on advanced semiconductor lithography equipment...",
+        "event_type": "Export ban/restriction",
+        "expert_reasoning": [
+          "Event represents a Trade Policy affecting semiconductor sourcing from China.",
+          "Automotive tier dependencies in China indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 4 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "US enacts strict export controls on advanced semiconductor lithography equipment to China, halting wafer production",
+        "impacted_industries": [
+          "Automotive",
+          "Semiconductors"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 4,
+        "region": "China",
+        "severity": 2,
+        "severity_pct": 65,
+        "summary": "Trade Policy disruption detected in China impacting semiconductor with estimated severity Level 2/3 (75% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Taiwan semiconductor foundry reports severe packaging bottlenecks following regional trade restrictions",
+      "id": "SCEN-02",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 19.573034997113723,
+        "median_drop": 24.736408981038238,
+        "n_samples": 10000,
+        "p95_drop": 32.91088780639625,
+        "p99_drop": 35.48606988384313,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 47997.04,
+              "macro_pcar_95_crore": 84368.95,
+              "macro_pcar_99_crore": 93716.63
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 2943.18,
+            "median_loss_crore": 3241.48,
+            "pcar_95_crore": 5173.5,
+            "pcar_99_crore": 5746.7,
+            "worst_case_loss_crore": 6564.98
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 47997.04,
+              "macro_pcar_95_crore": 84368.95,
+              "macro_pcar_99_crore": 93716.63
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 2365.29,
+            "median_loss_crore": 2605.02,
+            "pcar_95_crore": 4157.7,
+            "pcar_99_crore": 4618.36,
+            "worst_case_loss_crore": 5275.97
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 47997.04,
+              "macro_pcar_95_crore": 84368.95,
+              "macro_pcar_99_crore": 93716.63
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 7605.61,
+            "median_loss_crore": 8376.46,
+            "pcar_95_crore": 13369.1,
+            "pcar_99_crore": 14850.34,
+            "worst_case_loss_crore": 16964.89
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 47997.04,
+              "macro_pcar_95_crore": 84368.95,
+              "macro_pcar_99_crore": 93716.63
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 3002.21,
+            "median_loss_crore": 3306.5,
+            "pcar_95_crore": 5277.28,
+            "pcar_99_crore": 5861.98,
+            "worst_case_loss_crore": 6696.67
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 47997.03956143155,
+          "median_loss_crore": 52861.67117673349,
+          "pcar_95_crore": 84368.94999258248,
+          "pcar_99_crore": 93716.62998337307,
+          "worst_case_loss_crore": 107061.0244351493
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.702,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to Taiwan.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical semiconductor inputs."
+        ],
+        "affected_node": "Semiconductor Fab",
+        "affected_regions": [
+          "Taiwan"
+        ],
+        "companies": [],
+        "component": "semiconductor",
+        "confidence": 0.65,
+        "confidence_level": "Medium",
+        "confidence_pct": 65,
+        "confidence_reason": "Identified Trade Policy affecting semiconductor in Taiwan (0 critical disruption cues detected)",
+        "disruption_type": "Trade Policy",
+        "duration_days": 18,
+        "engine": "Fast Deterministic Parser",
+        "event": "Taiwan semiconductor foundry reports severe packaging bottlenecks following regi...",
+        "event_type": "Export ban/restriction",
+        "expert_reasoning": [
+          "Event represents a Trade Policy affecting semiconductor sourcing from Taiwan.",
+          "Automotive tier dependencies in Taiwan indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 2 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Taiwan semiconductor foundry reports severe packaging bottlenecks following regional trade restrictions",
+        "impacted_industries": [
+          "Automotive",
+          "Semiconductors"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 2,
+        "region": "Taiwan",
+        "severity": 1,
+        "severity_pct": 55,
+        "summary": "Trade Policy disruption detected in Taiwan impacting semiconductor with estimated severity Level 1/3 (65% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Domestic semiconductor distributor opens new headquarters and customer experience center in Bengaluru",
+      "id": "SCEN-03",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 2.6281028254837935,
+        "median_drop": 1.390499098101862,
+        "n_samples": 10000,
+        "p95_drop": 11.385719510825371,
+        "p99_drop": 20.00804259042114,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 339.05,
+            "median_loss_crore": 209.54,
+            "pcar_95_crore": 1333.97,
+            "pcar_99_crore": 2160.52,
+            "worst_case_loss_crore": 3129.06
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 272.48,
+            "median_loss_crore": 168.4,
+            "pcar_95_crore": 1072.05,
+            "pcar_99_crore": 1736.31,
+            "worst_case_loss_crore": 2514.68
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 876.15,
+            "median_loss_crore": 541.49,
+            "pcar_95_crore": 3447.17,
+            "pcar_99_crore": 5583.11,
+            "worst_case_loss_crore": 8085.95
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 345.85,
+            "median_loss_crore": 213.74,
+            "pcar_95_crore": 1360.72,
+            "pcar_99_crore": 2203.86,
+            "worst_case_loss_crore": 3191.82
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 5529.17340975431,
+          "median_loss_crore": 3417.1741869432726,
+          "pcar_95_crore": 21754.16743097676,
+          "pcar_99_crore": 35233.57414582001,
+          "worst_case_loss_crore": 51028.36651437272
+        }
+      },
+      "risk_class": "LOW",
+      "risk_score": 0.0,
+      "signal": {
+        "action_thoughts": [
+          "Maintain standard operational monitoring.",
+          "No supply chain escalation or knowledge graph traversal required.",
+          "Log entry as non-disruptive event."
+        ],
+        "affected_node": "Semiconductor Fab",
+        "affected_regions": [
+          "None"
+        ],
+        "component": "none",
+        "confidence": 0.89,
+        "confidence_level": "High",
+        "confidence_pct": 89,
+        "confidence_reason": "Routine corporate, commercial or maintenance event with zero supply chain disruption",
+        "disruption_type": "None",
+        "duration_days": 6,
+        "engine": "Fast Deterministic Parser",
+        "event": "Routine Operations / Non-Disruptive",
+        "event_type": "Logistics delay",
+        "expert_reasoning": [
+          "Headline reports standard commercial or operational developments with no supply chain threat.",
+          "No supplier capacity constraints, export bans, or transport bottlenecks identified.",
+          "Event filtered at Stage 1 (Relevance Filtering) per AlMahri et al. (2026) architecture."
+        ],
+        "headline": "Domestic semiconductor distributor opens new headquarters and customer experience center in Bengaluru",
+        "impacted_industries": [
+          "Automotive"
+        ],
+        "is_disruption": false,
+        "lead_time_weeks": 0,
+        "severity": 0,
+        "severity_pct": 0,
+        "summary": "Non-disruptive event filtered out during Stage 1 relevance screening."
+      },
+      "threshold_directive": "Maintain Standard Operations & Routine Monitoring"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Shanghai port closure and dock congestion disrupt Asian containerized automotive parts shipping",
+      "id": "SCEN-04",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 23.197632871912358,
+        "median_drop": 28.94147528971181,
+        "n_samples": 10000,
+        "p95_drop": 36.3599105687141,
+        "p99_drop": 38.83714805152764,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 3540.72,
+            "median_loss_crore": 3900.19,
+            "pcar_95_crore": 5938.76,
+            "pcar_99_crore": 6565.48,
+            "worst_case_loss_crore": 7929.04
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 2845.51,
+            "median_loss_crore": 3134.4,
+            "pcar_95_crore": 4772.7,
+            "pcar_99_crore": 5276.37,
+            "worst_case_loss_crore": 6372.19
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 9149.75,
+            "median_loss_crore": 10078.68,
+            "pcar_95_crore": 15346.63,
+            "pcar_99_crore": 16966.18,
+            "worst_case_loss_crore": 20489.81
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 57741.73,
+              "macro_pcar_95_crore": 96848.6,
+              "macro_pcar_99_crore": 107069.17
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 3611.75,
+            "median_loss_crore": 3978.43,
+            "pcar_95_crore": 6057.88,
+            "pcar_99_crore": 6697.18,
+            "worst_case_loss_crore": 8088.08
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 57741.72952291933,
+          "median_loss_crore": 63603.962770137776,
+          "pcar_95_crore": 96848.60026423149,
+          "pcar_99_crore": 107069.16816345831,
+          "worst_case_loss_crore": 129305.87632711526
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.782,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to China.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical logistics inputs."
+        ],
+        "affected_node": "Port/Logistics",
+        "affected_regions": [
+          "China"
+        ],
+        "companies": [],
+        "component": "logistics",
+        "confidence": 0.75,
+        "confidence_level": "Medium",
+        "confidence_pct": 75,
+        "confidence_reason": "Identified Logistics Disruption affecting logistics in China (1 critical disruption cues detected)",
+        "disruption_type": "Logistics Disruption",
+        "duration_days": 53,
+        "engine": "Fast Deterministic Parser",
+        "event": "Shanghai port closure and dock congestion disrupt Asian containerized automotive...",
+        "event_type": "Port closure",
+        "expert_reasoning": [
+          "Event represents a Logistics Disruption affecting logistics sourcing from China.",
+          "Automotive tier dependencies in China indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 4 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Shanghai port closure and dock congestion disrupt Asian containerized automotive parts shipping",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 4,
+        "region": "China",
+        "severity": 2,
+        "severity_pct": 73,
+        "summary": "Logistics Disruption disruption detected in China impacting logistics with estimated severity Level 2/3 (75% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Red Sea shipping crisis triggers indefinite maritime reroute around Cape of Good Hope, doubling freight transit times",
+      "id": "SCEN-05",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 28.239237776565073,
+        "median_drop": 34.35699410292014,
+        "n_samples": 10000,
+        "p95_drop": 41.23927897035737,
+        "p99_drop": 43.666502248044814,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 4368.88,
+            "median_loss_crore": 4798.89,
+            "pcar_95_crore": 7035.46,
+            "pcar_99_crore": 7768.2,
+            "worst_case_loss_crore": 9059.67
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 3511.06,
+            "median_loss_crore": 3856.64,
+            "pcar_95_crore": 5654.07,
+            "pcar_99_crore": 6242.93,
+            "worst_case_loss_crore": 7280.83
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 11289.83,
+            "median_loss_crore": 12401.05,
+            "pcar_95_crore": 18180.68,
+            "pcar_99_crore": 20074.17,
+            "worst_case_loss_crore": 23411.53
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 4456.51,
+            "median_loss_crore": 4895.15,
+            "pcar_95_crore": 7176.59,
+            "pcar_99_crore": 7924.02,
+            "worst_case_loss_crore": 9241.39
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 71247.22177249823,
+          "median_loss_crore": 78259.79125056756,
+          "pcar_95_crore": 114733.58204832047,
+          "pcar_99_crore": 126682.90528505604,
+          "worst_case_loss_crore": 147744.0836666123
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.905,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to Red Sea.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical logistics inputs."
+        ],
+        "affected_node": "Port/Logistics",
+        "affected_regions": [
+          "Red Sea"
+        ],
+        "companies": [],
+        "component": "logistics",
+        "confidence": 0.65,
+        "confidence_level": "Medium",
+        "confidence_pct": 65,
+        "confidence_reason": "Identified Logistics Disruption affecting logistics in Red Sea (0 critical disruption cues detected)",
+        "disruption_type": "Logistics Disruption",
+        "duration_days": 63,
+        "engine": "Fast Deterministic Parser",
+        "event": "Red Sea shipping crisis triggers indefinite maritime reroute around Cape of Good...",
+        "event_type": "Logistics delay",
+        "expert_reasoning": [
+          "Event represents a Logistics Disruption affecting logistics sourcing from Red Sea.",
+          "Automotive tier dependencies in Red Sea indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 8 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Red Sea shipping crisis triggers indefinite maritime reroute around Cape of Good Hope, doubling freight transit times",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 8,
+        "region": "Red Sea",
+        "severity": 3,
+        "severity_pct": 83,
+        "summary": "Logistics Disruption disruption detected in Red Sea impacting logistics with estimated severity Level 3/3 (65% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Routine maintenance completed smoothly at Chennai container terminal with zero vessel waiting times",
+      "id": "SCEN-06",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 2.6281028254837935,
+        "median_drop": 1.390499098101862,
+        "n_samples": 10000,
+        "p95_drop": 11.385719510825371,
+        "p99_drop": 20.00804259042114,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 339.05,
+            "median_loss_crore": 209.54,
+            "pcar_95_crore": 1333.97,
+            "pcar_99_crore": 2160.52,
+            "worst_case_loss_crore": 3129.06
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 272.48,
+            "median_loss_crore": 168.4,
+            "pcar_95_crore": 1072.05,
+            "pcar_99_crore": 1736.31,
+            "worst_case_loss_crore": 2514.68
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 876.15,
+            "median_loss_crore": 541.49,
+            "pcar_95_crore": 3447.17,
+            "pcar_99_crore": 5583.11,
+            "worst_case_loss_crore": 8085.95
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 345.85,
+            "median_loss_crore": 213.74,
+            "pcar_95_crore": 1360.72,
+            "pcar_99_crore": 2203.86,
+            "worst_case_loss_crore": 3191.82
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 5529.17340975431,
+          "median_loss_crore": 3417.1741869432726,
+          "pcar_95_crore": 21754.16743097676,
+          "pcar_99_crore": 35233.57414582001,
+          "worst_case_loss_crore": 51028.36651437272
+        }
+      },
+      "risk_class": "LOW",
+      "risk_score": 0.0,
+      "signal": {
+        "action_thoughts": [
+          "Maintain standard operational monitoring.",
+          "No supply chain escalation or knowledge graph traversal required.",
+          "Log entry as non-disruptive event."
+        ],
+        "affected_node": "Port/Logistics",
+        "affected_regions": [
+          "None"
+        ],
+        "component": "none",
+        "confidence": 0.89,
+        "confidence_level": "High",
+        "confidence_pct": 89,
+        "confidence_reason": "Routine corporate, commercial or maintenance event with zero supply chain disruption",
+        "disruption_type": "None",
+        "duration_days": 2,
+        "engine": "Fast Deterministic Parser",
+        "event": "Routine Operations / Non-Disruptive",
+        "event_type": "Logistics delay",
+        "expert_reasoning": [
+          "Headline reports standard commercial or operational developments with no supply chain threat.",
+          "No supplier capacity constraints, export bans, or transport bottlenecks identified.",
+          "Event filtered at Stage 1 (Relevance Filtering) per AlMahri et al. (2026) architecture."
+        ],
+        "headline": "Routine maintenance completed smoothly at Chennai container terminal with zero vessel waiting times",
+        "impacted_industries": [
+          "Automotive"
+        ],
+        "is_disruption": false,
+        "lead_time_weeks": 0,
+        "severity": 0,
+        "severity_pct": 0,
+        "summary": "Non-disruptive event filtered out during Stage 1 relevance screening."
+      },
+      "threshold_directive": "Maintain Standard Operations & Routine Monitoring"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "China restricts gallium and germanium exports citing national security, sparking acute raw material shortages",
+      "id": "SCEN-07",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 27.241862632521933,
+        "median_drop": 33.35400824601844,
+        "n_samples": 10000,
+        "p95_drop": 40.33917121952191,
+        "p99_drop": 42.77022118198531,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 68563.34,
+              "macro_pcar_95_crore": 112012.22,
+              "macro_pcar_99_crore": 121858.5
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 4204.3,
+            "median_loss_crore": 4617.53,
+            "pcar_95_crore": 6868.59,
+            "pcar_99_crore": 7472.36,
+            "worst_case_loss_crore": 8653.16
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 68563.34,
+              "macro_pcar_95_crore": 112012.22,
+              "macro_pcar_99_crore": 121858.5
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 3378.8,
+            "median_loss_crore": 3710.89,
+            "pcar_95_crore": 5519.96,
+            "pcar_99_crore": 6005.19,
+            "worst_case_loss_crore": 6954.14
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 68563.34,
+              "macro_pcar_95_crore": 112012.22,
+              "macro_pcar_99_crore": 121858.5
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 10864.55,
+            "median_loss_crore": 11932.38,
+            "pcar_95_crore": 17749.46,
+            "pcar_99_crore": 19309.7,
+            "worst_case_loss_crore": 22361.05
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 68563.34,
+              "macro_pcar_95_crore": 112012.22,
+              "macro_pcar_99_crore": 121858.5
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 4288.64,
+            "median_loss_crore": 4710.15,
+            "pcar_95_crore": 7006.36,
+            "pcar_99_crore": 7622.25,
+            "worst_case_loss_crore": 8826.73
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 68563.33864052952,
+          "median_loss_crore": 75302.14435767691,
+          "pcar_95_crore": 112012.21716365089,
+          "pcar_99_crore": 121858.49663878555,
+          "worst_case_loss_crore": 141114.79174095954
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.878,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to China.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical gallium and germanium inputs."
+        ],
+        "affected_node": "Raw Material Supplier",
+        "affected_regions": [
+          "China"
+        ],
+        "companies": [],
+        "component": "gallium and germanium",
+        "confidence": 0.85,
+        "confidence_level": "High",
+        "confidence_pct": 85,
+        "confidence_reason": "Identified Trade Policy affecting gallium and germanium in China (2 critical disruption cues detected)",
+        "disruption_type": "Trade Policy",
+        "duration_days": 33,
+        "engine": "Fast Deterministic Parser",
+        "event": "China restricts gallium and germanium exports citing national security, sparking...",
+        "event_type": "Export ban/restriction",
+        "expert_reasoning": [
+          "Event represents a Trade Policy affecting gallium and germanium sourcing from China.",
+          "Automotive tier dependencies in China indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 4 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "China restricts gallium and germanium exports citing national security, sparking acute raw material shortages",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 4,
+        "region": "China",
+        "severity": 2,
+        "severity_pct": 69,
+        "summary": "Trade Policy disruption detected in China impacting gallium and germanium with estimated severity Level 2/3 (85% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Global lithium and cobalt refinery curbs create Tier-4 supply shock for EV battery manufacturers",
+      "id": "SCEN-08",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 23.491105196291763,
+        "median_drop": 29.29640352018958,
+        "n_samples": 10000,
+        "p95_drop": 36.68856301908563,
+        "p99_drop": 39.15714805152764,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 58518.11,
+              "macro_pcar_95_crore": 97898.1,
+              "macro_pcar_99_crore": 108461.96
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 3588.33,
+            "median_loss_crore": 3956.67,
+            "pcar_95_crore": 6003.11,
+            "pcar_99_crore": 6650.89,
+            "worst_case_loss_crore": 8067.84
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 58518.11,
+              "macro_pcar_95_crore": 97898.1,
+              "macro_pcar_99_crore": 108461.96
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 2883.77,
+            "median_loss_crore": 3179.79,
+            "pcar_95_crore": 4824.42,
+            "pcar_99_crore": 5345.01,
+            "worst_case_loss_crore": 6483.74
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 58518.11,
+              "macro_pcar_95_crore": 97898.1,
+              "macro_pcar_99_crore": 108461.96
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 9272.78,
+            "median_loss_crore": 10224.62,
+            "pcar_95_crore": 15512.93,
+            "pcar_99_crore": 17186.88,
+            "worst_case_loss_crore": 20848.5
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 58518.11,
+              "macro_pcar_95_crore": 97898.1,
+              "macro_pcar_99_crore": 108461.96
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 3660.31,
+            "median_loss_crore": 4036.03,
+            "pcar_95_crore": 6123.53,
+            "pcar_99_crore": 6784.3,
+            "worst_case_loss_crore": 8229.67
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 58518.10724185977,
+          "median_loss_crore": 64524.92973802834,
+          "pcar_95_crore": 97898.0973595262,
+          "pcar_99_crore": 108461.9551449329,
+          "worst_case_loss_crore": 131569.46072108092
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.79,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to Global.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical critical raw materials inputs."
+        ],
+        "affected_node": "Raw Material Supplier",
+        "affected_regions": [
+          "Global"
+        ],
+        "companies": [],
+        "component": "critical raw materials",
+        "confidence": 0.65,
+        "confidence_level": "Medium",
+        "confidence_pct": 65,
+        "confidence_reason": "Identified Raw Material Shortage affecting critical raw materials in Global (0 critical disruption cues detected)",
+        "disruption_type": "Raw Material Shortage",
+        "duration_days": 19,
+        "engine": "Fast Deterministic Parser",
+        "event": "Global lithium and cobalt refinery curbs create Tier-4 supply shock for EV batte...",
+        "event_type": "Raw material shortage",
+        "expert_reasoning": [
+          "Event represents a Raw Material Shortage affecting critical raw materials sourcing from Global.",
+          "Automotive tier dependencies in Global indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 2 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Global lithium and cobalt refinery curbs create Tier-4 supply shock for EV battery manufacturers",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 2,
+        "region": "Global",
+        "severity": 1,
+        "severity_pct": 42,
+        "summary": "Raw Material Shortage disruption detected in Global impacting critical raw materials with estimated severity Level 1/3 (65% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Leading automaker celebrates milestone with 100,000 electric vehicle sales record quarterly expansion",
+      "id": "SCEN-09",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 2.6281028254837935,
+        "median_drop": 1.390499098101862,
+        "n_samples": 10000,
+        "p95_drop": 11.385719510825371,
+        "p99_drop": 20.00804259042114,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 339.05,
+            "median_loss_crore": 209.54,
+            "pcar_95_crore": 1333.97,
+            "pcar_99_crore": 2160.52,
+            "worst_case_loss_crore": 3129.06
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 272.48,
+            "median_loss_crore": 168.4,
+            "pcar_95_crore": 1072.05,
+            "pcar_99_crore": 1736.31,
+            "worst_case_loss_crore": 2514.68
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 876.15,
+            "median_loss_crore": 541.49,
+            "pcar_95_crore": 3447.17,
+            "pcar_99_crore": 5583.11,
+            "worst_case_loss_crore": 8085.95
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 345.85,
+            "median_loss_crore": 213.74,
+            "pcar_95_crore": 1360.72,
+            "pcar_99_crore": 2203.86,
+            "worst_case_loss_crore": 3191.82
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 5529.17340975431,
+          "median_loss_crore": 3417.1741869432726,
+          "pcar_95_crore": 21754.16743097676,
+          "pcar_99_crore": 35233.57414582001,
+          "worst_case_loss_crore": 51028.36651437272
+        }
+      },
+      "risk_class": "LOW",
+      "risk_score": 0.0,
+      "signal": {
+        "action_thoughts": [
+          "Maintain standard operational monitoring.",
+          "No supply chain escalation or knowledge graph traversal required.",
+          "Log entry as non-disruptive event."
+        ],
+        "affected_node": "Assembly Hub",
+        "affected_regions": [
+          "None"
+        ],
+        "component": "none",
+        "confidence": 0.97,
+        "confidence_level": "High",
+        "confidence_pct": 97,
+        "confidence_reason": "Routine corporate, commercial or maintenance event with zero supply chain disruption",
+        "disruption_type": "None",
+        "duration_days": 4,
+        "engine": "Fast Deterministic Parser",
+        "event": "Routine Operations / Non-Disruptive",
+        "event_type": "Demand shock",
+        "expert_reasoning": [
+          "Headline reports standard commercial or operational developments with no supply chain threat.",
+          "No supplier capacity constraints, export bans, or transport bottlenecks identified.",
+          "Event filtered at Stage 1 (Relevance Filtering) per AlMahri et al. (2026) architecture."
+        ],
+        "headline": "Leading automaker celebrates milestone with 100,000 electric vehicle sales record quarterly expansion",
+        "impacted_industries": [
+          "Automotive"
+        ],
+        "is_disruption": false,
+        "lead_time_weeks": 0,
+        "severity": 0,
+        "severity_pct": 0,
+        "summary": "Non-disruptive event filtered out during Stage 1 relevance screening."
+      },
+      "threshold_directive": "Maintain Standard Operations & Routine Monitoring"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "German autoworkers union launches walkout strike shutting down major powertrain assembly operations",
+      "id": "SCEN-10",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 11.393636037634604,
+        "median_drop": 10.313997391842342,
+        "n_samples": 10000,
+        "p95_drop": 24.684818060938575,
+        "p99_drop": 27.657068644706314,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 27410.71,
+              "macro_pcar_95_crore": 50267.98,
+              "macro_pcar_99_crore": 57055.91
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 1680.82,
+            "median_loss_crore": 1743.69,
+            "pcar_95_crore": 3082.43,
+            "pcar_99_crore": 3498.67,
+            "worst_case_loss_crore": 4545.5
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 27410.71,
+              "macro_pcar_95_crore": 50267.98,
+              "macro_pcar_99_crore": 57055.91
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 1350.8,
+            "median_loss_crore": 1401.32,
+            "pcar_95_crore": 2477.21,
+            "pcar_99_crore": 2811.72,
+            "worst_case_loss_crore": 3653.01
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 27410.71,
+              "macro_pcar_95_crore": 50267.98,
+              "macro_pcar_99_crore": 57055.91
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 4343.5,
+            "median_loss_crore": 4505.96,
+            "pcar_95_crore": 7965.46,
+            "pcar_99_crore": 9041.08,
+            "worst_case_loss_crore": 11746.26
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 27410.71,
+              "macro_pcar_95_crore": 50267.98,
+              "macro_pcar_99_crore": 57055.91
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 1714.54,
+            "median_loss_crore": 1778.67,
+            "pcar_95_crore": 3144.26,
+            "pcar_99_crore": 3568.85,
+            "worst_case_loss_crore": 4636.68
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 27410.7071148858,
+          "median_loss_crore": 28435.93959928171,
+          "pcar_95_crore": 50267.97568863652,
+          "pcar_99_crore": 57055.91383952229,
+          "worst_case_loss_crore": 74127.59095971328
+        }
+      },
+      "risk_class": "MEDIUM",
+      "risk_score": 0.537,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to Global.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical auto parts inputs."
+        ],
+        "affected_node": "Assembly Hub",
+        "affected_regions": [
+          "Global"
+        ],
+        "companies": [],
+        "component": "auto parts",
+        "confidence": 0.75,
+        "confidence_level": "Medium",
+        "confidence_pct": 75,
+        "confidence_reason": "Identified Labour Strike affecting auto parts in Global (1 critical disruption cues detected)",
+        "disruption_type": "Labour Strike",
+        "duration_days": 45,
+        "engine": "Fast Deterministic Parser",
+        "event": "German autoworkers union launches walkout strike shutting down major powertrain ...",
+        "event_type": "Factory shutdown",
+        "expert_reasoning": [
+          "Event represents a Labour Strike affecting auto parts sourcing from Global.",
+          "Automotive tier dependencies in Global indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 4 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "German autoworkers union launches walkout strike shutting down major powertrain assembly operations",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 4,
+        "region": "Global",
+        "severity": 2,
+        "severity_pct": 61,
+        "summary": "Labour Strike disruption detected in Global impacting auto parts with estimated severity Level 2/3 (75% SLM confidence)."
+      },
+      "threshold_directive": "Increase Safety Stock & Active Weekly Monitoring"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "US West Coast dockworkers strike halts container unloading at key automotive import ports",
+      "id": "SCEN-11",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 28.239237776565073,
+        "median_drop": 34.35699410292014,
+        "n_samples": 10000,
+        "p95_drop": 41.23927897035737,
+        "p99_drop": 43.666502248044814,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 4368.88,
+            "median_loss_crore": 4798.89,
+            "pcar_95_crore": 7035.46,
+            "pcar_99_crore": 7768.2,
+            "worst_case_loss_crore": 9059.67
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 3511.06,
+            "median_loss_crore": 3856.64,
+            "pcar_95_crore": 5654.07,
+            "pcar_99_crore": 6242.93,
+            "worst_case_loss_crore": 7280.83
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 11289.83,
+            "median_loss_crore": 12401.05,
+            "pcar_95_crore": 18180.68,
+            "pcar_99_crore": 20074.17,
+            "worst_case_loss_crore": 23411.53
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 71247.22,
+              "macro_pcar_95_crore": 114733.58,
+              "macro_pcar_99_crore": 126682.91
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 4456.51,
+            "median_loss_crore": 4895.15,
+            "pcar_95_crore": 7176.59,
+            "pcar_99_crore": 7924.02,
+            "worst_case_loss_crore": 9241.39
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 71247.22177249823,
+          "median_loss_crore": 78259.79125056756,
+          "pcar_95_crore": 114733.58204832047,
+          "pcar_99_crore": 126682.90528505604,
+          "worst_case_loss_crore": 147744.0836666123
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.905,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to United States.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical logistics inputs."
+        ],
+        "affected_node": "Port/Logistics",
+        "affected_regions": [
+          "United States"
+        ],
+        "companies": [],
+        "component": "logistics",
+        "confidence": 0.85,
+        "confidence_level": "High",
+        "confidence_pct": 85,
+        "confidence_reason": "Identified Labour Strike affecting logistics in United States (2 critical disruption cues detected)",
+        "disruption_type": "Labour Strike",
+        "duration_days": 77,
+        "engine": "Fast Deterministic Parser",
+        "event": "US West Coast dockworkers strike halts container unloading at key automotive imp...",
+        "event_type": "Factory shutdown",
+        "expert_reasoning": [
+          "Event represents a Labour Strike affecting logistics sourcing from United States.",
+          "Automotive tier dependencies in United States indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 8 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "US West Coast dockworkers strike halts container unloading at key automotive import ports",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 8,
+        "region": "United States",
+        "severity": 3,
+        "severity_pct": 82,
+        "summary": "Labour Strike disruption detected in United States impacting logistics with estimated severity Level 3/3 (85% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Automotive supplier union successfully concludes annual wage agreement without work stoppage",
+      "id": "SCEN-12",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 2.6281028254837935,
+        "median_drop": 1.390499098101862,
+        "n_samples": 10000,
+        "p95_drop": 11.385719510825371,
+        "p99_drop": 20.00804259042114,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 339.05,
+            "median_loss_crore": 209.54,
+            "pcar_95_crore": 1333.97,
+            "pcar_99_crore": 2160.52,
+            "worst_case_loss_crore": 3129.06
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 272.48,
+            "median_loss_crore": 168.4,
+            "pcar_95_crore": 1072.05,
+            "pcar_99_crore": 1736.31,
+            "worst_case_loss_crore": 2514.68
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 876.15,
+            "median_loss_crore": 541.49,
+            "pcar_95_crore": 3447.17,
+            "pcar_99_crore": 5583.11,
+            "worst_case_loss_crore": 8085.95
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 5529.17,
+              "macro_pcar_95_crore": 21754.17,
+              "macro_pcar_99_crore": 35233.57
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 345.85,
+            "median_loss_crore": 213.74,
+            "pcar_95_crore": 1360.72,
+            "pcar_99_crore": 2203.86,
+            "worst_case_loss_crore": 3191.82
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 5529.17340975431,
+          "median_loss_crore": 3417.1741869432726,
+          "pcar_95_crore": 21754.16743097676,
+          "pcar_99_crore": 35233.57414582001,
+          "worst_case_loss_crore": 51028.36651437272
+        }
+      },
+      "risk_class": "LOW",
+      "risk_score": 0.0,
+      "signal": {
+        "action_thoughts": [
+          "Maintain standard operational monitoring.",
+          "No supply chain escalation or knowledge graph traversal required.",
+          "Log entry as non-disruptive event."
+        ],
+        "affected_node": "Tier-1 Supplier",
+        "affected_regions": [
+          "None"
+        ],
+        "component": "none",
+        "confidence": 0.93,
+        "confidence_level": "High",
+        "confidence_pct": 93,
+        "confidence_reason": "Routine corporate, commercial or maintenance event with zero supply chain disruption",
+        "disruption_type": "None",
+        "duration_days": 6,
+        "engine": "Fast Deterministic Parser",
+        "event": "Routine Operations / Non-Disruptive",
+        "event_type": "Logistics delay",
+        "expert_reasoning": [
+          "Headline reports standard commercial or operational developments with no supply chain threat.",
+          "No supplier capacity constraints, export bans, or transport bottlenecks identified.",
+          "Event filtered at Stage 1 (Relevance Filtering) per AlMahri et al. (2026) architecture."
+        ],
+        "headline": "Automotive supplier union successfully concludes annual wage agreement without work stoppage",
+        "impacted_industries": [
+          "Automotive"
+        ],
+        "is_disruption": false,
+        "lead_time_weeks": 0,
+        "severity": 0,
+        "severity_pct": 0,
+        "summary": "Non-disruptive event filtered out during Stage 1 relevance screening."
+      },
+      "threshold_directive": "Maintain Standard Operations & Routine Monitoring"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Magnitude 7.4 earthquake strikes Taiwan, forcing emergency shutdown at major Hsinchu semiconductor fabs",
+      "id": "SCEN-13",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 25.830777794107348,
+        "median_drop": 31.92676527988482,
+        "n_samples": 10000,
+        "p95_drop": 39.09830889664173,
+        "p99_drop": 41.54052800909399,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 64716.04,
+              "macro_pcar_95_crore": 106754.41,
+              "macro_pcar_99_crore": 117198.45
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 3968.39,
+            "median_loss_crore": 4361.51,
+            "pcar_95_crore": 6546.18,
+            "pcar_99_crore": 7186.61,
+            "worst_case_loss_crore": 8071.31
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 64716.04,
+              "macro_pcar_95_crore": 106754.41,
+              "macro_pcar_99_crore": 117198.45
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 3189.21,
+            "median_loss_crore": 3505.14,
+            "pcar_95_crore": 5260.86,
+            "pcar_99_crore": 5775.54,
+            "worst_case_loss_crore": 6486.53
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 64716.04,
+              "macro_pcar_95_crore": 106754.41,
+              "macro_pcar_99_crore": 117198.45
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 10254.9,
+            "median_loss_crore": 11270.8,
+            "pcar_95_crore": 16916.3,
+            "pcar_99_crore": 18571.27,
+            "worst_case_loss_crore": 20857.47
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 64716.04,
+              "macro_pcar_95_crore": 106754.41,
+              "macro_pcar_99_crore": 117198.45
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 4047.99,
+            "median_loss_crore": 4449.0,
+            "pcar_95_crore": 6677.49,
+            "pcar_99_crore": 7330.76,
+            "worst_case_loss_crore": 8233.21
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 64716.041276224125,
+          "median_loss_crore": 71127.10441464797,
+          "pcar_95_crore": 106754.41097882109,
+          "pcar_99_crore": 117198.45310879465,
+          "worst_case_loss_crore": 131626.11566582986
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.848,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to Taiwan.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical semiconductor inputs."
+        ],
+        "affected_node": "Semiconductor Fab",
+        "affected_regions": [
+          "Taiwan"
+        ],
+        "companies": [],
+        "component": "semiconductor",
+        "confidence": 0.95,
+        "confidence_level": "High",
+        "confidence_pct": 95,
+        "confidence_reason": "Identified Natural Disaster affecting semiconductor in Taiwan (3 critical disruption cues detected)",
+        "disruption_type": "Natural Disaster",
+        "duration_days": 90,
+        "engine": "Fast Deterministic Parser",
+        "event": "Magnitude 7.4 earthquake strikes Taiwan, forcing emergency shutdown at major Hsi...",
+        "event_type": "Factory shutdown",
+        "expert_reasoning": [
+          "Event represents a Natural Disaster affecting semiconductor sourcing from Taiwan.",
+          "Automotive tier dependencies in Taiwan indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 8 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Magnitude 7.4 earthquake strikes Taiwan, forcing emergency shutdown at major Hsinchu semiconductor fabs",
+        "impacted_industries": [
+          "Automotive",
+          "Semiconductors"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 8,
+        "region": "Taiwan",
+        "severity": 3,
+        "severity_pct": 87,
+        "summary": "Natural Disaster disruption detected in Taiwan impacting semiconductor with estimated severity Level 3/3 (95% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Kyushu flash floods submerge silicon wafer processing facilities across southern Japan",
+      "id": "SCEN-14",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 19.081840694370605,
+        "median_drop": 24.03768582225623,
+        "n_samples": 10000,
+        "p95_drop": 32.339575819097995,
+        "p99_drop": 34.94639771150303,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 46754.75,
+              "macro_pcar_95_crore": 81909.63,
+              "macro_pcar_99_crore": 91636.14
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 2867.0,
+            "median_loss_crore": 3127.83,
+            "pcar_95_crore": 5022.7,
+            "pcar_99_crore": 5619.13,
+            "worst_case_loss_crore": 6583.37
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 46754.75,
+              "macro_pcar_95_crore": 81909.63,
+              "macro_pcar_99_crore": 91636.14
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 2304.07,
+            "median_loss_crore": 2513.69,
+            "pcar_95_crore": 4036.51,
+            "pcar_99_crore": 4515.83,
+            "worst_case_loss_crore": 5290.75
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 46754.75,
+              "macro_pcar_95_crore": 81909.63,
+              "macro_pcar_99_crore": 91636.14
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 7408.76,
+            "median_loss_crore": 8082.78,
+            "pcar_95_crore": 12979.4,
+            "pcar_99_crore": 14520.66,
+            "worst_case_loss_crore": 17012.41
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 46754.75,
+              "macro_pcar_95_crore": 81909.63,
+              "macro_pcar_99_crore": 91636.14
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 2924.51,
+            "median_loss_crore": 3190.57,
+            "pcar_95_crore": 5123.45,
+            "pcar_99_crore": 5731.84,
+            "worst_case_loss_crore": 6715.42
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 46754.74747600778,
+          "median_loss_crore": 51008.321625300785,
+          "pcar_95_crore": 81909.62921128003,
+          "pcar_99_crore": 91636.13677778502,
+          "worst_case_loss_crore": 107360.90803961549
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.689,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to Japan.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical semiconductor inputs."
+        ],
+        "affected_node": "Semiconductor Fab",
+        "affected_regions": [
+          "Japan"
+        ],
+        "companies": [],
+        "component": "semiconductor",
+        "confidence": 0.65,
+        "confidence_level": "Medium",
+        "confidence_pct": 65,
+        "confidence_reason": "Identified Natural Disaster affecting semiconductor in Japan (0 critical disruption cues detected)",
+        "disruption_type": "Natural Disaster",
+        "duration_days": 27,
+        "engine": "Fast Deterministic Parser",
+        "event": "Kyushu flash floods submerge silicon wafer processing facilities across southern...",
+        "event_type": "Natural disaster",
+        "expert_reasoning": [
+          "Event represents a Natural Disaster affecting semiconductor sourcing from Japan.",
+          "Automotive tier dependencies in Japan indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 2 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Kyushu flash floods submerge silicon wafer processing facilities across southern Japan",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 2,
+        "region": "Japan",
+        "severity": 1,
+        "severity_pct": 35,
+        "summary": "Natural Disaster disruption detected in Japan impacting semiconductor with estimated severity Level 1/3 (65% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    },
+    {
+      "cost_adjusted_directive": "Qualify Dual Source",
+      "headline": "Tropical typhoon damages coastal breakwaters at Busan Port, halting vessel docking operations",
+      "id": "SCEN-15",
+      "monte_carlo": {
+        "distribution_source": "calibrated_estimate",
+        "mean_drop": 18.20907694704038,
+        "median_drop": 23.00467114814888,
+        "n_samples": 10000,
+        "p95_drop": 31.66502214656956,
+        "p99_drop": 34.23297859593022,
+        "random_seed": 42
+      },
+      "pcar": {
+        "companies": {
+          "Hyundai India": {
+            "allocation_factor": 0.0613,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Hyundai India",
+            "dependency_ratio_pct": 42.0,
+            "effective_base_crore": 8205.5,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 44345.57,
+              "macro_pcar_95_crore": 78812.7,
+              "macro_pcar_99_crore": 88417.35
+            },
+            "market_share_pct": 14.6,
+            "mean_loss_crore": 2719.27,
+            "median_loss_crore": 2964.21,
+            "pcar_95_crore": 4832.79,
+            "pcar_99_crore": 5421.75,
+            "worst_case_loss_crore": 6704.01
+          },
+          "Mahindra": {
+            "allocation_factor": 0.0493,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Mahindra",
+            "dependency_ratio_pct": 44.0,
+            "effective_base_crore": 6594.37,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 44345.57,
+              "macro_pcar_95_crore": 78812.7,
+              "macro_pcar_99_crore": 88417.35
+            },
+            "market_share_pct": 11.2,
+            "mean_loss_crore": 2185.35,
+            "median_loss_crore": 2382.2,
+            "pcar_95_crore": 3883.89,
+            "pcar_99_crore": 4357.21,
+            "worst_case_loss_crore": 5387.7
+          },
+          "Maruti Suzuki": {
+            "allocation_factor": 0.1585,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Maruti Suzuki",
+            "dependency_ratio_pct": 38.0,
+            "effective_base_crore": 21204.22,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 44345.57,
+              "macro_pcar_95_crore": 78812.7,
+              "macro_pcar_99_crore": 88417.35
+            },
+            "market_share_pct": 41.7,
+            "mean_loss_crore": 7027.0,
+            "median_loss_crore": 7659.96,
+            "pcar_95_crore": 12488.66,
+            "pcar_99_crore": 14010.61,
+            "worst_case_loss_crore": 17324.16
+          },
+          "Tata Motors": {
+            "allocation_factor": 0.0626,
+            "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+            "company_name": "Tata Motors",
+            "dependency_ratio_pct": 45.0,
+            "effective_base_crore": 8370.09,
+            "industry_baseline_crore": 133814.34,
+            "macro_reference": {
+              "macro_mean_loss_crore": 44345.57,
+              "macro_pcar_95_crore": 78812.7,
+              "macro_pcar_99_crore": 88417.35
+            },
+            "market_share_pct": 13.9,
+            "mean_loss_crore": 2773.82,
+            "median_loss_crore": 3023.67,
+            "pcar_95_crore": 4929.73,
+            "pcar_99_crore": 5530.5,
+            "worst_case_loss_crore": 6838.48
+          }
+        },
+        "macro": {
+          "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+          "company_name": "Entire Indian Automotive Industry",
+          "dependency_ratio_pct": 100.0,
+          "effective_base_crore": 133814.34,
+          "industry_baseline_crore": 133814.34,
+          "market_share_pct": 100.0,
+          "mean_loss_crore": 44345.57393708928,
+          "median_loss_crore": 48340.02819497783,
+          "pcar_95_crore": 78812.69942267776,
+          "pcar_99_crore": 88417.34559273897,
+          "worst_case_loss_crore": 109328.2694327514
+        }
+      },
+      "risk_class": "HIGH",
+      "risk_score": 0.674,
+      "signal": {
+        "action_thoughts": [
+          "Map all Tier-1 and Tier-2 automotive component suppliers linked to South Korea.",
+          "Trigger deterministic risk scoring to quantify exposure breadth and dependency ratio.",
+          "Prepare counterfactual sourcing alternatives for critical logistics inputs."
+        ],
+        "affected_node": "Port/Logistics",
+        "affected_regions": [
+          "South Korea"
+        ],
+        "companies": [],
+        "component": "logistics",
+        "confidence": 0.75,
+        "confidence_level": "Medium",
+        "confidence_pct": 75,
+        "confidence_reason": "Identified Natural Disaster affecting logistics in South Korea (1 critical disruption cues detected)",
+        "disruption_type": "Natural Disaster",
+        "duration_days": 22,
+        "engine": "Fast Deterministic Parser",
+        "event": "Tropical typhoon damages coastal breakwaters at Busan Port, halting vessel docki...",
+        "event_type": "Factory shutdown",
+        "expert_reasoning": [
+          "Event represents a Natural Disaster affecting logistics sourcing from South Korea.",
+          "Automotive tier dependencies in South Korea indicate vulnerability at sub-tier supplier levels.",
+          "Anticipated operational buffer exhaustion within 2 weeks unless alternative sourcing is engaged."
+        ],
+        "headline": "Tropical typhoon damages coastal breakwaters at Busan Port, halting vessel docking operations",
+        "impacted_industries": [
+          "Automotive",
+          "Logistics"
+        ],
+        "is_disruption": true,
+        "lead_time_weeks": 2,
+        "region": "South Korea",
+        "severity": 1,
+        "severity_pct": 37,
+        "summary": "Natural Disaster disruption detected in South Korea impacting logistics with estimated severity Level 1/3 (75% SLM confidence)."
+      },
+      "threshold_directive": "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
+    }
+  ],
+  "siam_backtests": {
+    "dashboard_case": {
+      "distribution_source": "calibrated_estimate",
+      "mean_drop": 25.830777794107348,
+      "mean_gap_pp": -15.369222205892655,
+      "median_drop": 31.92676527988482,
+      "n_samples": 10000,
+      "p95_drop": 39.09830889664173,
+      "p95_gap_pp": -2.10169110335827,
+      "p99_drop": 41.54052800909399,
+      "random_seed": 42,
+      "target_actual_pct": 41.2
+    },
+    "data_source_case": {
+      "distribution_source": "calibrated_estimate",
+      "mean_drop": 25.85860179410735,
+      "median_drop": 31.966765279884818,
+      "n_samples": 10000,
+      "p95_drop": 39.13830889664173,
+      "p95_gap_pp": 1.678308896641731,
+      "p99_drop": 41.58052800909399,
+      "random_seed": 42,
+      "target_actual_pct": 37.46
+    }
+  }
+}
