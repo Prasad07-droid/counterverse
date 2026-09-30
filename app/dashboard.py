@@ -1801,7 +1801,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
             </div>
             """, unsafe_allow_html=True)
 
-        st.caption("📌 **Data Provenance**: Source: UN Comtrade 2022 · 🟡 Cached Fallback (HS 8542: ₹1,33,814.34 Cr · HS 8112: ₹552.86 Cr · Audited Annual Baseline @ ₹83.0/USD). HS 8112 is a broad basket covering other metals besides gallium and germanium, so it is used only as an upstream proxy.")
+        st.caption("📌 **Data Provenance**: Source: UN Comtrade 2022 · 🟡 Cached Fallback (HS 8542: ₹1,33,814.34 Cr · HS 8112: ₹552.86 Cr · Audited Annual Baseline @ ₹83.0/USD). HS 8112 is a broad basket covering other metals besides gallium and germanium, so it is used only as an upstream proxy. Automotive MCUs are primarily silicon-based; Ga/Ge is modeled as a compound-semiconductor stress-test pathway (GaN/GaAs/SiGe).")
         st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
 
         # Build year-by-year table

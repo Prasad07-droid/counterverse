@@ -15,7 +15,7 @@ Placeholder calibration facts (cite when used):
 
 ## HS 8112 Scope Caveat
 
-HS 8112 is not a gallium/germanium-only series. It also covers beryllium, chromium, vanadium, hafnium, indium, niobium, rhenium, thallium, and related articles, waste, and scrap. The aggregate HS 8112 baseline is therefore an upstream proxy and must not be presented as a measured gallium/germanium procurement total.
+HS 8112 is not a gallium/germanium-only series. It also covers beryllium, chromium, vanadium, hafnium, indium, niobium, rhenium, thallium, and related articles, waste, and scrap. The aggregate HS 8112 baseline is therefore an upstream proxy and must not be presented as a measured gallium/germanium procurement total. Mainstream automotive microcontrollers are silicon-based; gallium/germanium relevance is modeled only as a stress-test pathway through compound-semiconductor applications such as GaN, GaAs, and SiGe. The scenario must not imply that conventional silicon MCUs are fabricated from gallium or germanium.
 
 ---
 
