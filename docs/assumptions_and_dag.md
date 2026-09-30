@@ -13,6 +13,12 @@ Placeholder calibration facts (cite when used):
 
 ---
 
+## HS 8112 Scope Caveat
+
+HS 8112 is not a gallium/germanium-only series. It also covers beryllium, chromium, vanadium, hafnium, indium, niobium, rhenium, thallium, and related articles, waste, and scrap. The aggregate HS 8112 baseline is therefore an upstream proxy and must not be presented as a measured gallium/germanium procurement total.
+
+---
+
 ## Independence of Calibration and Validation
 
 This section documents whether any input variable feeding the Bayesian priors or severity classification in the September 2021 SIAM scenario was set with knowledge of the actual outcome (41.2% worst-month capacity drop; 54.0% Maruti Suzuki peak drop).

@@ -204,6 +204,7 @@ See interactive docs at `http://localhost:8000/docs` after launching the API.
 
 - Sensitivity ±20% on CPTs is a **robustness check on assumptions**, not a confidence interval.
 - PCaR numbers are **simulated under documented assumptions** using UN Comtrade macro trade volumes.
+- HS 8112 is a broad tariff basket covering several metals besides gallium and germanium; its aggregate value is used only as an upstream proxy.
 - This system does **not** predict future IIP or access proprietary OEM financials.
 
 ---
