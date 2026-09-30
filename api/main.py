@@ -146,6 +146,11 @@ class PcarRequest(BaseModel):
         default=None,
         description="Custom BOM baseline in Crore INR (overrides UN Comtrade default)"
     )
+    baseline_output_value_crore: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        description="Optional output-value baseline in Crore INR; omitted means lost-output metrics are unavailable"
+    )
 
 class PcarResponse(BaseModel):
     """Response for /calculate-pcar."""
@@ -155,6 +160,13 @@ class PcarResponse(BaseModel):
     pcar_95_crore: float
     pcar_99_crore: float
     worst_case_loss_crore: float
+    extra_procurement_cost_mean_crore: float
+    extra_procurement_cost_p95_crore: float
+    extra_procurement_cost_p99_crore: float
+    lost_output_value_mean_crore: Optional[float] = None
+    lost_output_value_p95_crore: Optional[float] = None
+    lost_output_value_p99_crore: Optional[float] = None
+    lost_output_value_status: str
     market_share_pct: Optional[float] = None
     dependency_ratio_pct: Optional[float] = None
     pipeline_time_ms: float
@@ -171,7 +183,12 @@ class CustomBOMRequest(BaseModel):
     components: List[BOMComponentItem] = Field(..., min_length=1, description="List of BOM line items")
     risk_score: float = Field(default=0.65, ge=0.0, le=1.0, description="Input risk score")
     mc_samples: int = Field(default=10000, ge=100, le=500000, description="Monte Carlo draws")
-    ground_against_graph: bool = Field(default=True, description="Verify components against GraphRAG")
+    ground_against_graph: bool = Field(default=True, description="Verify components against the grounding graph")
+    baseline_output_value_crore: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        description="Optional output-value baseline in Crore INR"
+    )
 
 class CustomBOMResponse(BaseModel):
     """Response for /calculate-custom-bom."""
@@ -182,6 +199,13 @@ class CustomBOMResponse(BaseModel):
     pcar_95_crore: float
     pcar_99_crore: float
     worst_case_loss_crore: float
+    extra_procurement_cost_mean_crore: float
+    extra_procurement_cost_p95_crore: float
+    extra_procurement_cost_p99_crore: float
+    lost_output_value_mean_crore: Optional[float] = None
+    lost_output_value_p95_crore: Optional[float] = None
+    lost_output_value_p99_crore: Optional[float] = None
+    lost_output_value_status: str
     component_grounding: List[Dict[str, Any]]
     pipeline_time_ms: float
 
@@ -399,9 +423,19 @@ async def calculate_pcar_endpoint(req: PcarRequest):
     baseline = req.custom_baseline_crore or SOURCED_HS8542_BASELINE_CRORE
 
     if req.company in ("Entire Indian Automotive Industry", "Macro (aggregate)"):
-        pcar = calculate_pcar(mc_result, baseline_revenue_crore=baseline, company_name="Entire Indian Automotive Industry")
+        pcar = calculate_pcar(
+            mc_result,
+            baseline_revenue_crore=baseline,
+            company_name="Entire Indian Automotive Industry",
+            baseline_output_value_crore=req.baseline_output_value_crore,
+        )
     else:
-        macro_pcar = calculate_pcar(mc_result, baseline_revenue_crore=baseline, company_name="Entire Indian Automotive Industry")
+        macro_pcar = calculate_pcar(
+            mc_result,
+            baseline_revenue_crore=baseline,
+            company_name="Entire Indian Automotive Industry",
+            baseline_output_value_crore=req.baseline_output_value_crore,
+        )
         try:
             pcar = calculate_pcar_by_company(req.company, macro_pcar)
         except ValueError:
@@ -419,6 +453,16 @@ async def calculate_pcar_endpoint(req: PcarRequest):
         pcar_95_crore=round(pcar.get("pcar_95_crore", 0.0), 2),
         pcar_99_crore=round(pcar.get("pcar_99_crore", 0.0), 2),
         worst_case_loss_crore=round(pcar.get("worst_case_loss_crore", 0.0), 2),
+        extra_procurement_cost_mean_crore=round(pcar.get("extra_procurement_cost_mean_crore", 0.0), 2),
+        extra_procurement_cost_p95_crore=round(pcar.get("extra_procurement_cost_p95_crore", 0.0), 2),
+        extra_procurement_cost_p99_crore=round(pcar.get("extra_procurement_cost_p99_crore", 0.0), 2),
+        lost_output_value_mean_crore=pcar.get("lost_output_value_mean_crore"),
+        lost_output_value_p95_crore=pcar.get("lost_output_value_p95_crore"),
+        lost_output_value_p99_crore=pcar.get("lost_output_value_p99_crore"),
+        lost_output_value_status=pcar.get(
+            "lost_output_value_status",
+            "not_calculated_missing_output_value_baseline",
+        ),
         market_share_pct=pcar.get("market_share_pct"),
         dependency_ratio_pct=pcar.get("dependency_ratio_pct"),
         pipeline_time_ms=round(elapsed_ms, 1),
@@ -462,6 +506,7 @@ async def calculate_custom_bom(req: CustomBOMRequest):
             bom_components=components_raw,
             company_name=req.company_name,
             ground_against_graph=req.ground_against_graph,
+            baseline_output_value_crore=req.baseline_output_value_crore,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -476,6 +521,16 @@ async def calculate_custom_bom(req: CustomBOMRequest):
         pcar_95_crore=round(float(custom_pcar.get("pcar_95_crore", 0.0)), 2),
         pcar_99_crore=round(float(custom_pcar.get("pcar_99_crore", 0.0)), 2),
         worst_case_loss_crore=round(float(custom_pcar.get("worst_case_loss_crore", 0.0)), 2),
+        extra_procurement_cost_mean_crore=round(float(custom_pcar.get("extra_procurement_cost_mean_crore", 0.0)), 2),
+        extra_procurement_cost_p95_crore=round(float(custom_pcar.get("extra_procurement_cost_p95_crore", 0.0)), 2),
+        extra_procurement_cost_p99_crore=round(float(custom_pcar.get("extra_procurement_cost_p99_crore", 0.0)), 2),
+        lost_output_value_mean_crore=custom_pcar.get("lost_output_value_mean_crore"),
+        lost_output_value_p95_crore=custom_pcar.get("lost_output_value_p95_crore"),
+        lost_output_value_p99_crore=custom_pcar.get("lost_output_value_p99_crore"),
+        lost_output_value_status=custom_pcar.get(
+            "lost_output_value_status",
+            "not_calculated_missing_output_value_baseline",
+        ),
         component_grounding=custom_pcar.get("component_grounding", custom_pcar.get("grounding_results", [])),
         pipeline_time_ms=round(elapsed_ms, 1),
     )
@@ -537,8 +592,8 @@ def _fallback_signal(headline: str) -> dict:
 
 
 def _sanitize_pcar(pcar: dict) -> dict:
-    """Remove numpy arrays from PCaR result for JSON serialization."""
-    return {k: v for k, v in pcar.items() if k != "_loss_samples"}
+    """Remove internal sample arrays from PCaR results for JSON serialization."""
+    return {k: v for k, v in pcar.items() if not k.startswith("_")}
 
 
 def _safe_dict(d: Any) -> dict:

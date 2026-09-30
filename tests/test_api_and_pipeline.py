@@ -277,7 +277,29 @@ class TestCustomBOM:
         assert result["bom_type"] == "custom"
         assert result["total_baseline_crore"] == 7000.0
         assert result["pcar_95_crore"] > 0
+        assert result["extra_procurement_cost_mean_crore"] > 0
+        assert result["lost_output_value_mean_crore"] is None
+        assert result["lost_output_value_status"] == "not_calculated_missing_output_value_baseline"
         assert len(result["component_pcars"]) == 2
+
+    def test_pcar_separates_procurement_premium_from_output_value(self):
+        from src.module_e_pcar import calculate_pcar
+
+        samples = np.array([0.0, 10.0, 20.0])
+        np.random.seed(42)
+        result = calculate_pcar(
+            samples,
+            baseline_revenue_crore=1000.0,
+            company_name="Entire Indian Automotive Industry",
+            baseline_output_value_crore=5000.0,
+        )
+
+        baseline_disrupted_spend = float(np.mean(samples / 100.0 * 1000.0))
+        assert result["mean_loss_crore"] == pytest.approx(
+            baseline_disrupted_spend + result["extra_procurement_cost_mean_crore"]
+        )
+        assert result["lost_output_value_mean_crore"] == pytest.approx(500.0)
+        assert result["lost_output_value_status"] == "calculated_from_caller_supplied_output_baseline"
 
     def test_calculate_pcar_custom_bom_empty_raises(self):
         from src.module_e_pcar import calculate_pcar_custom_bom
@@ -348,6 +370,22 @@ class TestFastAPI:
         data = resp.json()
         assert data["company_name"] == "Tata Motors"
         assert data["pcar_95_crore"] > 0
+        assert data["extra_procurement_cost_mean_crore"] > 0
+        assert data["lost_output_value_mean_crore"] is None
+        assert data["lost_output_value_status"] == "not_calculated_missing_output_value_baseline"
+
+    def test_pcar_with_output_value_baseline(self):
+        resp = self.client.post("/api/v1/calculate-pcar", json={
+            "company": "Entire Indian Automotive Industry",
+            "risk_score": 0.7,
+            "mc_samples": 500,
+            "baseline_output_value_crore": 500000.0,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["lost_output_value_mean_crore"] > 0
+        assert data["lost_output_value_p95_crore"] > data["lost_output_value_mean_crore"]
+        assert data["lost_output_value_status"] == "calculated_from_caller_supplied_output_baseline"
 
     def test_pcar_invalid_company(self):
         resp = self.client.post("/api/v1/calculate-pcar", json={
