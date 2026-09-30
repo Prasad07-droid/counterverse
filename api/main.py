@@ -57,6 +57,7 @@ from src.module_e_pcar import (
 from src.data_sources import (
     SOURCED_HS8542_BASELINE_CRORE,
     USD_INR_RATE,
+    load_comtrade_data,
 )
 
 logger = logging.getLogger("counterverse.api")
@@ -187,6 +188,8 @@ class CustomBOMResponse(BaseModel):
 class HealthResponse(BaseModel):
     """Response for /health."""
     status: str
+    mode: str
+    data_vintage: str
     gpu_available: bool
     gpu_name: Optional[str] = None
     slm_available: bool
@@ -493,8 +496,12 @@ async def health():
         except Exception:
             pass
 
+    comtrade_data = load_comtrade_data()
+
     return HealthResponse(
         status="healthy" if integrity else "degraded",
+        mode="slm" if SLM_AVAILABLE else "fast",
+        data_vintage=str(comtrade_data.get("data_vintage", "2022 Full Year")),
         gpu_available=_HAS_GPU,
         gpu_name=gpu_name,
         slm_available=SLM_AVAILABLE,

@@ -308,6 +308,8 @@ class TestFastAPI:
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] in ("healthy", "degraded")
+        assert data["mode"] in ("fast", "slm")
+        assert data["data_vintage"]
         assert data["graph_nodes"] >= 30
         assert data["baseline_crore"] == pytest.approx(133814.34, rel=1e-2)
 
