@@ -2092,10 +2092,11 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
 
         with st.expander("ℹ️ Formula Reliability Note", expanded=False):
             st.markdown("""
-            **Weight Provenance:** 75% of this score's weight rests on 
-            domain-asserted constants (EB, DC, TC, ED). Only 25% (Dependency 
-            Ratio) is computed from empirically measured UN Comtrade bilateral 
-            trade data.
+            **Weight Provenance:** This score is partially data-informed.
+            Dependency Ratio uses measured UN Comtrade bilateral trade shares,
+            but the upstream concentration term (`C_upstream`) and unhedged
+            exposure weight (`W_unhedged = 0.75`) are modeling assumptions.
+            EB, DC, TC, and ED also contain asserted or structural inputs.
             
             **Sensitivity:** A ±20% perturbation on any single asserted 
             constant does not flip the HIGH/MEDIUM/LOW classification for the 

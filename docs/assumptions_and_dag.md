@@ -34,15 +34,15 @@ This section documents whether any input variable feeding the Bayesian priors or
 
 ### Weight Provenance Table
 
-| Variable | Weight | Basis | Empirically Measured? |
+| Variable | Weight | Basis | Data status |
 |---|---|---|---|
 | EB (Exposure Breadth) | 35% | Domain assertion — AlMahri §3.2.5 | No — asserted constant |
-| DR (Dependency Ratio) | 25% | UN Comtrade bilateral trade shares | YES — real measured data |
+| DR (Dependency Ratio) | 25% | UN Comtrade bilateral shares plus upstream-concentration adjustment | Partially data-informed — trade shares are measured; $C_{\text{upstream}}$ and $W_{\text{unhedged}}=0.75$ are assumptions |
 | DC (Downstream Criticality) | 20% | Domain assertion — automotive ECU literature | No — asserted constant |
 | TC (Tier-1 Centrality) | 10% | Graph degree centrality (NetworkX) | Partial — topological, not economic |
 | ED (Exposure Depth) | 10% | Tier depth normalized (Tier/4.0) | Partial — structural, not economic |
 
-**Summary: 75% of formula weight rests on domain-asserted constants, 25% on empirically measured trade data (DR). This is a known limitation acknowledged in AlMahri et al. (2026) for domain-adapted implementations.**
+**Summary: the score is partially data-informed, not 25% empirically measured. DR uses measured UN Comtrade bilateral shares, but its upstream-concentration term $C_{\text{upstream}}$ and unhedged-exposure weight $W_{\text{unhedged}}=0.75$ are modeling assumptions. EB, DC, TC, and ED also contain asserted or structural inputs.**
 
 ### Sensitivity Analysis (±20% perturbation on each asserted constant)
 

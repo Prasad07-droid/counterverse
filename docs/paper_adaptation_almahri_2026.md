@@ -29,7 +29,7 @@ $$\text{Risk Score} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR} + 0.20 \cdot \
 
 Where:
 1. **$\text{EB}$ (Exposure Breadth, 35%)**: Number of disrupted sub-tier component categories affected (e.g. Gallium/Germanium = 0.90, Semiconductor = 0.85, Logistics = 0.70, Auto parts = 0.50).
-2. **$\text{DR}$ (Dependency Ratio, 25%)**: OEM reliance on the disrupted supplier/corridor, computed via empirical trade shares and upstream concentration penalties.
+2. **$\text{DR}$ (Dependency Ratio, 25%)**: OEM reliance on the disrupted supplier/corridor, partially data-informed by measured trade shares, with assumed upstream-concentration penalties ($C_{\text{upstream}}$) and an assumed unhedged-exposure weight ($W_{\text{unhedged}}=0.75$).
 3. **$\text{DC}$ (Downstream Criticality, 20%)**: Essentiality of component to assembly line continuity (ECU/Chip = 0.95, Auto parts = 0.65, Logistics = 0.60, Hardware = 0.40).
 4. **$\text{TC}$ (Tier-1 Centrality, 10%)**: Degree connectivity of exposed Tier-1 nodes across OEM vehicle models.
 5. **$\text{ED}$ (Exposure Depth, 10%)**: Normalized tier depth of disruption origin ($\text{Tier} / 4.0$).
