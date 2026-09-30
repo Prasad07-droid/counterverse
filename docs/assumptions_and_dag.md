@@ -6,6 +6,23 @@ Until then: **no CPT numbers in code.** Do not copy calibration anecdotes into t
 
 Fixed DAG: see `.cursorrules`. Do not add/remove edges without written approval.
 
+### Grounding Graph Counts (Code Output)
+
+`get_graph_summary()` reports **30 nodes and 69 directed edges**. The current edge counts by `relationship` are:
+
+| Relationship | Directed edges |
+|---|---:|
+| `operates_in` | 14 |
+| `depends_on` | 8 |
+| `supplies` | 14 |
+| `requires` | 8 |
+| `belongs_to` | 12 |
+| `exports` | 9 |
+| `imports_from` | 4 |
+| **Total** | **69** |
+
+These are deterministic code counts, not claims about completeness of the real-world supply network.
+
 Placeholder calibration facts (cite when used):
 
 - Maruti production Sep 2020 → Sep 2021: 166,086 → 81,278 (51.1%), from coverage of MSI regulatory filing (see `data/raw/oem_production/SOURCE.md`). Re-file the BSE PDF before treating as locked.
