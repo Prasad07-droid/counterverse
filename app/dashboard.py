@@ -1365,7 +1365,7 @@ body {{ background: transparent; overflow: hidden; }}
             </div>
         </div>
         <div>
-            <span>Physics Mode: Deterministic Multi-Tier Flow · 60 FPS</span>
+            <span>Physics Mode: Deterministic Multi-Tier Flow</span>
         </div>
     </div>
 </div>
@@ -2545,7 +2545,7 @@ if active_view == "01 — Executive War Room":
         st.markdown("""
         <div class="section-header" style="margin-bottom: 6px;">
             <h3>Causal Supply Chain Flow</h3>
-            <span class="section-badge">8 nodes · 9 edges · 60 FPS</span>
+            <span class="section-badge">8 nodes · 9 edges · Animated View</span>
         </div>
         """, unsafe_allow_html=True)
 
