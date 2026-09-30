@@ -12,7 +12,7 @@ No. `src/module_c_causal.py` applies a domain-informed weighted index and maps i
 
 ## 3. Is the grounding layer a full GraphRAG system?
 
-No. `src/grounding_graph.py` performs deterministic alias resolution and lookup against a static NetworkX graph. There is no embedding index, community summarization, vector retrieval, or retrieved context generation. The precise term used in project-facing text is “graph-grounded entity verification.”
+No. `src/grounding_graph.py` performs deterministic alias resolution and lookup against a static NetworkX graph. There is no embedding index, community summarization, vector retrieval, or retrieved context generation. The precise term used in project-facing text is “graph-grounded entity verification.” Unknown entities are retained as `Unverified` and receive the additive `NEEDS_HUMAN_VERIFICATION` review state.
 
 ## 4. What is actually in the verification graph?
 

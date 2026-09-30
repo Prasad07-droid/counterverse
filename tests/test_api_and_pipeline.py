@@ -181,6 +181,25 @@ class TestGraphPersistence:
         assert summary["total_edges"] >= 69
         assert "company" in summary["node_types"]
 
+    def test_unverified_entity_is_retained_for_human_review(self):
+        from src.grounding_graph import ground_entities
+
+        result = ground_entities({
+            "affected_regions": ["Atlantis"],
+            "component": "semiconductor",
+            "impacted_industries": ["Automotive"],
+            "companies": ["FictionalCorp"],
+        })
+        fictional = next(
+            item
+            for item in result["grounding_results"]
+            if item["entity_text"] == "FictionalCorp"
+        )
+        assert fictional["canonical_name"] is None
+        assert fictional["status"] == "Unverified"
+        assert fictional["review_state"] == "NEEDS_HUMAN_VERIFICATION"
+        assert result["summary"]["needs_human_verification_count"] == 2
+
     def test_save_and_load_overlay(self):
         """Test graph overlay persistence roundtrip."""
         from src.grounding_graph import (
