@@ -103,7 +103,7 @@ $$\text{Company PCaR} = \text{Simulated Production Drop (\%)} \times \text{Compa
 | **Subtotal (4 Named OEMs)** | **81.4%** | SIAM FY24 | **Weighted 40.7%** | **Combined Heuristic** | Major passenger vehicle manufacturers | **₹44,362 Cr** | **33.16%** |
 | **Entire Indian Industry** | 100.0% | Macro UN Comtrade aggregate | 100% | Measured Trade Baseline | National aggregate import turnover (HS 8542) | ₹1,33,814 Cr | 100.00% |
 
-#### Methodological Clarification: Algebraic Boundedness vs. Empirical Accuracy
+#### Methodological Clarification: Allocation Arithmetic Is Not Validation
 Summing the allocated exposure across all four named OEMs yields:
 $$\sum_{i=1}^{4} \text{Allocation Ratio}_i = 15.85\% + 6.13\% + 6.26\% + 4.93\% = 33.16\%$$
 
@@ -111,9 +111,8 @@ Consequently:
 $$\sum_{i=1}^{4} \text{Company PCaR}_i \approx 0.3316 \times \text{Macro PCaR} < \text{Macro PCaR}$$
 
 > [!WARNING]
-> **Algebraic Consistency vs. Empirical Accuracy:**  
-> The fact that individual company allocations sum to 33.16% ($\le 1.0$) guarantees **algebraic internal consistency by construction**, because the formula is mathematically structured to scale down from the macro baseline ($\text{Macro} \times \text{Share} \times \text{Dependency}$).  
-> **It does NOT guarantee empirical ground-truth accuracy.**  
+> **Arithmetic scope check — not validation:**
+> The 33.16% subtotal follows mechanically from the selected market-share and dependency inputs in $\text{Macro} \times \text{Share} \times \text{Dependency}$. This bounded subtotal is not evidence that the inputs, allocation method, or resulting PCaR values are valid against real OEM procurement data.
 > While market shares (41.7%, 14.6%, etc.) are verified from official SIAM FY24 filings, the dependency ratios (0.38, 0.42, 0.45, 0.44) are analyst-estimated heuristic proxies reflecting relative electronics intensity across vehicle segments, not certified audited OEM Bill of Materials (BOM) disclosures. Until validated through proprietary OEM procurement interviews or confidential enterprise ERP telemetry, these remain domain-asserted modeling assumptions (matching the status of EB, DC, and TC constants in Section 4.2).
 
 The remaining ~66.84% (₹89,452 Cr) represents non-covered passenger vehicle manufacturers (Kia, Toyota, Honda, MG, Volkswagen), commercial vehicles (Tata CV, Ashok Leyland), two-wheelers, tractors, and unexposed non-semiconductor electronic components. This relationship is verified in unit test `test_company_level_pcar_internal_consistency()`.
