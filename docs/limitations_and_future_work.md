@@ -52,7 +52,10 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 #### 1. Graph Mesh vs. Clean 4-Tier Chain Oversimplification
 * **The Reality:** Real global supply chains are not linear 4-tier acyclic trees. They form dense, cyclic bipartite meshes featuring multi-sourcing (e.g., dual-sourcing automotive microcontrollers from TSMC/Taiwan and Samsung/Korea), cross-tier lateral transshipments, and substitutable intermediate components.
-* **The Simulation Bound:** CounterVerse uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM.
+* **The Simulation Bound:** CounterVerse uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM. The separate 30-node/69-edge verification graph also contains three explicit simplifications:
+  - NXP is headquartered in the Netherlands, while the current graph models its headquarters country as USA for scope simplification.
+  - OEM-to-component edges are asymmetric: Tata Motors and Hyundai India have direct `Integrated Circuits` edges, while Maruti Suzuki and Mahindra are linked through ECU/sensor nodes. This is a modeling choice, not evidence of different real procurement structures.
+  - China Minmetals is included as a Chinese metals/mining actor, but its use as a gallium-supply representative requires source verification (`TODO_SOURCE` in `HUMAN_TODO.md`).
 * **The Engineering Fix:** 
   - Transition from a static NetworkX DAG to a **Bipartite Knowledge Graph (Neo4j / Graph Neural Network)** dynamically populated via Open Supply Chain data (e.g., OpenSanctions, ImportYeti, panjiva shipping bills).
   - Model alternate sourcing paths via dynamic edge weights reflecting switching costs and qualification cycle times (typically 6–18 months for automotive AEC-Q100 qualified silicon).
