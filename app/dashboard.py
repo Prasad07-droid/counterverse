@@ -2396,6 +2396,10 @@ st.markdown(f"""
         {base_html}
     </div>
 </div>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:-8px 0 16px 0;">
+    <span style="background:rgba(245, 158, 11, 0.14); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.35); border-radius:6px; padding:4px 9px; font-size:0.72rem; font-weight:800;">SCENARIO SIMULATOR — NOT A FORECAST</span>
+    <span style="background:rgba(14, 165, 233, 0.12); color:#38bdf8; border:1px solid rgba(14, 165, 233, 0.30); border-radius:6px; padding:4px 9px; font-size:0.72rem; font-weight:700;">DATA VINTAGE · UN COMTRADE 2022 FULL YEAR</span>
+</div>
 """, unsafe_allow_html=True)
 
 
@@ -2405,6 +2409,8 @@ st.markdown(f"""
 if active_view == "01 — Executive War Room":
     if "selected_headline" not in st.session_state:
         st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+        st.session_state["headline_is_sample"] = True
+    st.session_state.setdefault("headline_is_sample", True)
     
     headline_text = st.session_state.get("selected_headline", "")
     active_engine = st.session_state.get("extraction_engine", "slm" if SLM_AVAILABLE else "fast")
@@ -2431,6 +2437,7 @@ if active_view == "01 — Executive War Room":
     <div class="active-incident-banner">
         <div class="incident-badge-group">
             <span class="incident-shock-badge">🚨 ACTIVE INCIDENT</span>
+            {"<span class='section-badge'>SAMPLE</span>" if st.session_state.get("headline_is_sample", False) else ""}
             <span class="incident-headline-text">"{headline_text[:100]}..."</span>
         </div>
         <div class="incident-meta-group">
@@ -2464,21 +2471,25 @@ if active_view == "01 — Executive War Room":
         )
         if new_headline != st.session_state["selected_headline"]:
             st.session_state["selected_headline"] = new_headline
+            st.session_state["headline_is_sample"] = False
 
         # Quick Headline Presets & Stress Scenarios
         st.markdown("<div style='font-size:0.72rem; color:#64748b; font-weight:600; margin-bottom:4px;'>QUICK SAMPLES & STRESS VECTORS:</div>", unsafe_allow_html=True)
         qp1, qp2, qp3 = st.columns(3)
         with qp1:
-            if st.button("🇨🇳 China Ga/Ge", use_container_width=True, help="China export curbs on Gallium/Germanium"):
+            if st.button("SAMPLE · 🇨🇳 China Ga/Ge", use_container_width=True, help="China export curbs on Gallium/Germanium"):
                 st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+                st.session_state["headline_is_sample"] = True
                 st.rerun()
         with qp2:
-            if st.button("🇹🇼 TSMC Fab", use_container_width=True, help="Taiwan TSMC Fab shutdown"):
+            if st.button("SAMPLE · 🇹🇼 TSMC Fab", use_container_width=True, help="Taiwan TSMC Fab shutdown"):
                 st.session_state["selected_headline"] = "Magnitude 7.2 earthquake halts production at TSMC automotive microcontroller fab lines in Hsinchu."
+                st.session_state["headline_is_sample"] = True
                 st.rerun()
         with qp3:
-            if st.button("🌊 Red Sea", use_container_width=True, help="Red Sea maritime corridor disruption"):
+            if st.button("SAMPLE · 🌊 Red Sea", use_container_width=True, help="Red Sea maritime corridor disruption"):
                 st.session_state["selected_headline"] = "Houthi missile strikes close Bab-el-Mandeb Strait, diverting Asian semiconductor vessels around Africa."
+                st.session_state["headline_is_sample"] = True
                 st.rerun()
 
         # Historical Stress Scenario Selector
@@ -2486,10 +2497,10 @@ if active_view == "01 — Executive War Room":
             "Load Historical Crisis Scenario:",
             [
                 "— Select Predefined Stress Vector —",
-                "COVID-19 Manufacturing Shutdown (Extreme)",
-                "Global Chip Shortage Peak (Severe)",
-                "Shanghai Port Lockdown (Moderate)",
-                "Red Sea Maritime Blockade (Mild)"
+                "SAMPLE — COVID-19 Manufacturing Shutdown (Extreme)",
+                "SAMPLE — Global Chip Shortage Peak (Severe)",
+                "SAMPLE — Shanghai Port Lockdown (Moderate)",
+                "SAMPLE — Red Sea Maritime Blockade (Mild)"
             ],
             key="stress_scenario_quick_select",
             label_visibility="collapsed"
@@ -2503,6 +2514,7 @@ if active_view == "01 — Executive War Room":
                 st.session_state["selected_headline"] = "Strict pandemic containment protocols suspend container vessel departures at Shanghai maritime hub."
             elif "Red Sea" in stress_choice:
                 st.session_state["selected_headline"] = "Attacks on commercial vessels force Asian chip cargo carriers to detour around Cape of Good Hope, adding 14 days."
+            st.session_state["headline_is_sample"] = True
             st.rerun()
 
         analyze_clicked = st.button("⚡ Analyze Disruption", type="primary", use_container_width=True)
