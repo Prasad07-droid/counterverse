@@ -1,0 +1,36 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/user/counterverse
+plugins: anyio-4.15.1
+collected 46 items / 1 error
+
+==================================== ERRORS ====================================
+____________ ERROR collecting scratch/test_benign_generalization.py ____________
+ImportError while importing test module '/home/user/counterverse/scratch/test_benign_generalization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scratch/test_benign_generalization.py:22: in <module>
+    sig = extract_signal(h, simulate_delay=False, engine="slm")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/module_b_slm.py:699: in extract_signal
+    return extract_signal_qwen(headline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/module_b_slm.py:346: in extract_signal_qwen
+    import torch
+E   ModuleNotFoundError: No module named 'torch'
+------------------------------- Captured stdout --------------------------------
+=== FAST MODE ===
+H: Company announces routine quarterly earnings call, no s... | is_disr=False | pred_type=None | risk=0.0 | level=LOW
+H: Automotive plant completes scheduled annual maintenance... | is_disr=False | pred_type=None | risk=0.0 | level=LOW
+H: Trade ministry renews standard bilateral cooperation ag... | is_disr=False | pred_type=None | risk=0.0 | level=LOW
+
+=== SLM MODE ===
+=========================== short test summary info ============================
+ERROR scratch/test_benign_generalization.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.36s ===============================
+
+PYTEST_EXIT_CODE=2

@@ -821,7 +821,7 @@ div[data-testid="stStatusWidget"] {
     color: #ffffff !important;
 }
 
-/* ── GraphRAG Entity Badges ── */
+/* ── Graph-grounded Entity Verification Badges ── */
 .grounding-badge-verified {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 4px 12px; border-radius: 6px;
@@ -1365,7 +1365,7 @@ body {{ background: transparent; overflow: hidden; }}
             </div>
         </div>
         <div>
-            <span>Physics Mode: Deterministic Multi-Tier Flow · 60 FPS</span>
+            <span>Physics Mode: Deterministic Multi-Tier Flow</span>
         </div>
     </div>
 </div>
@@ -1801,7 +1801,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
             </div>
             """, unsafe_allow_html=True)
 
-        st.caption("📌 **Data Provenance**: Source: UN Comtrade 2022 · 🟡 Cached Fallback (HS 8542: ₹1,33,814.34 Cr · HS 8112: ₹552.86 Cr · Audited Annual Baseline @ ₹83.0/USD)")
+        st.caption("📌 **Data Provenance**: Source: UN Comtrade 2022 · 🟡 Cached Fallback (HS 8542: ₹1,33,814.34 Cr · HS 8112: ₹552.86 Cr · Audited Annual Baseline @ ₹83.0/USD). HS 8112 is a broad basket covering other metals besides gallium and germanium, so it is used only as an upstream proxy. Automotive MCUs are primarily silicon-based; Ga/Ge is modeled as a compound-semiconductor stress-test pathway (GaN/GaAs/SiGe).")
         st.markdown('<div style="height: 14px;"></div>', unsafe_allow_html=True)
 
         # Build year-by-year table
@@ -1818,7 +1818,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
             str_8542_inr = f"₹{format_inr(val_8542_inr)} Cr" if val_8542_inr else "—"
             str_8112_inr = f"₹{format_inr(val_8112_inr)} Cr" if val_8112_inr else "—"
             
-            note = "✅ Complete (Adopted Baseline)" if y == "2022" else ("✅ Complete" if val_8542_usd and val_8542_usd > 1e8 else ("⚠️ Partial / Incomplete in UN Comtrade public tier" if y == "2023" else "⏳ Pending Official Release"))
+            note = "✅ Complete (Adopted Baseline)" if y == "2022" else ("✅ Complete" if val_8542_usd and val_8542_usd > 1e8 else ("⚠️ Partial / Incomplete in UN Comtrade public tier" if y == "2023" else "ℹ️ Not captured in repository baseline"))
             table_rows.append({
                 "Year": y,
                 "HS 8542 Imports (USD)": str_8542_usd,
@@ -1878,7 +1878,7 @@ def render_comtrade_trade_baseline(expanded: bool = False):
             st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
 
         st.caption("📌 **Citation**: Source: UN Comtrade, HS 8542/8112, 2026-09-05. Converted at stated exchange rate 1 USD = ₹83.0 INR. Reporter: India, Flow: Imports.")
-        st.caption("⚠️ **Notice on Data Completeness**: 2023 trade reports in the UN Comtrade public preview tier remain partial (only select trading months indexed); 2024 full data is pending official release. Sourced full-year 2022 baseline is adopted to maintain absolute quantitative integrity rather than falling back to assumed figures.")
+        st.caption("⚠️ **Notice on Data Vintage**: The repository uses 2022 because it is the latest complete full-year HS 8542/8112 extraction that was fetched, checked, and stored in this project. Later full-year data has not been ingested and audited here; this is not a claim that 2024 UN Comtrade data is unreleased. The baseline also predates China's August 2023 gallium/germanium export controls.")
 
 
 # ════════════════════════════════════════════════════════════════
@@ -2021,7 +2021,7 @@ $$\text{Structural Exposure Score} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR}
 | **Dependency Ratio** | `dependency_ratio` | **25%** | `{bd.get('dependency_ratio', {}).get('value', 0):.3f}` | **`{bd.get('dependency_ratio', {}).get('contribution', 0):.4f}`** | {bd.get('dependency_ratio', {}).get('desc', 'Derived from UN Comtrade HS 8542/8112 import shares')} |
 | **Downstream Criticality** | `downstream_criticality` | **20%** | `{bd.get('downstream_criticality', {}).get('value', 0):.3f}` | **`{bd.get('downstream_criticality', {}).get('contribution', 0):.4f}`** | Essentiality of microcontrollers/chips to vehicle ECU assembly continuity |
 | **Tier-1 Centrality** | `tier1_centrality` | **10%** | `{bd.get('tier1_centrality', {}).get('value', 0):.3f}` | **`{bd.get('tier1_centrality', {}).get('contribution', 0):.4f}`** | Degree connectivity of exposed Tier-1 electronic nodes |
-| **Exposure Depth** | `exposure_depth` | **10%** | `{bd.get('exposure_depth', {}).get('value', 0):.3f}` | **`{bd.get('exposure_depth', {}).get('contribution', 0):.4f}`** | Normalized origin tier depth in supply chain (Tier-4=1.0, Tier-1=0.25) |
+| **Exposure Depth** | `exposure_depth` | **10%** | `{bd.get('exposure_depth', {}).get('value', 0):.3f}` | **`{bd.get('exposure_depth', {}).get('contribution', 0):.4f}`** | Discrete component-class depth lookup (raw material=1.00, IC/wafer/MCU/ECU=0.75, sensor=0.25, fallback=0.50) |
 | **Supplier Structural Exposure** | — | **100%** | — | **`{r_score:.3f}`** | **Classification: {r_level}** |
 
 **Executive CSCO Decision Directive:** {r_action}  
@@ -2092,10 +2092,11 @@ def compute_dependency_ratio(direct_import_share, upstream_concentration_penalty
 
         with st.expander("ℹ️ Formula Reliability Note", expanded=False):
             st.markdown("""
-            **Weight Provenance:** 75% of this score's weight rests on 
-            domain-asserted constants (EB, DC, TC, ED). Only 25% (Dependency 
-            Ratio) is computed from empirically measured UN Comtrade bilateral 
-            trade data.
+            **Weight Provenance:** This score is partially data-informed.
+            Dependency Ratio uses measured UN Comtrade bilateral trade shares,
+            but the upstream concentration term (`C_upstream`) and unhedged
+            exposure weight (`W_unhedged = 0.75`) are modeling assumptions.
+            EB, DC, TC, and ED also contain asserted or structural inputs.
             
             **Sensitivity:** A ±20% perturbation on any single asserted 
             constant does not flip the HIGH/MEDIUM/LOW classification for the 
@@ -2395,6 +2396,10 @@ st.markdown(f"""
         {base_html}
     </div>
 </div>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:-8px 0 16px 0;">
+    <span style="background:rgba(245, 158, 11, 0.14); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.35); border-radius:6px; padding:4px 9px; font-size:0.72rem; font-weight:800;">SCENARIO SIMULATOR — NOT A FORECAST</span>
+    <span style="background:rgba(14, 165, 233, 0.12); color:#38bdf8; border:1px solid rgba(14, 165, 233, 0.30); border-radius:6px; padding:4px 9px; font-size:0.72rem; font-weight:700;">DATA VINTAGE · UN COMTRADE 2022 FULL YEAR</span>
+</div>
 """, unsafe_allow_html=True)
 
 
@@ -2404,6 +2409,8 @@ st.markdown(f"""
 if active_view == "01 — Executive War Room":
     if "selected_headline" not in st.session_state:
         st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+        st.session_state["headline_is_sample"] = True
+    st.session_state.setdefault("headline_is_sample", True)
     
     headline_text = st.session_state.get("selected_headline", "")
     active_engine = st.session_state.get("extraction_engine", "slm" if SLM_AVAILABLE else "fast")
@@ -2430,6 +2437,7 @@ if active_view == "01 — Executive War Room":
     <div class="active-incident-banner">
         <div class="incident-badge-group">
             <span class="incident-shock-badge">🚨 ACTIVE INCIDENT</span>
+            {"<span class='section-badge'>SAMPLE</span>" if st.session_state.get("headline_is_sample", False) else ""}
             <span class="incident-headline-text">"{headline_text[:100]}..."</span>
         </div>
         <div class="incident-meta-group">
@@ -2463,21 +2471,25 @@ if active_view == "01 — Executive War Room":
         )
         if new_headline != st.session_state["selected_headline"]:
             st.session_state["selected_headline"] = new_headline
+            st.session_state["headline_is_sample"] = False
 
         # Quick Headline Presets & Stress Scenarios
         st.markdown("<div style='font-size:0.72rem; color:#64748b; font-weight:600; margin-bottom:4px;'>QUICK SAMPLES & STRESS VECTORS:</div>", unsafe_allow_html=True)
         qp1, qp2, qp3 = st.columns(3)
         with qp1:
-            if st.button("🇨🇳 China Ga/Ge", use_container_width=True, help="China export curbs on Gallium/Germanium"):
+            if st.button("SAMPLE · 🇨🇳 China Ga/Ge", use_container_width=True, help="China export curbs on Gallium/Germanium"):
                 st.session_state["selected_headline"] = "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India."
+                st.session_state["headline_is_sample"] = True
                 st.rerun()
         with qp2:
-            if st.button("🇹🇼 TSMC Fab", use_container_width=True, help="Taiwan TSMC Fab shutdown"):
+            if st.button("SAMPLE · 🇹🇼 TSMC Fab", use_container_width=True, help="Taiwan TSMC Fab shutdown"):
                 st.session_state["selected_headline"] = "Magnitude 7.2 earthquake halts production at TSMC automotive microcontroller fab lines in Hsinchu."
+                st.session_state["headline_is_sample"] = True
                 st.rerun()
         with qp3:
-            if st.button("🌊 Red Sea", use_container_width=True, help="Red Sea maritime corridor disruption"):
+            if st.button("SAMPLE · 🌊 Red Sea", use_container_width=True, help="Red Sea maritime corridor disruption"):
                 st.session_state["selected_headline"] = "Houthi missile strikes close Bab-el-Mandeb Strait, diverting Asian semiconductor vessels around Africa."
+                st.session_state["headline_is_sample"] = True
                 st.rerun()
 
         # Historical Stress Scenario Selector
@@ -2485,10 +2497,10 @@ if active_view == "01 — Executive War Room":
             "Load Historical Crisis Scenario:",
             [
                 "— Select Predefined Stress Vector —",
-                "COVID-19 Manufacturing Shutdown (Extreme)",
-                "Global Chip Shortage Peak (Severe)",
-                "Shanghai Port Lockdown (Moderate)",
-                "Red Sea Maritime Blockade (Mild)"
+                "SAMPLE — COVID-19 Manufacturing Shutdown (Extreme)",
+                "SAMPLE — Global Chip Shortage Peak (Severe)",
+                "SAMPLE — Shanghai Port Lockdown (Moderate)",
+                "SAMPLE — Red Sea Maritime Blockade (Mild)"
             ],
             key="stress_scenario_quick_select",
             label_visibility="collapsed"
@@ -2502,6 +2514,7 @@ if active_view == "01 — Executive War Room":
                 st.session_state["selected_headline"] = "Strict pandemic containment protocols suspend container vessel departures at Shanghai maritime hub."
             elif "Red Sea" in stress_choice:
                 st.session_state["selected_headline"] = "Attacks on commercial vessels force Asian chip cargo carriers to detour around Cape of Good Hope, adding 14 days."
+            st.session_state["headline_is_sample"] = True
             st.rerun()
 
         analyze_clicked = st.button("⚡ Analyze Disruption", type="primary", use_container_width=True)
@@ -2544,7 +2557,7 @@ if active_view == "01 — Executive War Room":
         st.markdown("""
         <div class="section-header" style="margin-bottom: 6px;">
             <h3>Causal Supply Chain Flow</h3>
-            <span class="section-badge">8 nodes · 9 edges · 60 FPS</span>
+            <span class="section-badge">8 nodes · 9 edges · Animated View</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -2616,7 +2629,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
         **Enterprise Custom Procurement Risk Engine**:
         Instead of using the macro aggregate UN Comtrade baseline (₹1,33,814 Cr) or static SIAM market-share scaling,
         upload your enterprise's actual Bill of Materials to compute enterprise-specific Procurement Cost-at-Risk (PCaR).
-        Each component is verified against the **GraphRAG Grounding Graph** topology.
+        Each component is verified against the **graph-grounded entity-verification graph** topology.
         """)
 
         bom_col1, bom_col2 = st.columns([1, 1])
@@ -2681,7 +2694,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
             st.markdown(f"**BOM Preview ({len(parsed_components)} components — Total Procurement Spend: ₹{total_spend:,.1f} Cr):**")
             st.dataframe(bom_df, use_container_width=True, hide_index=True)
 
-            if st.button("🚀 Calculate Enterprise PCaR with GraphRAG Grounding", key="btn_run_custom_bom_pcar"):
+            if st.button("🚀 Calculate Enterprise PCaR with Graph-Grounded Verification", key="btn_run_custom_bom_pcar"):
                 if calculate_pcar_custom_bom is not None:
                     try:
                         res = calculate_pcar_custom_bom(
@@ -2698,7 +2711,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
                         m3.metric("95% PCaR (VaR)", f"₹{res['pcar_95_crore']:,.1f} Cr", delta=f"{res['pcar_95_pct']:.1f}%", delta_color="inverse")
                         m4.metric("Worst-Case Loss", f"₹{res['worst_case_loss_crore']:,.1f} Cr", delta=f"{res['worst_case_pct']:.1f}%", delta_color="inverse")
 
-                        st.markdown("##### 🔍 GraphRAG Component Grounding Breakdown")
+                        st.markdown("##### 🔍 Graph-Grounded Component Verification Breakdown")
                         grounding_rows = []
                         for g in res.get("component_grounding", []):
                             status_badge = "✅ Grounded in Graph" if g.get("grounded") else "⚠️ Topology Unmapped"
@@ -2740,7 +2753,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
 # ════════════════════════════════════════════════════════════════
 elif active_view == "03 — Governance & Model Validation":
     st.markdown("### 🛡️ Model Governance, Operational Boundaries & Empirical Validation")
-    st.caption("Empirical backtesting against SIAM September 2021 actuals + Table 5 evaluation replicating AlMahri et al. (2026).")
+    st.caption("Empirical backtesting against SIAM September 2021 actuals + an adapted evaluation protocol based on AlMahri et al. (2026).")
 
     v_tab1, v_tab2, v_tab3 = st.tabs(["📈 SIAM 2021 Historical Backtest", "🔬 Pipeline Benchmark (Table 5)", "🏛️ Operational Governance & Constraints"])
 
@@ -2836,7 +2849,7 @@ elif active_view == "03 — Governance & Model Validation":
         with bkpi4:
             st.markdown(f'<div class="metric-card"><div class="metric-label">Disruption Recall</div><div class="metric-value">100.0%</div><div class="metric-sub">11 / 11 True Shocks Caught</div></div>', unsafe_allow_html=True)
 
-        st.markdown("#### Table 5: Overall Performance Metrics (AlMahri et al. 2026 Replication)")
+        st.markdown("#### Adapted Evaluation Protocol: Overall Performance Metrics")
         table5_data = [
             {"Agent / Pipeline Stage": "Stage 1: Disruption Monitoring (Relevance Filter)", "Precision": f"{m['disruption_monitoring']['precision']:.3f}", "Recall": f"{m['disruption_monitoring']['recall']:.3f}", "F1 Score": f"{m['disruption_monitoring']['f1']:.3f}"},
             {"Agent / Pipeline Stage": "Stage 2: Entity & Type Classification", "Precision": f"{m['classification']['precision']:.3f}", "Recall": f"{m['classification']['recall']:.3f}", "F1 Score": f"{m['classification']['f1']:.3f}"},

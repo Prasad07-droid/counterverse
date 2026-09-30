@@ -496,7 +496,7 @@ body {{ background: #ffffff; overflow: hidden; }}
             </div>
         </div>
         <div>
-            <span>Physics Mode: Deterministic Multi-Tier Flow · 60 FPS</span>
+            <span>Physics Mode: Deterministic Multi-Tier Flow</span>
         </div>
     </div>
 </div>

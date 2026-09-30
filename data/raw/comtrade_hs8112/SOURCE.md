@@ -27,7 +27,7 @@
 ## Known Limitations
 
 1. **Tariff Basket Aggregation**: HS 8112 bundles gallium and germanium together with beryllium, chromium, vanadium, hafnium, indium, niobium, rhenium, and thallium. Disaggregated national customs tariff items (e.g. HS 8112.92 for unwrought gallium) require DGCIS TradeStat 8-digit data.
-2. **2023–2024 Trade Release Lag**: 2023 records in the UN Comtrade public preview tier remain partial; 2024 full-year data is pending official release. Sourced full-year 2022 baseline is adopted to maintain absolute quantitative integrity rather than falling back to assumed figures.
+2. **Repository Data-Vintage Boundary**: 2022 is the latest complete full-year HS 8112 extraction fetched, checked, and stored in this repository. Later full-year data has not been ingested and audited here; this is not a claim that 2024 UN Comtrade data is unreleased. The selected baseline predates China’s August 2023 gallium/germanium export controls.
 
 ## How to Regenerate
 

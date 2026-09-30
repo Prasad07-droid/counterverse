@@ -29,10 +29,10 @@ $$\text{Risk Score} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR} + 0.20 \cdot \
 
 Where:
 1. **$\text{EB}$ (Exposure Breadth, 35%)**: Number of disrupted sub-tier component categories affected (e.g. Gallium/Germanium = 0.90, Semiconductor = 0.85, Logistics = 0.70, Auto parts = 0.50).
-2. **$\text{DR}$ (Dependency Ratio, 25%)**: OEM reliance on the disrupted supplier/corridor, computed via empirical trade shares and upstream concentration penalties.
+2. **$\text{DR}$ (Dependency Ratio, 25%)**: OEM reliance on the disrupted supplier/corridor, partially data-informed by measured trade shares, with assumed upstream-concentration penalties ($C_{\text{upstream}}$) and an assumed unhedged-exposure weight ($W_{\text{unhedged}}=0.75$).
 3. **$\text{DC}$ (Downstream Criticality, 20%)**: Essentiality of component to assembly line continuity (ECU/Chip = 0.95, Auto parts = 0.65, Logistics = 0.60, Hardware = 0.40).
 4. **$\text{TC}$ (Tier-1 Centrality, 10%)**: Degree connectivity of exposed Tier-1 nodes across OEM vehicle models.
-5. **$\text{ED}$ (Exposure Depth, 10%)**: Normalized tier depth of disruption origin ($\text{Tier} / 4.0$).
+5. **$\text{ED}$ (Exposure Depth, 10%)**: Discrete component-class lookup used by the code: raw material = 1.00; integrated circuit/wafer/microcontroller/ECU = 0.75; automotive sensor = 0.25; unverified fallback = 0.50. This is not computed as $\text{Tier}/4.0$.
 
 ### Thresholds & Action Directives (Section 3.2.5 & 3.2.6):
 - **$\text{Risk Score} \ge 0.60$ (HIGH Risk)**: Replace supplier / Qualify dual-sourcing immediately.
@@ -76,7 +76,7 @@ In testing the genuine neural SLM (`Qwen2.5-0.5B-Instruct`), the extractor produ
 
 ---
 
-## 4. Evaluation Results (Table 5 Replication)
+## 4. Evaluation Results (Adapted Evaluation Protocol)
 
 Tested across 15 synthesized scenarios covering five disruption classes:
 - Semiconductor Export Ban (3 scenarios: 2 TP, 1 FP)
@@ -85,7 +85,7 @@ Tested across 15 synthesized scenarios covering five disruption classes:
 - Labour Strike (3 scenarios: 2 TP, 1 FP)
 - Natural Disaster (3 scenarios: 3 TP)
 
-### Table 5: Replicated Performance Metrics (Post-Fix Pass)
+### Adapted Table 5 Evaluation Metrics (Post-Fix Pass)
 *Evaluated on local Qwen2.5-0.5B-Instruct in bfloat16 on NVIDIA RTX 3050 Ti GPU:*
 
 $$\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}, \quad \text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}, \quad \text{F1} = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$
@@ -120,9 +120,9 @@ This distinction is explicitly labeled in the dashboard UI as "Structural Risk F
 
 ---
 
-## GraphRAG vs. Static Graph Lookup — Terminology Clarification
+## Graph-Grounded Entity Verification — Terminology Clarification
 
-The component labeled "GraphRAG grounding" in this project 
+The graph-grounded entity-verification component in this project
 (`src/grounding_graph.py`) implements:
 
 **What it IS:**
@@ -139,12 +139,8 @@ The component labeled "GraphRAG grounding" in this project
 - A generative retrieval-augmented generation pipeline in the 
   standard LangChain/LlamaIndex sense
 
-**Why "GraphRAG" is used:**
-The term follows AlMahri et al. (2026)'s own framing — using a 
-knowledge graph as a structured retrieval mechanism to ground 
-LLM outputs. This is consistent with the reference paper's 
-methodology, which also uses a static enterprise knowledge graph 
-(Neo4j) for entity verification, not a vector retrieval system.
+**Terminology used here:**
+The implementation is described as graph-grounded entity verification because it performs deterministic lookup against a static graph. It is not presented as a full retrieval-augmented generation system.
 
 **Genuine RAG (Future Work):**
 A full RAG implementation would embed the GDELT headline corpus 
