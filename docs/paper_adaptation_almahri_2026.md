@@ -76,7 +76,7 @@ In testing the genuine neural SLM (`Qwen2.5-0.5B-Instruct`), the extractor produ
 
 ---
 
-## 4. Evaluation Results (Table 5 Replication)
+## 4. Evaluation Results (Adapted Evaluation Protocol)
 
 Tested across 15 synthesized scenarios covering five disruption classes:
 - Semiconductor Export Ban (3 scenarios: 2 TP, 1 FP)
@@ -85,7 +85,7 @@ Tested across 15 synthesized scenarios covering five disruption classes:
 - Labour Strike (3 scenarios: 2 TP, 1 FP)
 - Natural Disaster (3 scenarios: 3 TP)
 
-### Table 5: Replicated Performance Metrics (Post-Fix Pass)
+### Adapted Table 5 Evaluation Metrics (Post-Fix Pass)
 *Evaluated on local Qwen2.5-0.5B-Instruct in bfloat16 on NVIDIA RTX 3050 Ti GPU:*
 
 $$\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}, \quad \text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}, \quad \text{F1} = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$

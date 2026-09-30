@@ -2740,7 +2740,7 @@ elif active_view == "02 — Financial Exposure & PCaR":
 # ════════════════════════════════════════════════════════════════
 elif active_view == "03 — Governance & Model Validation":
     st.markdown("### 🛡️ Model Governance, Operational Boundaries & Empirical Validation")
-    st.caption("Empirical backtesting against SIAM September 2021 actuals + Table 5 evaluation replicating AlMahri et al. (2026).")
+    st.caption("Empirical backtesting against SIAM September 2021 actuals + an adapted evaluation protocol based on AlMahri et al. (2026).")
 
     v_tab1, v_tab2, v_tab3 = st.tabs(["📈 SIAM 2021 Historical Backtest", "🔬 Pipeline Benchmark (Table 5)", "🏛️ Operational Governance & Constraints"])
 
@@ -2836,7 +2836,7 @@ elif active_view == "03 — Governance & Model Validation":
         with bkpi4:
             st.markdown(f'<div class="metric-card"><div class="metric-label">Disruption Recall</div><div class="metric-value">100.0%</div><div class="metric-sub">11 / 11 True Shocks Caught</div></div>', unsafe_allow_html=True)
 
-        st.markdown("#### Table 5: Overall Performance Metrics (AlMahri et al. 2026 Replication)")
+        st.markdown("#### Adapted Evaluation Protocol: Overall Performance Metrics")
         table5_data = [
             {"Agent / Pipeline Stage": "Stage 1: Disruption Monitoring (Relevance Filter)", "Precision": f"{m['disruption_monitoring']['precision']:.3f}", "Recall": f"{m['disruption_monitoring']['recall']:.3f}", "F1 Score": f"{m['disruption_monitoring']['f1']:.3f}"},
             {"Agent / Pipeline Stage": "Stage 2: Entity & Type Classification", "Precision": f"{m['classification']['precision']:.3f}", "Recall": f"{m['classification']['recall']:.3f}", "F1 Score": f"{m['classification']['f1']:.3f}"},
