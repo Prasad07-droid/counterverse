@@ -1,0 +1,488 @@
+{
+  "evaluation_timestamp": "1791017975.3958976",
+  "fast_parser_evaluation": {
+    "original_15_scenarios": {
+      "n_samples": 15,
+      "metrics": {
+        "disruption_monitoring": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "classification": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "risk_manager": {
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.889
+        },
+        "csco_decision": {
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.889
+        },
+        "macro_average": {
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.945
+        }
+      },
+      "misclassifications_count": 3,
+      "misclassifications": [
+        {
+          "id": "SCEN-04",
+          "headline": "Shanghai port closure and dock congestion disrupt Asian containerized automotive parts shipping",
+          "expected": "Logistics Disruption (MEDIUM) [disruption=True]",
+          "predicted": "Logistics Disruption (HIGH) [disruption=True]",
+          "risk_score": 0.782,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.782)"
+          ]
+        },
+        {
+          "id": "SCEN-11",
+          "headline": "US West Coast dockworkers strike halts container unloading at key automotive import ports",
+          "expected": "Labour Strike (MEDIUM) [disruption=True]",
+          "predicted": "Labour Strike (HIGH) [disruption=True]",
+          "risk_score": 0.905,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.905)"
+          ]
+        },
+        {
+          "id": "SCEN-15",
+          "headline": "Tropical typhoon damages coastal breakwaters at Busan Port, halting vessel docking operations",
+          "expected": "Natural Disaster (MEDIUM) [disruption=True]",
+          "predicted": "Natural Disaster (HIGH) [disruption=True]",
+          "risk_score": 0.674,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.674)"
+          ]
+        }
+      ]
+    },
+    "heldout_30_scenarios": {
+      "n_samples": 30,
+      "metrics": {
+        "disruption_monitoring": {
+          "precision": 0.444,
+          "recall": 1.0,
+          "f1": 0.615
+        },
+        "classification": {
+          "precision": 0.833,
+          "recall": 1.0,
+          "f1": 0.909
+        },
+        "risk_manager": {
+          "precision": 0.333,
+          "recall": 1.0,
+          "f1": 0.5
+        },
+        "csco_decision": {
+          "precision": 0.333,
+          "recall": 1.0,
+          "f1": 0.5
+        },
+        "macro_average": {
+          "precision": 0.486,
+          "recall": 1.0,
+          "f1": 0.631
+        }
+      },
+      "misclassifications_count": 23,
+      "misclassifications": [
+        {
+          "id": "ADV-01",
+          "headline": "China Ministry of Commerce halts all gallium and germanium export permits to overseas semiconductor fabs",
+          "expected": "Trade Policy (HIGH) [disruption=True]",
+          "predicted": "Raw Material Shortage (HIGH) [disruption=True]",
+          "risk_score": 0.951,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Trade Policy', got 'Raw Material Shortage'"
+          ]
+        },
+        {
+          "id": "ADV-04",
+          "headline": "Kyushu automotive chip packaging plant halts production following severe river flooding and power outages",
+          "expected": "Natural Disaster (MEDIUM) [disruption=True]",
+          "predicted": "Natural Disaster (HIGH) [disruption=True]",
+          "risk_score": 0.83,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.830)"
+          ]
+        },
+        {
+          "id": "ADV-05",
+          "headline": "European chemical suppliers declare force majeure on ultra-pure semiconductor grade sulfuric acid shipments",
+          "expected": "Raw Material Shortage (MEDIUM) [disruption=True]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Raw Material Shortage', got 'Geopolitical'",
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-06",
+          "headline": "Militant drone strikes in Bab-el-Mandeb force container vessels carrying automotive wiring harnesses to halt transit",
+          "expected": "Logistics Disruption (MEDIUM) [disruption=True]",
+          "predicted": "Labour Strike (HIGH) [disruption=True]",
+          "risk_score": 0.833,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Logistics Disruption', got 'Labour Strike'",
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.833)"
+          ]
+        },
+        {
+          "id": "ADV-08",
+          "headline": "Wildfire near Dresden semiconductor cluster knocks out high-voltage substation, idling silicon wafer manufacturing lines",
+          "expected": "Natural Disaster (MEDIUM) [disruption=True]",
+          "predicted": "Industrial Accident (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Natural Disaster', got 'Industrial Accident'",
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-09",
+          "headline": "South Korean memory chip fabrication plant experiences contamination in chemical vapor deposition chamber, halting lines",
+          "expected": "Raw Material Shortage (MEDIUM) [disruption=True]",
+          "predicted": "Industrial Accident (HIGH) [disruption=True]",
+          "risk_score": 0.674,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Raw Material Shortage', got 'Industrial Accident'",
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.674)"
+          ]
+        },
+        {
+          "id": "ADV-11",
+          "headline": "Lithography equipment manufacturer ASML reports critical supply chain disruption halting DUV scanner assembly",
+          "expected": "Trade Policy (HIGH) [disruption=True]",
+          "predicted": "Industrial Accident (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Trade Policy', got 'Industrial Accident'"
+          ]
+        },
+        {
+          "id": "ADV-12",
+          "headline": "Severe drought in Taiwan forces water rationing for high-volume semiconductor fabrication plants in Taichung",
+          "expected": "Natural Disaster (HIGH) [disruption=True]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.702,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Natural Disaster', got 'Geopolitical'"
+          ]
+        },
+        {
+          "id": "ADV-13",
+          "headline": "Semiconductor industry association confirms no shortage expected as wafer foundry capacity reaches multi-year highs",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-14",
+          "headline": "Automotive chip supply improves markedly as global microcontroller lead times fall to 12 weeks",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-16",
+          "headline": "Despite geopolitical tensions, bilateral trade ministry confirms zero disruption to critical raw material quotas",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Raw Material Shortage (LOW) [disruption=True]",
+          "risk_score": 0.0,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True"
+          ]
+        },
+        {
+          "id": "ADV-18",
+          "headline": "Automakers report healthy chip buffer inventories with no supply chain impact observed during seasonal shutdown",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Industrial Accident (LOW) [disruption=True]",
+          "risk_score": 0.0,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True"
+          ]
+        },
+        {
+          "id": "ADV-20",
+          "headline": "Ministry of Commerce reassures domestic manufacturers of adequate semiconductor buffer stocks and no price spikes",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-21",
+          "headline": "University medical center publishes clinical trial using gallium-68 radiotracers for early prostate cancer detection",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Raw Material Shortage (HIGH) [disruption=True]",
+          "risk_score": 0.79,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.790)"
+          ]
+        },
+        {
+          "id": "ADV-22",
+          "headline": "Astrophysicists detect trace amounts of germanium and zinc isotopes in debris from distant supernova explosion",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Raw Material Shortage (HIGH) [disruption=True]",
+          "risk_score": 0.79,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.790)"
+          ]
+        },
+        {
+          "id": "ADV-23",
+          "headline": "Silicon Valley venture capital firm closes new $500 million fund to invest in early-stage generative AI chip startups",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-24",
+          "headline": "Historic municipal port authority in Lisbon celebrates 500th anniversary of maritime trade museum opening",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-25",
+          "headline": "Global semiconductor manufacturer reports quarterly earnings beat and expands dividend payout to shareholders",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-26",
+          "headline": "Materials science researchers synthesize novel gallium nitride crystal structure for ultra-efficient home LED lighting",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Raw Material Shortage (HIGH) [disruption=True]",
+          "risk_score": 0.79,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.790)"
+          ]
+        },
+        {
+          "id": "ADV-27",
+          "headline": "Automotive OEM celebrates manufacturing milestone with rollout of 100,000th electric SUV from Pune assembly plant",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (LOW) [disruption=True]",
+          "risk_score": 0.0,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True"
+          ]
+        },
+        {
+          "id": "ADV-28",
+          "headline": "National laboratory discovers catalytic properties of liquid gallium alloys in room-temperature plastic recycling",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Raw Material Shortage (HIGH) [disruption=True]",
+          "risk_score": 0.79,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.790)"
+          ]
+        },
+        {
+          "id": "ADV-29",
+          "headline": "Semiconductor foundry executive elected fellow of international engineering society for lifetime packaging research",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        },
+        {
+          "id": "ADV-30",
+          "headline": "Municipal maritime port reclaims 50 acres of coastal land for public waterfront park and recreational marina",
+          "expected": "None (LOW) [disruption=False]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.748,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=False, got True",
+            "Risk level error: expected 'LOW', got 'HIGH' (0.748)"
+          ]
+        }
+      ]
+    }
+  },
+  "qwen_slm_evaluation": {
+    "status": "completed",
+    "heldout_30_scenarios": {
+      "n_samples": 30,
+      "metrics": {
+        "disruption_monitoring": {
+          "precision": 1.0,
+          "recall": 0.833,
+          "f1": 0.909
+        },
+        "classification": {
+          "precision": 0.667,
+          "recall": 1.0,
+          "f1": 0.8
+        },
+        "risk_manager": {
+          "precision": 0.857,
+          "recall": 0.923,
+          "f1": 0.889
+        },
+        "csco_decision": {
+          "precision": 0.857,
+          "recall": 0.923,
+          "f1": 0.889
+        },
+        "macro_average": {
+          "precision": 0.845,
+          "recall": 0.92,
+          "f1": 0.872
+        }
+      },
+      "misclassifications_count": 10,
+      "misclassifications": [
+        {
+          "id": "ADV-01",
+          "headline": "China Ministry of Commerce halts all gallium and germanium export permits to overseas semiconductor fabs",
+          "expected": "Trade Policy (HIGH) [disruption=True]",
+          "predicted": "Raw Material Shortage (HIGH) [disruption=True]",
+          "risk_score": 0.951,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Trade Policy', got 'Raw Material Shortage'"
+          ]
+        },
+        {
+          "id": "ADV-03",
+          "headline": "Indefinite dockworkers strike shuts down Busan container port, stranding automotive microcontrollers bound for India",
+          "expected": "Labour Strike (HIGH) [disruption=True]",
+          "predicted": "Logistics Disruption (HIGH) [disruption=True]",
+          "risk_score": 0.813,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Labour Strike', got 'Logistics Disruption'"
+          ]
+        },
+        {
+          "id": "ADV-04",
+          "headline": "Kyushu automotive chip packaging plant halts production following severe river flooding and power outages",
+          "expected": "Natural Disaster (MEDIUM) [disruption=True]",
+          "predicted": "Natural Disaster (HIGH) [disruption=True]",
+          "risk_score": 0.83,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.830)"
+          ]
+        },
+        {
+          "id": "ADV-05",
+          "headline": "European chemical suppliers declare force majeure on ultra-pure semiconductor grade sulfuric acid shipments",
+          "expected": "Raw Material Shortage (MEDIUM) [disruption=True]",
+          "predicted": "None (LOW) [disruption=False]",
+          "risk_score": 0.0,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=True, got False",
+            "Disruption type error: expected 'Raw Material Shortage', got 'None'",
+            "Risk level error: expected 'MEDIUM', got 'LOW' (0.000)"
+          ]
+        },
+        {
+          "id": "ADV-06",
+          "headline": "Militant drone strikes in Bab-el-Mandeb force container vessels carrying automotive wiring harnesses to halt transit",
+          "expected": "Logistics Disruption (MEDIUM) [disruption=True]",
+          "predicted": "Logistics Disruption (HIGH) [disruption=True]",
+          "risk_score": 0.905,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.905)"
+          ]
+        },
+        {
+          "id": "ADV-08",
+          "headline": "Wildfire near Dresden semiconductor cluster knocks out high-voltage substation, idling silicon wafer manufacturing lines",
+          "expected": "Natural Disaster (MEDIUM) [disruption=True]",
+          "predicted": "Natural Disaster (HIGH) [disruption=True]",
+          "risk_score": 0.905,
+          "diagnostic_reasons": [
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.905)"
+          ]
+        },
+        {
+          "id": "ADV-09",
+          "headline": "South Korean memory chip fabrication plant experiences contamination in chemical vapor deposition chamber, halting lines",
+          "expected": "Raw Material Shortage (MEDIUM) [disruption=True]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.813,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Raw Material Shortage', got 'Geopolitical'",
+            "Risk level error: expected 'MEDIUM', got 'HIGH' (0.813)"
+          ]
+        },
+        {
+          "id": "ADV-10",
+          "headline": "Taiwan Strait maritime transport union initiates 10-day walkout, freezing coastal container feeder services",
+          "expected": "Labour Strike (HIGH) [disruption=True]",
+          "predicted": "None (LOW) [disruption=False]",
+          "risk_score": 0.0,
+          "diagnostic_reasons": [
+            "Relevance error: expected is_disruption=True, got False",
+            "Disruption type error: expected 'Labour Strike', got 'None'",
+            "Risk level error: expected 'HIGH', got 'LOW' (0.000)"
+          ]
+        },
+        {
+          "id": "ADV-11",
+          "headline": "Lithography equipment manufacturer ASML reports critical supply chain disruption halting DUV scanner assembly",
+          "expected": "Trade Policy (HIGH) [disruption=True]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.905,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Trade Policy', got 'Geopolitical'"
+          ]
+        },
+        {
+          "id": "ADV-12",
+          "headline": "Severe drought in Taiwan forces water rationing for high-volume semiconductor fabrication plants in Taichung",
+          "expected": "Natural Disaster (HIGH) [disruption=True]",
+          "predicted": "Geopolitical (HIGH) [disruption=True]",
+          "risk_score": 0.848,
+          "diagnostic_reasons": [
+            "Disruption type error: expected 'Natural Disaster', got 'Geopolitical'"
+          ]
+        }
+      ]
+    }
+  }
+}

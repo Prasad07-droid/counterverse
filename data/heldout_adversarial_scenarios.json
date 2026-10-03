@@ -1,0 +1,422 @@
+[
+  {
+    "id": "ADV-01",
+    "headline": "China Ministry of Commerce halts all gallium and germanium export permits to overseas semiconductor fabs",
+    "category": "export restriction",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Trade Policy",
+      "component": "gallium",
+      "region": "China",
+      "severity": 3,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "dependency_ratio"
+    }
+  },
+  {
+    "id": "ADV-02",
+    "headline": "Magnitude 7.4 earthquake strikes Hsinchu Science Park, damaging cleanroom facilities at major wafer foundries",
+    "category": "natural disaster",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Natural Disaster",
+      "component": "semiconductor",
+      "region": "Taiwan",
+      "severity": 3,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "downstream_criticality"
+    }
+  },
+  {
+    "id": "ADV-03",
+    "headline": "Indefinite dockworkers strike shuts down Busan container port, stranding automotive microcontrollers bound for India",
+    "category": "labour strike",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Labour Strike",
+      "component": "microcontroller",
+      "region": "South Korea",
+      "severity": 2,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "dependency_ratio"
+    }
+  },
+  {
+    "id": "ADV-04",
+    "headline": "Kyushu automotive chip packaging plant halts production following severe river flooding and power outages",
+    "category": "natural disaster",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Natural Disaster",
+      "component": "semiconductor",
+      "region": "Japan",
+      "severity": 2,
+      "expected_risk_level": "MEDIUM",
+      "top_risk_driver": "downstream_criticality"
+    }
+  },
+  {
+    "id": "ADV-05",
+    "headline": "European chemical suppliers declare force majeure on ultra-pure semiconductor grade sulfuric acid shipments",
+    "category": "raw material shortage",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Raw Material Shortage",
+      "component": "semiconductor",
+      "region": "Germany",
+      "severity": 2,
+      "expected_risk_level": "MEDIUM",
+      "top_risk_driver": "exposure_breadth"
+    }
+  },
+  {
+    "id": "ADV-06",
+    "headline": "Militant drone strikes in Bab-el-Mandeb force container vessels carrying automotive wiring harnesses to halt transit",
+    "category": "logistics disruption",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Logistics Disruption",
+      "component": "auto parts",
+      "region": "Red Sea",
+      "severity": 2,
+      "expected_risk_level": "MEDIUM",
+      "top_risk_driver": "tier1_centrality"
+    }
+  },
+  {
+    "id": "ADV-07",
+    "headline": "Beijing imposes strict quota restrictions on rare earth magnet exports to foreign electric vehicle tier-1 suppliers",
+    "category": "export restriction",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Trade Policy",
+      "component": "raw material",
+      "region": "China",
+      "severity": 3,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "dependency_ratio"
+    }
+  },
+  {
+    "id": "ADV-08",
+    "headline": "Wildfire near Dresden semiconductor cluster knocks out high-voltage substation, idling silicon wafer manufacturing lines",
+    "category": "natural disaster",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Natural Disaster",
+      "component": "semiconductor",
+      "region": "Germany",
+      "severity": 2,
+      "expected_risk_level": "MEDIUM",
+      "top_risk_driver": "downstream_criticality"
+    }
+  },
+  {
+    "id": "ADV-09",
+    "headline": "South Korean memory chip fabrication plant experiences contamination in chemical vapor deposition chamber, halting lines",
+    "category": "raw material shortage",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Raw Material Shortage",
+      "component": "semiconductor",
+      "region": "South Korea",
+      "severity": 2,
+      "expected_risk_level": "MEDIUM",
+      "top_risk_driver": "downstream_criticality"
+    }
+  },
+  {
+    "id": "ADV-10",
+    "headline": "Taiwan Strait maritime transport union initiates 10-day walkout, freezing coastal container feeder services",
+    "category": "labour strike",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Labour Strike",
+      "component": "auto parts",
+      "region": "Taiwan",
+      "severity": 2,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "dependency_ratio"
+    }
+  },
+  {
+    "id": "ADV-11",
+    "headline": "Lithography equipment manufacturer ASML reports critical supply chain disruption halting DUV scanner assembly",
+    "category": "export restriction",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Trade Policy",
+      "component": "semiconductor",
+      "region": "Netherlands",
+      "severity": 3,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "downstream_criticality"
+    }
+  },
+  {
+    "id": "ADV-12",
+    "headline": "Severe drought in Taiwan forces water rationing for high-volume semiconductor fabrication plants in Taichung",
+    "category": "natural disaster",
+    "ground_truth": {
+      "is_disruption": true,
+      "disruption_type": "Natural Disaster",
+      "component": "semiconductor",
+      "region": "Taiwan",
+      "severity": 2,
+      "expected_risk_level": "HIGH",
+      "top_risk_driver": "downstream_criticality"
+    }
+  },
+  {
+    "id": "ADV-13",
+    "headline": "Semiconductor industry association confirms no shortage expected as wafer foundry capacity reaches multi-year highs",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-14",
+    "headline": "Automotive chip supply improves markedly as global microcontroller lead times fall to 12 weeks",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-15",
+    "headline": "Port of Shanghai reports smooth cargo operations without work stoppage following rapid storm clearance",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-16",
+    "headline": "Despite geopolitical tensions, bilateral trade ministry confirms zero disruption to critical raw material quotas",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-17",
+    "headline": "Automotive supplier union successfully concludes annual collective bargaining agreement with no policy changes",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-18",
+    "headline": "Automakers report healthy chip buffer inventories with no supply chain impact observed during seasonal shutdown",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-19",
+    "headline": "Taiwan foundry completes scheduled annual maintenance ahead of schedule with zero waiting vessel backlog",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-20",
+    "headline": "Ministry of Commerce reassures domestic manufacturers of adequate semiconductor buffer stocks and no price spikes",
+    "category": "ambiguous/negation",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-21",
+    "headline": "University medical center publishes clinical trial using gallium-68 radiotracers for early prostate cancer detection",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-22",
+    "headline": "Astrophysicists detect trace amounts of germanium and zinc isotopes in debris from distant supernova explosion",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-23",
+    "headline": "Silicon Valley venture capital firm closes new $500 million fund to invest in early-stage generative AI chip startups",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-24",
+    "headline": "Historic municipal port authority in Lisbon celebrates 500th anniversary of maritime trade museum opening",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-25",
+    "headline": "Global semiconductor manufacturer reports quarterly earnings beat and expands dividend payout to shareholders",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-26",
+    "headline": "Materials science researchers synthesize novel gallium nitride crystal structure for ultra-efficient home LED lighting",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-27",
+    "headline": "Automotive OEM celebrates manufacturing milestone with rollout of 100,000th electric SUV from Pune assembly plant",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-28",
+    "headline": "National laboratory discovers catalytic properties of liquid gallium alloys in room-temperature plastic recycling",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-29",
+    "headline": "Semiconductor foundry executive elected fellow of international engineering society for lifetime packaging research",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  },
+  {
+    "id": "ADV-30",
+    "headline": "Municipal maritime port reclaims 50 acres of coastal land for public waterfront park and recreational marina",
+    "category": "hard negative",
+    "ground_truth": {
+      "is_disruption": false,
+      "disruption_type": "None",
+      "component": "none",
+      "region": "None",
+      "severity": 0,
+      "expected_risk_level": "LOW",
+      "top_risk_driver": "none"
+    }
+  }
+]
