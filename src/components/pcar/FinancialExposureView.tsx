@@ -512,6 +512,9 @@ export const FinancialExposureView: React.FC<FinancialExposureViewProps> = ({
                 <strong className="block text-sm text-[#00c8ff] font-mono mt-0.5">
                   {formatCurrencyValue(bomFile.calculatedPCaRCrores, currency)}
                 </strong>
+            <p className="text-[10px] text-[#a5a5a5] mt-1">
+              Illustrative frontend formula, not calculate_pcar_custom_bom.
+            </p>
               </div>
             </div>
           </div>

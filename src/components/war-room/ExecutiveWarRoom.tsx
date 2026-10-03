@@ -249,6 +249,9 @@ export const ExecutiveWarRoom: React.FC<ExecutiveWarRoomProps> = ({ selectedOEM 
           <div className="mt-3">
             <h3 className="text-sm font-bold text-[#f7f7f7] font-mono text-[#1787ff]">
               {formatCurrencyValue(currentP95PCaR, 'INR')}
+            <p className="text-[10px] text-[#a5a5a5] mt-1">
+              Frontend estimate: allocated baseline × P95 drop × 2.05 (not the backend PCaR engine)
+            </p>
             </h3>
             <p className="mt-1 text-xs text-[#a5a5a5]">
               95% PCaR · <strong className="text-[#f7f7f7]">{selectedOEM.name}</strong>
@@ -580,6 +583,7 @@ export const ExecutiveWarRoom: React.FC<ExecutiveWarRoomProps> = ({ selectedOEM 
           <div className="mt-2 text-lg sm:text-xl font-bold text-[#f7f7f7] font-mono">
             {formatCurrencyValue(currentMeanLoss, 'INR')}
           </div>
+          <p className="text-[10px] text-[#a5a5a5] mt-1">Frontend estimate: allocated baseline × mean drop × 1.25</p>
           <span className="mt-1 text-[11px] text-[#a5a5a5]">Expected Baseline Draw</span>
         </div>
       </section>
