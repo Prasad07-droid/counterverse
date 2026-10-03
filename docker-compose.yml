@@ -75,29 +75,29 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ── Streamlit Dashboard ───────────────────────────────────────
-  dashboard:
-    build: .
-    container_name: counterverse-dashboard
-    ports:
-      - "8501:8501"
-    environment:
-      - COUNTERVERSE_STREAMLIT_PORT=8501
-      - COUNTERVERSE_NEO4J_URI=bolt://neo4j:7687
-      - COUNTERVERSE_NEO4J_USER=neo4j
-      - COUNTERVERSE_NEO4J_PASSWORD=password
-      - COUNTERVERSE_REDIS_URL=redis://redis:6379
-    volumes:
-      - ./data:/app/data
-    depends_on:
-      - api
-    command: >
-      streamlit run app/dashboard.py
-      --server.port=8501
-      --server.address=0.0.0.0
-      --server.headless=true
-      --browser.gatherUsageStats=false
-    restart: unless-stopped
+  # ── Streamlit Dashboard (removed) ───────────────────────────────────────
+  # dashboard:
+  #   build: .
+  #   container_name: counterverse-dashboard
+  #   ports:
+  #     - "8501:8501"
+  #   environment:
+  #     - COUNTERVERSE_STREAMLIT_PORT=8501
+  #     - COUNTERVERSE_NEO4J_URI=bolt://neo4j:7687
+  #     - COUNTERVERSE_NEO4J_USER=neo4j
+  #     - COUNTERVERSE_NEO4J_PASSWORD=password
+  #     - COUNTERVERSE_REDIS_URL=redis://redis:6379
+  #   volumes:
+  #     - ./data:/app/data
+  #   depends_on:
+  #     - api
+  #   command: >
+  #     streamlit run app/dashboard.py
+  #     --server.port=8501
+  #     --server.address=0.0.0.0
+  #     --server.headless=true
+  #     --browser.gatherUsageStats=false
+  #   restart: unless-stopped
 
 volumes:
   neo4j_data:
