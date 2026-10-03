@@ -344,7 +344,7 @@ def get_slm_model(timeout_seconds: int = 45):
     return model_container[0]
 
 
-def extract_signal_qwen(headline: str) -> Dict[str, Any]:
+def extract_signal_qwen(headline: str, severity_pct_override: Optional[int] = None, duration_days_override: Optional[int] = None) -> Dict[str, Any]:
     """
     Executes real SLM inference using local Qwen2.5-0.5B-Instruct on GPU.
     Formats the input using the Appendix A2 system persona and prompt.
@@ -626,7 +626,7 @@ JSON:"""
     confidence = max(0.0, min(1.0, round(confidence, 2)))
 
     # Parameter extraction with deterministic seeded derivation
-    fast_fallback = _map_fast_params(headline, severity, is_disruption=is_disruption)
+    fast_fallback = _map_fast_params(headline, severity, is_disruption=is_disruption, severity_pct_override=severity_pct_override, duration_days_override=duration_days_override)
     affected_node = parsed.get("affected_node")
     if affected_node not in ALLOWED_AFFECTED_NODES:
         affected_node = fast_fallback["affected_node"]
@@ -677,7 +677,7 @@ JSON:"""
 
 from src.data_sources import sanitize_headline
 
-def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fast") -> Dict[str, Any]:
+def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fast", severity_pct_override: Optional[int] = None, duration_days_override: Optional[int] = None) -> Dict[str, Any]:
     """
     Extracts structured disruption signal from a news headline.
 
@@ -704,7 +704,7 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     headline = sanitized_headline  # use sanitized from here on
 
     if engine.lower() == "slm":
-        return extract_signal_qwen(headline)
+        return extract_signal_qwen(headline, severity_pct_override=severity_pct_override, duration_days_override=duration_days_override)
 
     logger.info(f"Extracting disruption signal (Fast Mode) from headline: '{headline}'")
     if simulate_delay:
@@ -863,7 +863,7 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
         f"Prepare counterfactual sourcing alternatives for critical {component} inputs."
     ]
 
-    fast_params = _map_fast_params(headline, severity, is_disruption=True)
+    fast_params = _map_fast_params(headline, severity, is_disruption=True, severity_pct_override=severity_pct_override, duration_days_override=duration_days_override)
     confidence_reason = f"Identified {disruption_type} affecting {component} in {region} ({cue_matches} critical disruption cues detected)"
 
     result = {
@@ -895,14 +895,14 @@ def extract_signal(headline: str, simulate_delay: bool = True, engine: str = "fa
     return result
 
 
-def extract_signal_fast(headline: str) -> Dict[str, Any]:
+def extract_signal_fast(headline: str, severity_pct_override: Optional[int] = None, duration_days_override: Optional[int] = None) -> Dict[str, Any]:
     """
     Fast deterministic rule-based signal extraction without SLM/GPU.
     Conforms strictly to the Appendix A2 JSON schema.
     """
-    res = extract_signal(headline, simulate_delay=False, engine="fast")
+    res = extract_signal(headline, simulate_delay=False, engine="fast", severity_pct_override=severity_pct_override, duration_days_override=duration_days_override)
     if "affected_node" not in res:
-        res.update(_map_fast_params(headline, res.get("severity", 2), is_disruption=res.get("is_disruption", True)))
+        res.update(_map_fast_params(headline, res.get("severity", 2), is_disruption=res.get("is_disruption", True), severity_pct_override=severity_pct_override, duration_days_override=duration_days_override))
     return res
 
 
