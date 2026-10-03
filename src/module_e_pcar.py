@@ -59,7 +59,8 @@ OEM_REALIZATION_LAKH_PER_UNIT = {
 def calculate_pcar(
     mc_samples: np.ndarray,
     baseline_revenue_crore: float = DEFAULT_COMTRADE_HS8542_BASELINE_CRORE,
-    company_name: str = "Maruti Suzuki"
+    company_name: str = "Maruti Suzuki",
+    baseline_output_value_crore: float = None,
 ) -> dict:
     """
     Calculates Procurement Cost-at-Risk (PCaR) metrics based on simulated production drop samples
@@ -75,7 +76,10 @@ def calculate_pcar(
                                 (Default: ₹1,33,814.34 Crore from UN Comtrade HS 8542).
         company_name: Target OEM ("Maruti Suzuki", "Hyundai India", "Tata Motors", "Mahindra",
                       or "Entire Indian Automotive Industry").
-        
+        baseline_output_value_crore: Optional annual output-value baseline for the selected
+                                     scope. When omitted, lost-output-value keys are returned
+                                     as None rather than inferred from procurement spend.
+
     Returns:
         A dictionary of company-allocated financial risk metrics in Crore INR.
     """
@@ -102,9 +106,25 @@ def calculate_pcar(
     # Generate stochastic Spot Premium Multiplier (between 1.3 and 2.8)
     premium_multiplier_samples = np.random.uniform(low=1.3, high=2.8, size=len(samples_array))
     
-    # Formula: Company Loss = Production_Drop% * Effective_Company_Base * Premium_Multiplier
+    # Existing protected metric: total stressed procurement exposure.
     loss_samples = drop_fractions * effective_base_crore * premium_multiplier_samples
-    
+
+    # Additive decomposition: only the premium above the baseline price is an
+    # extra procurement cost. This reuses the exact existing random draws.
+    extra_procurement_cost_samples = (
+        drop_fractions * effective_base_crore * (premium_multiplier_samples - 1.0)
+    )
+
+    # Procurement spend is not an output/revenue baseline. Do not relabel it as
+    # lost output. Compute this metric only when a caller supplies that baseline.
+    lost_output_value_samples = None
+    if baseline_output_value_crore is not None:
+        if baseline_output_value_crore < 0:
+            raise ValueError("baseline_output_value_crore must be non-negative")
+        output_scope_factor = market_share if company_name != "Entire Indian Automotive Industry" else 1.0
+        effective_output_value_crore = baseline_output_value_crore * output_scope_factor
+        lost_output_value_samples = drop_fractions * effective_output_value_crore
+
     metrics = {
         "company_name": company_name,
         "market_share_pct": round(market_share * 100, 1),
@@ -116,8 +136,35 @@ def calculate_pcar(
         "pcar_95_crore": float(np.percentile(loss_samples, 95)),
         "pcar_99_crore": float(np.percentile(loss_samples, 99)),
         "worst_case_loss_crore": float(np.max(loss_samples)),
+        "extra_procurement_cost_mean_crore": float(np.mean(extra_procurement_cost_samples)),
+        "extra_procurement_cost_median_crore": float(np.median(extra_procurement_cost_samples)),
+        "extra_procurement_cost_p95_crore": float(np.percentile(extra_procurement_cost_samples, 95)),
+        "extra_procurement_cost_p99_crore": float(np.percentile(extra_procurement_cost_samples, 99)),
+        "extra_procurement_cost_worst_case_crore": float(np.max(extra_procurement_cost_samples)),
+        "lost_output_value_mean_crore": (
+            float(np.mean(lost_output_value_samples)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_median_crore": (
+            float(np.median(lost_output_value_samples)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_p95_crore": (
+            float(np.percentile(lost_output_value_samples, 95)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_p99_crore": (
+            float(np.percentile(lost_output_value_samples, 99)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_worst_case_crore": (
+            float(np.max(lost_output_value_samples)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_status": (
+            "calculated_from_caller_supplied_output_baseline"
+            if lost_output_value_samples is not None
+            else "not_calculated_missing_output_value_baseline"
+        ),
         "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
         "_loss_samples": loss_samples,
+        "_extra_procurement_cost_samples": extra_procurement_cost_samples,
+        "_lost_output_value_samples": lost_output_value_samples,
     }
     
     logger.info(f"Calculated PCaR 95% for {company_name}: ₹{metrics['pcar_95_crore']:,.0f} Crore (Base: ₹{effective_base_crore:,.0f} Cr)")
@@ -217,6 +264,59 @@ def calculate_pcar_by_company(
         worst_case = macro_worst * allocation_factor
         company_samples = None
 
+    # Additive procurement-premium decomposition, scaled with the same company
+    # procurement allocation factor as the protected PCaR metrics.
+    macro_extra_samples = macro_pcar_result.get("_extra_procurement_cost_samples")
+    if macro_extra_samples is not None:
+        company_extra_samples = np.asarray(macro_extra_samples) * allocation_factor
+        extra_metrics = {
+            "extra_procurement_cost_mean_crore": float(round(np.mean(company_extra_samples), 2)),
+            "extra_procurement_cost_median_crore": float(round(np.median(company_extra_samples), 2)),
+            "extra_procurement_cost_p95_crore": float(round(np.percentile(company_extra_samples, 95), 2)),
+            "extra_procurement_cost_p99_crore": float(round(np.percentile(company_extra_samples, 99), 2)),
+            "extra_procurement_cost_worst_case_crore": float(round(np.max(company_extra_samples), 2)),
+        }
+    else:
+        company_extra_samples = None
+        extra_metrics = {
+            key: (
+                float(round(macro_pcar_result.get(key, 0.0) * allocation_factor, 2))
+                if macro_pcar_result.get(key) is not None else None
+            )
+            for key in (
+                "extra_procurement_cost_mean_crore",
+                "extra_procurement_cost_median_crore",
+                "extra_procurement_cost_p95_crore",
+                "extra_procurement_cost_p99_crore",
+                "extra_procurement_cost_worst_case_crore",
+            )
+        }
+
+    # Lost output is separate from procurement exposure and scales by company
+    # market share only. It remains unavailable unless the macro call received
+    # an explicit output-value baseline.
+    macro_output_samples = macro_pcar_result.get("_lost_output_value_samples")
+    if macro_output_samples is not None:
+        company_output_samples = np.asarray(macro_output_samples) * market_share
+        output_metrics = {
+            "lost_output_value_mean_crore": float(round(np.mean(company_output_samples), 2)),
+            "lost_output_value_median_crore": float(round(np.median(company_output_samples), 2)),
+            "lost_output_value_p95_crore": float(round(np.percentile(company_output_samples, 95), 2)),
+            "lost_output_value_p99_crore": float(round(np.percentile(company_output_samples, 99), 2)),
+            "lost_output_value_worst_case_crore": float(round(np.max(company_output_samples), 2)),
+            "lost_output_value_status": "calculated_from_caller_supplied_output_baseline",
+        }
+    else:
+        company_output_samples = None
+        output_metrics = {
+            "lost_output_value_mean_crore": None,
+            "lost_output_value_median_crore": None,
+            "lost_output_value_p95_crore": None,
+            "lost_output_value_p99_crore": None,
+            "lost_output_value_worst_case_crore": None,
+            "lost_output_value_status": "not_calculated_missing_output_value_baseline",
+        }
+
     metrics = {
         "company_name": canonical_name,
         "market_share_pct": round(market_share * 100, 1),
@@ -236,8 +336,14 @@ def calculate_pcar_by_company(
             "macro_pcar_99_crore": float(round(macro_pcar_result.get("pcar_99_crore", 0.0), 2)),
         }
     }
+    metrics.update(extra_metrics)
+    metrics.update(output_metrics)
     if company_samples is not None:
         metrics["_loss_samples"] = company_samples
+    if company_extra_samples is not None:
+        metrics["_extra_procurement_cost_samples"] = company_extra_samples
+    if company_output_samples is not None:
+        metrics["_lost_output_value_samples"] = company_output_samples
 
     logger.info(
         f"Calculated Company PCaR for {canonical_name}: "
@@ -318,6 +424,7 @@ def calculate_pcar_custom_bom(
     bom_components: list,
     company_name: str = "Custom Enterprise",
     ground_against_graph: bool = True,
+    baseline_output_value_crore: float = None,
 ) -> dict:
     """
     Calculates Procurement Cost-at-Risk using a custom Bill of Materials.
@@ -336,8 +443,10 @@ def calculate_pcar_custom_bom(
             - hs_code: str (e.g. "8542")
             - annual_spend_crore: float
         company_name: Label for the custom enterprise.
-        ground_against_graph: Whether to verify components against GraphRAG.
-    
+        ground_against_graph: Whether to verify components against the graph.
+        baseline_output_value_crore: Optional output-value baseline. Lost-output
+                                     metrics remain None when it is omitted.
+
     Returns:
         dict with PCaR metrics plus component-level grounding results.
     """
@@ -379,6 +488,14 @@ def calculate_pcar_custom_bom(
     drop_fractions = samples_array / 100.0
     premium_multiplier_samples = np.random.uniform(low=1.3, high=2.8, size=len(samples_array))
     loss_samples = drop_fractions * total_baseline_crore * premium_multiplier_samples
+    extra_procurement_cost_samples = (
+        drop_fractions * total_baseline_crore * (premium_multiplier_samples - 1.0)
+    )
+    lost_output_value_samples = None
+    if baseline_output_value_crore is not None:
+        if baseline_output_value_crore < 0:
+            raise ValueError("baseline_output_value_crore must be non-negative")
+        lost_output_value_samples = drop_fractions * baseline_output_value_crore
 
     # Component-level loss allocation
     component_pcars = []
@@ -410,11 +527,38 @@ def calculate_pcar_custom_bom(
         "pcar_99_crore": float(round(np.percentile(loss_samples, 99), 2)),
         "worst_case_loss_crore": float(round(np.max(loss_samples), 2)),
         "worst_case_pct": float(round((np.max(loss_samples) / total_baseline_crore) * 100, 2)) if total_baseline_crore > 0 else 0.0,
+        "extra_procurement_cost_mean_crore": float(round(np.mean(extra_procurement_cost_samples), 2)),
+        "extra_procurement_cost_median_crore": float(round(np.median(extra_procurement_cost_samples), 2)),
+        "extra_procurement_cost_p95_crore": float(round(np.percentile(extra_procurement_cost_samples, 95), 2)),
+        "extra_procurement_cost_p99_crore": float(round(np.percentile(extra_procurement_cost_samples, 99), 2)),
+        "extra_procurement_cost_worst_case_crore": float(round(np.max(extra_procurement_cost_samples), 2)),
+        "lost_output_value_mean_crore": (
+            float(round(np.mean(lost_output_value_samples), 2)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_median_crore": (
+            float(round(np.median(lost_output_value_samples), 2)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_p95_crore": (
+            float(round(np.percentile(lost_output_value_samples, 95), 2)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_p99_crore": (
+            float(round(np.percentile(lost_output_value_samples, 99), 2)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_worst_case_crore": (
+            float(round(np.max(lost_output_value_samples), 2)) if lost_output_value_samples is not None else None
+        ),
+        "lost_output_value_status": (
+            "calculated_from_caller_supplied_output_baseline"
+            if lost_output_value_samples is not None
+            else "not_calculated_missing_output_value_baseline"
+        ),
         "component_pcars": component_pcars,
         "grounding_results": grounding_results,
         "component_grounding": grounding_results,
         "allocation_formula": "BOM_Baseline × Production_Drop% × Premium_Multiplier U[1.3, 2.8]",
         "_loss_samples": loss_samples,
+        "_extra_procurement_cost_samples": extra_procurement_cost_samples,
+        "_lost_output_value_samples": lost_output_value_samples,
     }
 
     logger.info(

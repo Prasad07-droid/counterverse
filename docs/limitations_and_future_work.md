@@ -52,7 +52,10 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 #### 1. Graph Mesh vs. Clean 4-Tier Chain Oversimplification
 * **The Reality:** Real global supply chains are not linear 4-tier acyclic trees. They form dense, cyclic bipartite meshes featuring multi-sourcing (e.g., dual-sourcing automotive microcontrollers from TSMC/Taiwan and Samsung/Korea), cross-tier lateral transshipments, and substitutable intermediate components.
-* **The Simulation Bound:** CounterVerse uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM.
+* **The Simulation Bound:** CounterVerse uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM. The separate 30-node/69-edge verification graph also contains three explicit simplifications:
+  - NXP is headquartered in the Netherlands, while the current graph models its headquarters country as USA for scope simplification.
+  - OEM-to-component edges are asymmetric: Tata Motors and Hyundai India have direct `Integrated Circuits` edges, while Maruti Suzuki and Mahindra are linked through ECU/sensor nodes. This is a modeling choice, not evidence of different real procurement structures.
+  - China Minmetals is included as a Chinese metals/mining actor, but its use as a gallium-supply representative requires source verification (`TODO_SOURCE` in `HUMAN_TODO.md`).
 * **The Engineering Fix:** 
   - Transition from a static NetworkX DAG to a **Bipartite Knowledge Graph (Neo4j / Graph Neural Network)** dynamically populated via Open Supply Chain data (e.g., OpenSanctions, ImportYeti, panjiva shipping bills).
   - Model alternate sourcing paths via dynamic edge weights reflecting switching costs and qualification cycle times (typically 6–18 months for automotive AEC-Q100 qualified silicon).
@@ -121,7 +124,7 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 #### 9. Proprietary OEM BOM Confidentiality & Heuristic Dependency Ratios
 * **The Reality:** No automotive OEM (Maruti, Tata, Hyundai) will upload their proprietary Bill of Materials (BOM), supplier cost margins, or tier-N contracts into a public cloud-hosted web application.
 * **The Simulation Bound:** Uses public SIAM FY24 market share estimates and domain-estimated BOM dependency ratios (38%–45%).
-* **Heuristic Assignment Disclosure:** As documented in `docs/assumptions_and_dag.md`, the dependency ratios (Maruti 0.38, Hyundai 0.42, Tata 0.45, Mahindra 0.44) are heuristic proxies reflecting relative electronics intensity across vehicle segments, NOT certified audited OEM BOM disclosures. While the formula $\sum (\text{Market Share}_i \times \text{Dependency}_i) = 33.16\% \le 1.0$ guarantees **algebraic internal consistency by construction**, it does **not guarantee empirical ground-truth accuracy**.
+* **Heuristic Assignment Disclosure:** As documented in `docs/assumptions_and_dag.md`, the dependency ratios (Maruti 0.38, Hyundai 0.42, Tata 0.45, Mahindra 0.44) are heuristic proxies reflecting relative electronics intensity across vehicle segments, NOT certified audited OEM BOM disclosures. The formula $\sum (\text{Market Share}_i \times \text{Dependency}_i) = 33.16\% \le 1.0$ produces a bounded subtotal by construction, but this arithmetic property is **not a validation claim** and provides no evidence of empirical ground-truth accuracy.
 * **The Engineering Fix:** 
   - Deploy via **On-Premise Enterprise Containers** or **Confidential Computing (Intel SGX / AWS Nitro Enclaves)**.
   - Implement **Federated Supply Chain Learning & Zero-Knowledge Proofs (ZKP)**: Tier-1 suppliers prove capacity availability without disclosing sensitive supplier identities or raw prices.

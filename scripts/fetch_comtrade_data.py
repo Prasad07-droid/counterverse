@@ -66,7 +66,7 @@ def main():
             "exchange_rate_usd_inr": 83.0,
             "access_date": "2026-09-05",
             "last_fetch_utc": now_utc,
-            "stale_warning": "UN Comtrade public trade data is annual and lagged by 3-12 months. 2023-2024 records may be partial or unreleased."
+            "stale_warning": "This repository uses its audited 2022 full-year extraction; later full-year data has not been fetched and audited into the project. The 2022 baseline predates China’s August 2023 gallium/germanium export controls."
         },
         "yearly_totals": {},
         "partner_shares": {}

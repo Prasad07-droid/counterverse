@@ -1,0 +1,20 @@
+{
+  "approval": "User explicitly approved the proposed Tier C SHA-256 seed change after reviewing exact expected outputs.",
+  "changes": {
+    "SCEN-01": {"severity_pct": 66, "duration_days": 49},
+    "SCEN-02": {"severity_pct": 39, "duration_days": 16},
+    "SCEN-03": {"severity_pct": 0, "duration_days": 5},
+    "SCEN-04": {"severity_pct": 71, "duration_days": 50},
+    "SCEN-05": {"severity_pct": 87, "duration_days": 78},
+    "SCEN-06": {"severity_pct": 0, "duration_days": 5},
+    "SCEN-07": {"severity_pct": 75, "duration_days": 50},
+    "SCEN-08": {"severity_pct": 37, "duration_days": 24},
+    "SCEN-09": {"severity_pct": 0, "duration_days": 5},
+    "SCEN-10": {"severity_pct": 77, "duration_days": 37},
+    "SCEN-11": {"severity_pct": 88, "duration_days": 75},
+    "SCEN-12": {"severity_pct": 0, "duration_days": 6},
+    "SCEN-13": {"severity_pct": 95, "duration_days": 77},
+    "SCEN-14": {"severity_pct": 43, "duration_days": 25},
+    "SCEN-15": {"severity_pct": 52, "duration_days": 17}
+  }
+}

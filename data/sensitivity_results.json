@@ -1,0 +1,119 @@
+{
+  "analysis": "joint_uniform_perturbation_of_asserted_values_and_formula_weights",
+  "baseline_case": "severity-2 China integrated-circuit branch",
+  "baseline_class": "HIGH",
+  "baseline_score": 0.7825,
+  "baseline_values": {
+    "DC": 0.95,
+    "DR": 0.56,
+    "EB": 0.85,
+    "ED": 0.75,
+    "TC": 0.8
+  },
+  "baseline_weights": {
+    "DC": 0.2,
+    "DR": 0.25,
+    "EB": 0.35,
+    "ED": 0.1,
+    "TC": 0.1
+  },
+  "dependency_ratio_note": "DR is fixed at the protected 0.560 output and is partially data-informed; C_upstream and W_unhedged remain assumptions in branches where they apply.",
+  "disclaimer": "Robustness analysis of assumptions; not a confidence interval and not a forecast.",
+  "joint_analysis": {
+    "class_counts": {
+      "HIGH": 10000,
+      "LOW": 0,
+      "MEDIUM": 0
+    },
+    "class_rates": {
+      "HIGH": 1.0,
+      "LOW": 0.0,
+      "MEDIUM": 0.0
+    },
+    "draws": 10000,
+    "max_score": 0.894669,
+    "mean_score": 0.778051,
+    "median_score": 0.778502,
+    "min_score": 0.669288,
+    "p05_score": 0.711262,
+    "p95_score": 0.845117,
+    "perturbation": "independent Uniform[-20%, +20%] multipliers",
+    "random_seed": 42,
+    "std_score": 0.041113,
+    "weight_handling": "renormalized to sum to 1 after perturbation"
+  },
+  "tornado": [
+    {
+      "high_delta": 0.0525,
+      "high_score": 0.835,
+      "kind": "asserted_factor_value",
+      "low_delta": -0.0595,
+      "low_score": 0.723,
+      "parameter": "EB"
+    },
+    {
+      "high_delta": 0.01,
+      "high_score": 0.7925,
+      "kind": "asserted_factor_value",
+      "low_delta": -0.038,
+      "low_score": 0.7445,
+      "parameter": "DC"
+    },
+    {
+      "high_delta": 0.016,
+      "high_score": 0.7985,
+      "kind": "asserted_factor_value",
+      "low_delta": -0.016,
+      "low_score": 0.7665,
+      "parameter": "TC"
+    },
+    {
+      "high_delta": 0.015,
+      "high_score": 0.7975,
+      "kind": "asserted_factor_value",
+      "low_delta": -0.015,
+      "low_score": 0.7675,
+      "parameter": "ED"
+    },
+    {
+      "high_delta": -0.010595,
+      "high_score": 0.771905,
+      "kind": "formula_weight",
+      "low_delta": 0.011711,
+      "low_score": 0.794211,
+      "parameter": "weight_DR"
+    },
+    {
+      "high_delta": 0.006442,
+      "high_score": 0.788942,
+      "kind": "formula_weight",
+      "low_delta": -0.006979,
+      "low_score": 0.775521,
+      "parameter": "weight_DC"
+    },
+    {
+      "high_delta": 0.004416,
+      "high_score": 0.786916,
+      "kind": "formula_weight",
+      "low_delta": -0.005081,
+      "low_score": 0.777419,
+      "parameter": "weight_EB"
+    },
+    {
+      "high_delta": -0.000637,
+      "high_score": 0.781863,
+      "kind": "formula_weight",
+      "low_delta": 0.000663,
+      "low_score": 0.783163,
+      "parameter": "weight_ED"
+    },
+    {
+      "high_delta": 0.000343,
+      "high_score": 0.782843,
+      "kind": "formula_weight",
+      "low_delta": -0.000357,
+      "low_score": 0.782143,
+      "parameter": "weight_TC"
+    }
+  ]
+}

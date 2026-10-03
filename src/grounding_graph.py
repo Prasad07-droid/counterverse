@@ -27,8 +27,9 @@ WHAT THIS DOES:
 
 3. Entities found in the graph are marked "Graph-Verified" with enriched metadata
    (hs_code, industry, country) from the graph's stored node attributes.
-   Entities NOT found are marked "Unverified (SLM inference only)" — they are NOT
-   discarded, only flagged. The SLM should still work on novel/unknown entities.
+   Entities NOT found retain the compatible "Unverified" status, gain the additive
+   review state "NEEDS_HUMAN_VERIFICATION", and are NOT discarded. The SLM should
+   still work on novel/unknown entities.
 
 ALIGNMENT WITH AlMahri et al. (2026):
 This implements one of the "three complementary mechanisms" described in Section 1
@@ -434,7 +435,8 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
     For each entity extracted by the SLM (regions, components, industries, companies):
     1. Attempts to resolve it to a canonical graph node via alias mapping.
     2. If found: marks it "Graph-Verified" and enriches with graph attributes.
-    3. If NOT found: marks it "Unverified (SLM inference only)" — NOT discarded.
+    3. If NOT found: retains "Unverified", adds the review state
+       "NEEDS_HUMAN_VERIFICATION", and does NOT discard the entity.
 
     This is a DETERMINISTIC lookup function (graph.has_node(), graph.has_edge()),
     not another LLM call — grounding must be fast and non-hallucinating by construction.
@@ -468,6 +470,7 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
                 "canonical_name": None,
                 "entity_type": "country (inferred)",
                 "status": "Unverified",
+                "review_state": "NEEDS_HUMAN_VERIFICATION",
                 "reason": "Entity not found in grounding graph — SLM inference only",
             })
 
@@ -506,6 +509,7 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
                         "canonical_name": None,
                         "entity_type": "component (inferred)",
                         "status": "Unverified",
+                        "review_state": "NEEDS_HUMAN_VERIFICATION",
                         "reason": "Entity not found in grounding graph — SLM inference only",
                     })
 
@@ -528,6 +532,7 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
                 "canonical_name": None,
                 "entity_type": "industry (inferred)",
                 "status": "Unverified",
+                "review_state": "NEEDS_HUMAN_VERIFICATION",
                 "reason": "Entity not found in grounding graph — SLM inference only",
             })
 
@@ -553,6 +558,7 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
                 "canonical_name": None,
                 "entity_type": "company (inferred)",
                 "status": "Unverified",
+                "review_state": "NEEDS_HUMAN_VERIFICATION",
                 "reason": "Entity not found in grounding graph — SLM inference only",
             })
 
@@ -619,6 +625,11 @@ def ground_entities(signal: Dict[str, Any]) -> Dict[str, Any]:
             "total_entities": total_count,
             "verified_count": verified_count,
             "unverified_count": total_count - verified_count,
+            "needs_human_verification_count": sum(
+                1
+                for result in grounding_results
+                if result.get("review_state") == "NEEDS_HUMAN_VERIFICATION"
+            ),
             "verification_rate": round(verified_count / max(total_count, 1) * 100, 1),
             "graph_stats": {
                 "total_nodes": G.number_of_nodes(),

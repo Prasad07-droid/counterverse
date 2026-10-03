@@ -6,10 +6,33 @@ Until then: **no CPT numbers in code.** Do not copy calibration anecdotes into t
 
 Fixed DAG: see `.cursorrules`. Do not add/remove edges without written approval.
 
+### Grounding Graph Counts (Code Output)
+
+`get_graph_summary()` reports **30 nodes and 69 directed edges**. The current edge counts by `relationship` are:
+
+| Relationship | Directed edges |
+|---|---:|
+| `operates_in` | 14 |
+| `depends_on` | 8 |
+| `supplies` | 14 |
+| `requires` | 8 |
+| `belongs_to` | 12 |
+| `exports` | 9 |
+| `imports_from` | 4 |
+| **Total** | **69** |
+
+These are deterministic code counts, not claims about completeness of the real-world supply network.
+
 Placeholder calibration facts (cite when used):
 
 - Maruti production Sep 2020 → Sep 2021: 166,086 → 81,278 (51.1%), from coverage of MSI regulatory filing (see `data/raw/oem_production/SOURCE.md`). Re-file the BSE PDF before treating as locked.
 - Tata Motors Q2 FY22 loss ₹4,442 crore — **re-cite the original results release** in Phase 4; do not use until the PDF URL is in this file.
+
+---
+
+## HS 8112 Scope Caveat
+
+HS 8112 is not a gallium/germanium-only series. It also covers beryllium, chromium, vanadium, hafnium, indium, niobium, rhenium, thallium, and related articles, waste, and scrap. The aggregate HS 8112 baseline is therefore an upstream proxy and must not be presented as a measured gallium/germanium procurement total. Mainstream automotive microcontrollers are silicon-based; gallium/germanium relevance is modeled only as a stress-test pathway through compound-semiconductor applications such as GaN, GaAs, and SiGe. The scenario must not imply that conventional silicon MCUs are fabricated from gallium or germanium.
 
 ---
 
@@ -34,15 +57,15 @@ This section documents whether any input variable feeding the Bayesian priors or
 
 ### Weight Provenance Table
 
-| Variable | Weight | Basis | Empirically Measured? |
+| Variable | Weight | Basis | Data status |
 |---|---|---|---|
 | EB (Exposure Breadth) | 35% | Domain assertion — AlMahri §3.2.5 | No — asserted constant |
-| DR (Dependency Ratio) | 25% | UN Comtrade bilateral trade shares | YES — real measured data |
+| DR (Dependency Ratio) | 25% | UN Comtrade bilateral shares plus upstream-concentration adjustment | Partially data-informed — trade shares are measured; $C_{\text{upstream}}$ and $W_{\text{unhedged}}=0.75$ are assumptions |
 | DC (Downstream Criticality) | 20% | Domain assertion — automotive ECU literature | No — asserted constant |
 | TC (Tier-1 Centrality) | 10% | Graph degree centrality (NetworkX) | Partial — topological, not economic |
-| ED (Exposure Depth) | 10% | Tier depth normalized (Tier/4.0) | Partial — structural, not economic |
+| ED (Exposure Depth) | 10% | Discrete component-class lookup: raw material 1.00; IC/wafer/MCU/ECU 0.75; automotive sensor 0.25; unverified fallback 0.50 | Structural assumption, not a continuous tier formula |
 
-**Summary: 75% of formula weight rests on domain-asserted constants, 25% on empirically measured trade data (DR). This is a known limitation acknowledged in AlMahri et al. (2026) for domain-adapted implementations.**
+**Summary: the score is partially data-informed, not 25% empirically measured. DR uses measured UN Comtrade bilateral shares, but its upstream-concentration term $C_{\text{upstream}}$ and unhedged-exposure weight $W_{\text{unhedged}}=0.75$ are modeling assumptions. EB, DC, TC, and ED also contain asserted or structural inputs.**
 
 ### Sensitivity Analysis (±20% perturbation on each asserted constant)
 
@@ -103,7 +126,7 @@ $$\text{Company PCaR} = \text{Simulated Production Drop (\%)} \times \text{Compa
 | **Subtotal (4 Named OEMs)** | **81.4%** | SIAM FY24 | **Weighted 40.7%** | **Combined Heuristic** | Major passenger vehicle manufacturers | **₹44,362 Cr** | **33.16%** |
 | **Entire Indian Industry** | 100.0% | Macro UN Comtrade aggregate | 100% | Measured Trade Baseline | National aggregate import turnover (HS 8542) | ₹1,33,814 Cr | 100.00% |
 
-#### Methodological Clarification: Algebraic Boundedness vs. Empirical Accuracy
+#### Methodological Clarification: Allocation Arithmetic Is Not Validation
 Summing the allocated exposure across all four named OEMs yields:
 $$\sum_{i=1}^{4} \text{Allocation Ratio}_i = 15.85\% + 6.13\% + 6.26\% + 4.93\% = 33.16\%$$
 
@@ -111,9 +134,8 @@ Consequently:
 $$\sum_{i=1}^{4} \text{Company PCaR}_i \approx 0.3316 \times \text{Macro PCaR} < \text{Macro PCaR}$$
 
 > [!WARNING]
-> **Algebraic Consistency vs. Empirical Accuracy:**  
-> The fact that individual company allocations sum to 33.16% ($\le 1.0$) guarantees **algebraic internal consistency by construction**, because the formula is mathematically structured to scale down from the macro baseline ($\text{Macro} \times \text{Share} \times \text{Dependency}$).  
-> **It does NOT guarantee empirical ground-truth accuracy.**  
+> **Arithmetic scope check — not validation:**
+> The 33.16% subtotal follows mechanically from the selected market-share and dependency inputs in $\text{Macro} \times \text{Share} \times \text{Dependency}$. This bounded subtotal is not evidence that the inputs, allocation method, or resulting PCaR values are valid against real OEM procurement data.
 > While market shares (41.7%, 14.6%, etc.) are verified from official SIAM FY24 filings, the dependency ratios (0.38, 0.42, 0.45, 0.44) are analyst-estimated heuristic proxies reflecting relative electronics intensity across vehicle segments, not certified audited OEM Bill of Materials (BOM) disclosures. Until validated through proprietary OEM procurement interviews or confidential enterprise ERP telemetry, these remain domain-asserted modeling assumptions (matching the status of EB, DC, and TC constants in Section 4.2).
 
 The remaining ~66.84% (₹89,452 Cr) represents non-covered passenger vehicle manufacturers (Kia, Toyota, Honda, MG, Volkswagen), commercial vehicles (Tata CV, Ashok Leyland), two-wheelers, tractors, and unexposed non-semiconductor electronic components. This relationship is verified in unit test `test_company_level_pcar_internal_consistency()`.
@@ -145,12 +167,16 @@ To replace manual UI sliders while maintaining rigorous reproducibility, `src/mo
   - `"Demand shock"`: *demand, sales, earnings, recession*
   - *Fallback:* Defaults strictly to `"Logistics delay"`.
 
-### 2. Seeded PRNG Determinism (`hash(headline)`)
+### 2. Stable SHA-256-Seeded PRNG Determinism
 
-To guarantee that the exact same headline produces identical disruption severity and duration across separate invocations without state persistence, parameters are seeded via:
+To guarantee that the same headline produces identical disruption severity and duration across Python processes without state persistence, the approved hardening path derives a fixed integer seed from the first eight bytes of the headline's SHA-256 digest:
 ```python
-rng = random.Random(hash(headline))
+digest = hashlib.sha256(headline.encode("utf-8")).digest()
+stable_seed = int.from_bytes(digest[:8], byteorder="big", signed=False)
+rng = random.Random(stable_seed)
 ```
+
+This replaces Python's process-randomized `hash()` seed. It changes the generated severity/duration values relative to the pre-hardening baseline, but leaves their documented ranges and optional override behavior unchanged.
 
 Severity and duration ranges are governed by the classified disruption level:
 
