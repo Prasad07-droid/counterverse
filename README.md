@@ -131,6 +131,12 @@ docker compose up --build
 # API:       http://localhost:8000/docs
 ```
 
+### Run with live backend
+To connect the frontend to the live FastAPI backend instead of offline static demo data:
+1. Start the API server: `uvicorn api.main:app --host 0.0.0.0 --port 8000`
+2. Create `.env` from `.env.example` with `VITE_API_URL=http://localhost:8000`
+3. Start the frontend: `npm run dev` (the UI will display the green **Live API** telemetry badge).
+
 ---
 
 ## API Endpoints

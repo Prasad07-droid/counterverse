@@ -406,6 +406,68 @@ async def analyze_headline(req: HeadlineRequest):
     )
 
 
+class SignalExtractionRequest(BaseModel):
+    headline: str = Field(..., min_length=5, max_length=500)
+    engine: str = Field(default="fast")
+
+
+@app.post("/api/v1/signal", tags=["Pipeline"])
+async def extract_signal_endpoint(req: SignalExtractionRequest):
+    """
+    Extracts structured supply chain disruption signal from unstructured headline.
+    """
+    if req.engine == "slm" and SLM_AVAILABLE:
+        try:
+            signal = extract_signal(req.headline, engine="slm")
+        except Exception:
+            signal = extract_signal_fast(req.headline) if extract_signal_fast else _fallback_signal(req.headline)
+    elif extract_signal_fast:
+        signal = extract_signal_fast(req.headline)
+    else:
+        signal = _fallback_signal(req.headline)
+
+    grounding = ground_entities(signal)
+    return {
+        "signal": _safe_dict(signal),
+        "grounding": grounding,
+        "engine_used": req.engine,
+    }
+
+
+@app.post("/api/v1/simulate", tags=["Pipeline"])
+async def simulate_endpoint(signal_payload: Dict[str, Any]):
+    """
+    Propagates an extracted signal through causal scoring and Monte Carlo simulation.
+    Accepts either an extracted signal directly or a dict wrapping { "signal": ... }.
+    """
+    sig = signal_payload.get("signal", signal_payload)
+    risk_result = calculate_deterministic_risk_score(sig)
+    risk_score = risk_result.get("risk_score", 0.5)
+    risk_label = "HIGH" if risk_score >= 0.60 else ("MEDIUM" if risk_score >= 0.45 else "LOW")
+
+    probabilities = simulate_causal_impact(sig)
+    mc_result = run_monte_carlo(probabilities, n_samples=10000, random_seed=42)
+
+    pcar_macro = calculate_pcar(mc_result, company_name="Entire Indian Automotive Industry")
+    directive_result = compute_cost_adjusted_recommendation(
+        risk_score=risk_score,
+        pcar_mean_crore=float(pcar_macro.get("mean_loss_crore", 0.0)),
+    )
+
+    return {
+        "risk_score": round(risk_score, 4),
+        "risk_label": risk_label,
+        "probabilities": {k: v for k, v in probabilities.items() if not k.startswith("_") and not isinstance(v, dict)},
+        "mc_stats": {
+            "mean_drop": round(float(mc_result["mean_drop"]), 2),
+            "p95_drop": round(float(mc_result["p95_drop"]), 2),
+            "p99_drop": round(float(mc_result["p99_drop"]), 2),
+        },
+        "pcar": _sanitize_pcar(pcar_macro),
+        "csco_directive": directive_result.get("recommendation", "Maintain Standard Operations"),
+    }
+
+
 @app.post("/api/v1/simulate-risk", response_model=SimulateResponse)
 async def simulate_risk(req: SimulateRequest):
     """

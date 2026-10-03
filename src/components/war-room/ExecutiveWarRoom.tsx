@@ -26,6 +26,7 @@ import {
   ScrapedNewsArticle
 } from '../../data/mockData';
 import { formatCurrencyValue } from '../../utils/formatters';
+import { postSignal, postSimulate, isLiveApiConfigured } from '../../api/client';
 
 interface ExecutiveWarRoomProps {
   selectedOEM: OEMProfile;
@@ -37,6 +38,9 @@ export const ExecutiveWarRoom: React.FC<ExecutiveWarRoomProps> = ({ selectedOEM 
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisStatus, setAnalysisStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState<string>('');
+  const [apiMode, setApiMode] = useState<'Live API' | 'Offline demo data'>(() =>
+    isLiveApiConfigured() ? 'Live API' : 'Offline demo data'
+  );
 
   // Real-Time Web Scraper State
   const [isScraping, setIsScraping] = useState<boolean>(false);
@@ -68,15 +72,47 @@ export const ExecutiveWarRoom: React.FC<ExecutiveWarRoomProps> = ({ selectedOEM 
     }, 850);
   };
 
-  const handleAutoExtractTopNews = () => {
+  const handleAutoExtractTopNews = async () => {
     setIsScraping(true);
     setScrapeNotification('Auto-scraping web & selecting highest disruption threat...');
+
+    const top = scrapedFeed[0];
+    const headline = top ? top.title : incidentText;
+
+    if (isLiveApiConfigured()) {
+      try {
+        const signalRes = await postSignal(headline, 'fast');
+        if (signalRes && signalRes.signal) {
+          const simRes = await postSimulate(signalRes.signal);
+          if (simRes) {
+            setIsScraping(false);
+            setIncidentText(headline);
+            if (top) setActiveVector(top.vector);
+            setScrapeNotification(`⚡ Live Ingested: "${headline.slice(0, 55)}..."`);
+            setApiMode('Live API');
+
+            setIsAnalyzing(false);
+            setAnalysisStatus('success');
+            setStatusMessage(`Live API propagation complete: Risk ${(simRes.risk_score * 100).toFixed(1)}% (${simRes.risk_label}), Directive: ${simRes.csco_directive}.`);
+            if (simRes.mc_stats) {
+              setP95DropPct(simRes.mc_stats.p95_drop || 41.2);
+              setMeanDropPct(simRes.mc_stats.mean_drop || 28.2);
+            }
+            return;
+          }
+        }
+      } catch (err) {
+        // Fallback to local behavior
+      }
+    }
+
+    // Offline / fallback execution
     setTimeout(() => {
       setIsScraping(false);
-      const top = scrapedFeed[0];
-      setIncidentText(top.title);
-      setActiveVector(top.vector);
-      setScrapeNotification(`⚡ Auto-Ingested: "${top.title.slice(0, 55)}..."`);
+      setIncidentText(headline);
+      if (top) setActiveVector(top.vector);
+      setScrapeNotification(`⚡ Auto-Ingested: "${headline.slice(0, 55)}..."`);
+      setApiMode('Offline demo data');
 
       // Trigger automatic causal analysis
       setIsAnalyzing(true);
@@ -279,15 +315,28 @@ export const ExecutiveWarRoom: React.FC<ExecutiveWarRoomProps> = ({ selectedOEM 
                   <span>{isScraping ? 'Scraping Web...' : '🕷️ Scrape Live Web'}</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleAutoExtractTopNews}
-                  disabled={isScraping || isAnalyzing}
-                  className="flex items-center justify-center gap-1.5 rounded border border-[#00df8f]/40 bg-[#00df8f]/10 px-2.5 py-2 text-xs font-bold text-[#00df8f] hover:bg-[#00df8f]/20 transition disabled:opacity-50 cursor-pointer"
-                >
-                  <Sparkles className="h-3.5 w-3.5 text-[#00df8f]" />
-                  <span>⚡ Auto-Extract & Simulate</span>
-                </button>
+                <div className="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={handleAutoExtractTopNews}
+                    disabled={isScraping || isAnalyzing}
+                    className="flex items-center justify-center gap-1.5 rounded border border-[#00df8f]/40 bg-[#00df8f]/10 px-2.5 py-2 text-xs font-bold text-[#00df8f] hover:bg-[#00df8f]/20 transition disabled:opacity-50 cursor-pointer w-full"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-[#00df8f]" />
+                    <span>⚡ Auto-Extract & Simulate</span>
+                  </button>
+                  <div className="flex justify-end">
+                    <span
+                      className={`text-[9px] font-mono rounded px-1.5 py-0.5 border ${
+                        apiMode === 'Live API'
+                          ? 'bg-[#00df8f]/10 border-[#00df8f]/30 text-[#00df8f]'
+                          : 'bg-[#666666]/10 border-[#666666]/30 text-[#a5a5a5]'
+                      }`}
+                    >
+                      {apiMode}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {scrapeNotification && (
