@@ -680,6 +680,29 @@ async def get_supported_currencies():
     return {"supported": list(CURRENCY_RATES.keys()), "base": "INR"}
 
 
+@app.get("/api/v1/backtest/siam", tags=["Model Validation"])
+async def get_siam_backtest():
+    """
+    Returns dynamically computed SIAM 2021 historical benchmark backtest results.
+    Loads from precomputed data/siam_backtest_results.json or computes on the fly if missing.
+    """
+    results_path = _PROJECT_ROOT / "data" / "siam_backtest_results.json"
+    if results_path.exists():
+        try:
+            with open(results_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.warning(f"Failed to read {results_path}: {e}")
+
+    try:
+        from scripts.run_siam_backtest import run_siam_backtest
+        return run_siam_backtest(seed=42, n_samples=10000)
+    except Exception as e:
+        logger.error(f"Failed to compute SIAM backtest on the fly: {e}")
+        raise HTTPException(status_code=500, detail=f"SIAM backtest computation failed: {str(e)}")
+
+
+
 # ════════════════════════════════════════════════════════════════
 # HELPERS
 # ════════════════════════════════════════════════════════════════

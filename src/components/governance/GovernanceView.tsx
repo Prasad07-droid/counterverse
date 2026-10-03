@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -12,10 +12,49 @@ import {
   Cpu
 } from 'lucide-react';
 import { EXPOSURE_INDEX_FACTORS, GROUNDING_ENTITIES, SIAM_2021_BACKTEST } from '../../data/mockData';
+import { BacktestScenario } from '../../types';
+import siamBacktestData from '../../data/siamBacktest.json';
 
 export const GovernanceView: React.FC = () => {
   // Compute overall structural score
   const totalScore = EXPOSURE_INDEX_FACTORS.reduce((acc, f) => acc + f.contribution, 0);
+
+  // Dynamic SIAM backtest data source resolution (API -> bundled JSON -> static fallback)
+  const [backtestItems, setBacktestItems] = useState<BacktestScenario[]>(() => {
+    if (siamBacktestData && Array.isArray((siamBacktestData as any).results)) {
+      return (siamBacktestData as any).results;
+    }
+    return SIAM_2021_BACKTEST;
+  });
+  const [dataSourceType, setDataSourceType] = useState<'Computed' | 'Static fallback'>(() => {
+    return (siamBacktestData && Array.isArray((siamBacktestData as any).results))
+      ? 'Computed'
+      : 'Static fallback';
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    if (apiUrl) {
+      fetch(`${apiUrl}/api/v1/backtest/siam`)
+        .then((res) => {
+          if (!res.ok) throw new Error('API backtest fetch failed');
+          return res.json();
+        })
+        .then((data) => {
+          if (isMounted && data && Array.isArray(data.results)) {
+            setBacktestItems(data.results);
+            setDataSourceType('Computed');
+          }
+        })
+        .catch(() => {
+          // If live fetch fails, keep bundled JSON or fallback
+        });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -216,11 +255,22 @@ export const GovernanceView: React.FC = () => {
 
         {/* SIAM 2021 Historical Backtest Panel (6 cols) */}
         <div className="lg:col-span-6 rounded-lg border border-[#222222] bg-[#070707] p-5 space-y-4">
-          <div className="flex items-center gap-2 border-b border-[#1a1a1a] pb-3">
-            <History className="h-4 w-4 text-[#f5a623]" />
-            <h2 className="text-sm font-semibold text-[#f7f7f7]">
-              SIAM 2021 Chip Crisis Backtest Calibration
-            </h2>
+          <div className="flex items-center justify-between border-b border-[#1a1a1a] pb-3">
+            <div className="flex items-center gap-2">
+              <History className="h-4 w-4 text-[#f5a623]" />
+              <h2 className="text-sm font-semibold text-[#f7f7f7]">
+                SIAM 2021 Chip Crisis Backtest Calibration
+              </h2>
+            </div>
+            <span
+              className={`rounded px-2 py-0.5 text-[10px] font-mono border ${
+                dataSourceType === 'Computed'
+                  ? 'bg-[#00df8f]/10 border-[#00df8f]/30 text-[#00df8f]'
+                  : 'bg-[#666666]/10 border-[#666666]/30 text-[#a5a5a5]'
+              }`}
+            >
+              {dataSourceType}
+            </span>
           </div>
 
           <p className="text-xs text-[#a5a5a5]">
@@ -228,11 +278,17 @@ export const GovernanceView: React.FC = () => {
           </p>
 
           <div className="space-y-3">
-            {SIAM_2021_BACKTEST.map((item) => (
+            {backtestItems.map((item) => (
               <div key={item.metric} className="rounded border border-[#1e1e1e] bg-[#0c0c0c] p-3 text-xs space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-[#f7f7f7]">{item.metric}</span>
-                  <span className="rounded bg-[#00df8f]/10 border border-[#00df8f]/30 px-2 py-0.5 text-[10px] font-mono text-[#00df8f]">
+                  <span
+                    className={`rounded px-2 py-0.5 text-[10px] font-mono border ${
+                      item.status === 'Not Modelled'
+                        ? 'bg-[#666666]/10 border-[#666666]/30 text-[#a5a5a5]'
+                        : 'bg-[#00df8f]/10 border-[#00df8f]/30 text-[#00df8f]'
+                    }`}
+                  >
                     {item.status}
                   </span>
                 </div>
@@ -248,6 +304,7 @@ export const GovernanceView: React.FC = () => {
             ))}
           </div>
         </div>
+
       </div>
 
       {/* 4. Model Health Telemetry Deck */}

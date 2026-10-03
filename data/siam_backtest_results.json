@@ -1,0 +1,76 @@
+{
+  "source": "computed_by_pipeline",
+  "timestamp": "2026-10-03T08:46:41.077883+00:00",
+  "seed": 42,
+  "n_samples": 10000,
+  "ground_truth_citation": "Source: Society of Indian Automobile Manufacturers (SIAM), Publicly Reported Monthly Press Releases, Aug\u2013Oct 2021",
+  "benchmark_config": {
+    "disrupted_node": "Semiconductor / IC Fabrication (East Asia)",
+    "component": "Electronic Integrated Circuits (HS 8542)",
+    "raw_material": "Gallium / Germanium (HS 8112)",
+    "event_type": "Raw Material / Chip Shortage",
+    "severity": 3,
+    "duration_days": 90,
+    "recovery_time_days": 60,
+    "target_comparison_metric": "Passenger Vehicle Production Drop (September 2021)",
+    "target_actual_pct": 37.46
+  },
+  "probabilities": {
+    "High (>15%)": 0.72,
+    "Medium (5-15%)": 0.187,
+    "Low (<5%)": 0.075,
+    "None": 0.019,
+    "affected_node": "Semiconductor / IC Fabrication (East Asia)",
+    "graph_node_id": "tier1_supplier_a",
+    "event_type": "Raw Material / Chip Shortage",
+    "severity_pct": 75.0,
+    "duration_days": 90
+  },
+  "mc_summary": {
+    "mean_drop_pct": 28.24,
+    "p95_drop_pct": 41.24,
+    "random_seed": 42
+  },
+  "pcar_summary": {
+    "mean_loss_crore": 71247.22,
+    "pcar_95_crore": 114733.58
+  },
+  "results": [
+    {
+      "metric": "Passenger Vehicle (PV) Production Drop",
+      "actual": "-37.46%",
+      "model_estimate": "-28.2% (P95: -41.2%)",
+      "error": "-9.22% vs Mean (+3.78% vs P95)",
+      "status": "Calibrated",
+      "details": "SIAM Sep 2021 reported YoY PV drop was -37.46%. Modeled posterior mean is -28.24% with P95 tail at -41.24% (actual falls within simulated P90-P95 mass).",
+      "historicalValue": "-37.46%",
+      "modelEstimate": "-28.2%",
+      "deltaError": "-9.2%",
+      "seed": 42
+    },
+    {
+      "metric": "Microcontroller Lead Time Increase",
+      "actual": "+34 weeks",
+      "model_estimate": "Not modelled",
+      "error": "N/A",
+      "status": "Not Modelled",
+      "details": "Delivery lead times in calendar weeks are exogenous input duration parameters (90 days), not an endogenous pipeline forecast output.",
+      "historicalValue": "+34 weeks",
+      "modelEstimate": "Not modelled",
+      "deltaError": "N/A",
+      "seed": 42
+    },
+    {
+      "metric": "Spot Premium Multiplier",
+      "actual": "1.85x \u2013 2.80x",
+      "model_estimate": "2.05x (Modeled Median)",
+      "error": "0.00x vs median",
+      "status": "Within Margin",
+      "details": "Downstream spot procurement surge pricing multiplier is modeled as Uniform[1.3, 2.8] with expected value 2.05x.",
+      "historicalValue": "1.85x \u2013 2.80x",
+      "modelEstimate": "2.05x",
+      "deltaError": "0.00x",
+      "seed": 42
+    }
+  ]
+}

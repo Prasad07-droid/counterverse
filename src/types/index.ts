@@ -115,7 +115,7 @@ export interface BacktestScenario {
   historicalValue: string;
   modelEstimate: string;
   deltaError: string;
-  status: 'Calibrated' | 'Within Margin' | 'Deviated';
+  status: 'Calibrated' | 'Within Margin' | 'Deviated' | 'Not Modelled';
   details: string;
 }
 
