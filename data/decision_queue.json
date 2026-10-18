@@ -1,0 +1,83 @@
+[
+  {
+    "id": "EVT-2026-001",
+    "headline": "China restricts gallium and germanium exports citing national security, sparking chip shortage fears in India.",
+    "risk_band": "High",
+    "risk_score": 0.65,
+    "component": "Gallium / Germanium",
+    "oem": "Maruti Suzuki",
+    "p95_exposure_crore": 709,
+    "p95_exposure_range": "₹650 Cr – ₹780 Cr",
+    "recommended_action": "Qualify dual-source domestic chemical distributors & allocate 45-day buffer stock",
+    "net_benefit_crore": 142.5,
+    "cost_crore": 18.0,
+    "stale_warning": "UN Comtrade baseline vintage is 2022; spot prices may fluctuate",
+    "unverified_warning": "Chemical precursor distributor unverified in tier-2 node mapping",
+    "status": "PENDING",
+    "assigned_to": null,
+    "audit_trail": [
+      {
+        "action": "ingested",
+        "actor": "system",
+        "timestamp": "2026-10-18T10:00:00Z",
+        "notes": "Automated ingestion via GDELT / Customs feed"
+      }
+    ]
+  },
+  {
+    "id": "EVT-2026-002",
+    "headline": "TSMC and Vanguard pause automotive MCU fabrication lines in Hsinchu following regional grid power drop.",
+    "risk_band": "High",
+    "risk_score": 0.58,
+    "component": "Microcontroller (MCU)",
+    "oem": "Tata Motors",
+    "p95_exposure_crore": 498,
+    "p95_exposure_range": "₹450 Cr – ₹540 Cr",
+    "recommended_action": "Reserve secondary fab allocation with STMicroelectronics / NXP European foundries",
+    "net_benefit_crore": 95.0,
+    "cost_crore": 22.0,
+    "stale_warning": null,
+    "unverified_warning": "Hsinchu sub-tier packaging vendor requires human verification",
+    "status": "ACKNOWLEDGED",
+    "assigned_to": "Semiconductor Procurement Triage Desk",
+    "audit_trail": [
+      {
+        "action": "ingested",
+        "actor": "system",
+        "timestamp": "2026-10-18T11:15:00Z",
+        "notes": "Automated ingestion via Nikkei Asia feed"
+      },
+      {
+        "action": "acknowledged",
+        "actor": "Officer R. Sharma",
+        "timestamp": "2026-10-18T11:45:00Z",
+        "notes": "Acknowledged threat; contacting tier-1 ECU integrator"
+      }
+    ]
+  },
+  {
+    "id": "EVT-2026-003",
+    "headline": "Dense fog and berth congestion at Port of Shanghai delay container vessel departures carrying automotive semiconductors by 9 days.",
+    "risk_band": "Medium",
+    "risk_score": 0.48,
+    "component": "Electronic Control Units",
+    "oem": "Mahindra",
+    "p95_exposure_crore": 312,
+    "p95_exposure_range": "₹280 Cr – ₹350 Cr",
+    "recommended_action": "Reroute critical shipments via air freight charter (Shanghai -> Mumbai cargo)",
+    "net_benefit_crore": 62.0,
+    "cost_crore": 9.5,
+    "stale_warning": null,
+    "unverified_warning": null,
+    "status": "PENDING",
+    "assigned_to": null,
+    "audit_trail": [
+      {
+        "action": "ingested",
+        "actor": "system",
+        "timestamp": "2026-10-18T13:30:00Z",
+        "notes": "Automated maritime choke point detection"
+      }
+    ]
+  }
+]

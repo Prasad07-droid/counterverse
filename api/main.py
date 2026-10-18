@@ -16,20 +16,41 @@ Launch:
 """
 
 import os
+import json
 import sys
+import uuid
 import logging
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+from contextlib import asynccontextmanager
 
 # ── Auth, metrics, rate-limiting ──
 try:
-    from src.auth import create_access_token, authenticate_user, AUTH_AVAILABLE, oauth2_scheme
+    from src.auth import (
+        create_access_token,
+        authenticate_user,
+        AUTH_AVAILABLE,
+        oauth2_scheme,
+        require_roles,
+        require_officer,
+        require_analyst,
+        require_admin,
+        require_authenticated,
+        verify_security_configuration,
+    )
 except ImportError:
     AUTH_AVAILABLE = False
     oauth2_scheme = None
     def create_access_token(data, expires_delta=None): return "no-auth"
     def authenticate_user(u, p): return None
+    def require_roles(*r): return lambda: None
+    require_officer = lambda: None
+    require_analyst = lambda: None
+    require_admin = lambda: None
+    require_authenticated = lambda: None
+    def verify_security_configuration(): pass
 
 try:
     from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -56,8 +77,9 @@ for p in [str(_PROJECT_ROOT), str(_API_DIR)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 # ── Project imports ──
@@ -72,7 +94,11 @@ from src.module_c_causal import (
     simulate_causal_impact,
     calculate_deterministic_risk_score,
     compute_cost_adjusted_recommendation,
+    RISK_THRESHOLD_HIGH,
+    RISK_THRESHOLD_MEDIUM,
+    classify_risk_band,
 )
+from src.module_i_report import generate_report
 from src.module_d_mc import run_monte_carlo
 from src.module_e_pcar import (
     calculate_pcar,
@@ -80,12 +106,17 @@ from src.module_e_pcar import (
     calculate_pcar_custom_bom,
     OEM_PROFILES,
     SUPPORTED_OEM_COMPANIES,
+    METRIC_VERSION,
+    PCAR_ASSUMPTIONS,
 )
 from src.data_sources import (
     SOURCED_HS8542_BASELINE_CRORE,
     USD_INR_RATE,
     load_comtrade_data,
+    sanitize_headline,
+    fetch_headlines_resilient,
 )
+from src.module_a_ingest import _fetch_twitter
 
 logger = logging.getLogger("counterverse.api")
 
@@ -208,6 +239,9 @@ class PcarResponse(BaseModel):
     lost_output_value_status: str
     market_share_pct: Optional[float] = None
     dependency_ratio_pct: Optional[float] = None
+    data_provenance: Optional[Dict[str, Any]] = None
+    metric_version: str = "2.0.0"
+    assumptions: Optional[Dict[str, Any]] = None
     pipeline_time_ms: float
 
 class BOMComponentItem(BaseModel):
@@ -246,7 +280,38 @@ class CustomBOMResponse(BaseModel):
     lost_output_value_p99_crore: Optional[float] = None
     lost_output_value_status: str
     component_grounding: List[Dict[str, Any]]
+    data_provenance: Optional[Dict[str, Any]] = None
+    metric_version: str = "2.0.0"
+    assumptions: Optional[Dict[str, Any]] = None
     pipeline_time_ms: float
+
+class HeadlinesResponse(BaseModel):
+    """Response for /api/v1/headlines."""
+    success: bool = True
+    fallback_tier: str
+    data_vintage: str
+    is_stale: bool = False
+    staleness_warning: Optional[str] = None
+    citation: Optional[str] = None
+    total_headlines: int
+    articles: List[Dict[str, Any]]
+    sources_status: Dict[str, Any]
+
+class DecisionActionRequest(BaseModel):
+    """Request body for /api/v1/decision/action."""
+    event_id: str = Field(..., description="Target event ID in the decision queue")
+    action: str = Field(..., description="Action type: 'acknowledge', 'assign', 'comment', 'resolve'")
+    officer: str = Field(default="Procurement Officer", description="Name or role of officer executing the action")
+    notes: Optional[str] = Field(default="", description="Operational notes or comments")
+
+class DecisionActionResponse(BaseModel):
+    """Response for /api/v1/decision/action."""
+    success: bool
+    event_id: str
+    status: str
+    assigned_to: Optional[str] = None
+    audit_trail: List[Dict[str, Any]]
+    message: str
 
 class HealthResponse(BaseModel):
     """Response for /health."""
@@ -264,11 +329,19 @@ class HealthResponse(BaseModel):
     baseline_crore: float
     usd_inr_rate: float
     version: str
+    reasons: List[str] = Field(default_factory=list, description="Specific diagnostics for degraded or unhealthy status")
 
 
 # ════════════════════════════════════════════════════════════════
 # APP CONSTRUCTION
 # ════════════════════════════════════════════════════════════════
+
+# ── Startup Security Lifespan ──
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Validates that insecure default secrets/passwords are not used outside dev mode."""
+    verify_security_configuration()
+    yield
 
 app = FastAPI(
     title="CounterVerse API",
@@ -280,15 +353,53 @@ app = FastAPI(
     version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
+)
+
+# ── CORS Configuration (Restricted to Configured Origins) ──
+_DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://localhost:8501",
+    "http://127.0.0.1:8501",
+]
+_env_allowed_origins = os.getenv("COUNTERVERSE_ALLOWED_ORIGINS")
+ALLOWED_ORIGINS: List[str] = (
+    [o.strip() for o in _env_allowed_origins.split(",") if o.strip()]
+    if _env_allowed_origins
+    else _DEFAULT_ALLOWED_ORIGINS
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# ── Request ID and Structured Logging Middleware ──
+@app.middleware("http")
+async def request_id_and_structured_logging(request: Request, call_next):
+    req_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    t0 = time.perf_counter()
+    response: Response = await call_next(request)
+    elapsed_ms = (time.perf_counter() - t0) * 1000.0
+    response.headers["X-Request-ID"] = req_id
+
+    # Structured log
+    log_record = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "request_id": req_id,
+        "method": request.method,
+        "path": request.url.path,
+        "status_code": response.status_code,
+        "duration_ms": round(elapsed_ms, 2),
+    }
+    logger.info(json.dumps(log_record))
+    return response
 
 # ── Rate-limiter state ──
 if _SLOWAPI_AVAILABLE and _limiter:
@@ -299,12 +410,18 @@ if _SLOWAPI_AVAILABLE and _limiter:
 if PROMETHEUS_AVAILABLE and _make_metrics_app:
     app.mount("/metrics", _make_metrics_app())
 
+# ── Static files mount for generated reports ──
+_STATIC_DIR = _PROJECT_ROOT / "static"
+_STATIC_DIR.mkdir(parents=True, exist_ok=True)
+(_STATIC_DIR / "reports").mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
 
 # ════════════════════════════════════════════════════════════════
 # ENDPOINTS
 # ════════════════════════════════════════════════════════════════
 
-@app.post("/api/v1/analyze-headline", response_model=HeadlineResponse)
+@app.post("/api/v1/analyze-headline", response_model=HeadlineResponse, dependencies=[Depends(require_authenticated)])
 async def analyze_headline(req: HeadlineRequest):
     """
     Full pipeline: Headline → SLM Signal Extraction → GraphRAG Grounding →
@@ -361,12 +478,7 @@ async def analyze_headline(req: HeadlineRequest):
     risk_score = risk_result.get("risk_score", 0.5)
 
     # Risk label
-    if risk_score >= 0.60:
-        risk_label = "HIGH"
-    elif risk_score >= 0.45:
-        risk_label = "MEDIUM"
-    else:
-        risk_label = "LOW"
+    risk_label = classify_risk_band(risk_score)
 
     # 4. Monte Carlo → PCaR
     probabilities = simulate_causal_impact(signal)
@@ -411,7 +523,7 @@ class SignalExtractionRequest(BaseModel):
     engine: str = Field(default="fast")
 
 
-@app.post("/api/v1/signal", tags=["Pipeline"])
+@app.post("/api/v1/signal", tags=["Pipeline"], dependencies=[Depends(require_authenticated)])
 async def extract_signal_endpoint(req: SignalExtractionRequest):
     """
     Extracts structured supply chain disruption signal from unstructured headline.
@@ -434,21 +546,28 @@ async def extract_signal_endpoint(req: SignalExtractionRequest):
     }
 
 
-@app.post("/api/v1/simulate", tags=["Pipeline"])
+@app.post("/api/v1/simulate", tags=["Pipeline"], dependencies=[Depends(require_authenticated)])
 async def simulate_endpoint(signal_payload: Dict[str, Any]):
     """
     Propagates an extracted signal through causal scoring and Monte Carlo simulation.
     Accepts either an extracted signal directly or a dict wrapping { "signal": ... }.
+    Accepts optional mc_samples (default: 10000) and seed/random_seed (default: 42).
     """
     sig = signal_payload.get("signal", signal_payload)
     risk_result = calculate_deterministic_risk_score(sig)
     risk_score = risk_result.get("risk_score", 0.5)
-    risk_label = "HIGH" if risk_score >= 0.60 else ("MEDIUM" if risk_score >= 0.45 else "LOW")
+    risk_label = classify_risk_band(risk_score)
+
+    mc_samples = int(signal_payload.get("mc_samples") or signal_payload.get("n_samples") or 10000)
+    seed_val = signal_payload.get("seed")
+    if seed_val is None:
+        seed_val = signal_payload.get("random_seed")
+    seed = int(seed_val) if seed_val is not None else 42
 
     probabilities = simulate_causal_impact(sig)
-    mc_result = run_monte_carlo(probabilities, n_samples=10000, random_seed=42)
+    mc_result = run_monte_carlo(probabilities, n_samples=mc_samples, random_seed=seed)
 
-    pcar_macro = calculate_pcar(mc_result, company_name="Entire Indian Automotive Industry")
+    pcar_macro = calculate_pcar(mc_result, company_name="Entire Indian Automotive Industry", random_seed=seed)
     directive_result = compute_cost_adjusted_recommendation(
         risk_score=risk_score,
         pcar_mean_crore=float(pcar_macro.get("mean_loss_crore", 0.0)),
@@ -457,18 +576,27 @@ async def simulate_endpoint(signal_payload: Dict[str, Any]):
     return {
         "risk_score": round(risk_score, 4),
         "risk_label": risk_label,
+        "risk_result": _safe_dict(risk_result),
+        "factor_breakdown": risk_result.get("breakdown", {}),
         "probabilities": {k: v for k, v in probabilities.items() if not k.startswith("_") and not isinstance(v, dict)},
         "mc_stats": {
             "mean_drop": round(float(mc_result["mean_drop"]), 2),
             "p95_drop": round(float(mc_result["p95_drop"]), 2),
             "p99_drop": round(float(mc_result["p99_drop"]), 2),
+            "n_samples": mc_result.get("n_samples", mc_samples),
+        },
+        "simulation_config": {
+            "mc_samples": mc_samples,
+            "random_seed": seed,
         },
         "pcar": _sanitize_pcar(pcar_macro),
         "csco_directive": directive_result.get("recommendation", "Maintain Standard Operations"),
+        "metric_version": pcar_macro.get("metric_version", METRIC_VERSION),
+        "assumptions": pcar_macro.get("assumptions"),
     }
 
 
-@app.post("/api/v1/simulate-risk", response_model=SimulateResponse)
+@app.post("/api/v1/simulate-risk", response_model=SimulateResponse, dependencies=[Depends(require_analyst)])
 async def simulate_risk(req: SimulateRequest):
     """
     Runs Monte Carlo simulation with custom parameters.
@@ -491,12 +619,7 @@ async def simulate_risk(req: SimulateRequest):
     risk_result = calculate_deterministic_risk_score(synthetic_signal)
     risk_score = risk_result.get("risk_score", 0.5)
 
-    if risk_score >= 0.60:
-        risk_label = "HIGH"
-    elif risk_score >= 0.45:
-        risk_label = "MEDIUM"
-    else:
-        risk_label = "LOW"
+    risk_label = classify_risk_band(risk_score)
 
     probabilities = simulate_causal_impact(synthetic_signal)
     mc_result = run_monte_carlo(
@@ -534,7 +657,8 @@ async def simulate_risk(req: SimulateRequest):
     )
 
 
-@app.post("/api/v1/calculate-pcar", response_model=PcarResponse)
+@app.post("/api/v1/pcar/calculate", response_model=PcarResponse, tags=["Procurement Cost-at-Risk"], dependencies=[Depends(require_authenticated)])
+@app.post("/api/v1/calculate-pcar", response_model=PcarResponse, dependencies=[Depends(require_authenticated)])
 async def calculate_pcar_endpoint(req: PcarRequest):
     """
     Calculate Procurement Cost at Risk for a specific OEM or custom baseline.
@@ -601,6 +725,9 @@ async def calculate_pcar_endpoint(req: PcarRequest):
         ),
         market_share_pct=pcar.get("market_share_pct"),
         dependency_ratio_pct=pcar.get("dependency_ratio_pct"),
+        data_provenance=pcar.get("data_provenance"),
+        metric_version=pcar.get("metric_version", METRIC_VERSION),
+        assumptions=pcar.get("assumptions"),
         pipeline_time_ms=round(elapsed_ms, 1),
     )
 
@@ -609,7 +736,8 @@ async def calculate_pcar_endpoint(req: PcarRequest):
     "/api/v1/calculate-custom-bom",
     response_model=CustomBOMResponse,
     tags=["Procurement Cost-at-Risk"],
-    summary="Compute enterprise PCaR from a custom Bill of Materials (BOM) with GraphRAG grounding"
+    summary="Compute enterprise PCaR from a custom Bill of Materials (BOM) with GraphRAG grounding",
+    dependencies=[Depends(require_authenticated)],
 )
 async def calculate_custom_bom(req: CustomBOMRequest):
     """
@@ -668,6 +796,9 @@ async def calculate_custom_bom(req: CustomBOMRequest):
             "not_calculated_missing_output_value_baseline",
         ),
         component_grounding=custom_pcar.get("component_grounding", custom_pcar.get("grounding_results", [])),
+        data_provenance=custom_pcar.get("data_provenance"),
+        metric_version=custom_pcar.get("metric_version", METRIC_VERSION),
+        assumptions=custom_pcar.get("assumptions"),
         pipeline_time_ms=round(elapsed_ms, 1),
     )
 
@@ -678,6 +809,45 @@ async def health():
     G = get_grounding_graph()
     integrity = verify_graph_integrity(G)
     graph_hash = _compute_graph_hash(G)
+
+    reasons: List[str] = []
+    GOLDEN_HASH = "31f67108669b9208"
+
+    # 1. Critical graph health checks
+    if not integrity:
+        reasons.append("Graph integrity verification failed (topology disconnected or invalid)")
+    if graph_hash != GOLDEN_HASH:
+        reasons.append(f"Graph hash mismatch: expected {GOLDEN_HASH}, computed {graph_hash}")
+
+    # 2. SLM and GPU availability
+    if not SLM_AVAILABLE:
+        reasons.append(f"SLM inference unavailable: {_SLM_SKIP_REASON or 'Not loaded'} (fast heuristic active)")
+
+    # 3. Custom overlay presence
+    overlay_path = _PROJECT_ROOT / "data" / "processed" / "grounding_graph_custom.json"
+    if not overlay_path.exists():
+        reasons.append("Grounding graph custom overlay file missing from disk")
+
+    # 4. Headline cache database staleness check
+    cache_db_path = _PROJECT_ROOT / "data" / "processed" / "headline_cache.db"
+    if not cache_db_path.exists():
+        reasons.append("Headline cache database missing from disk")
+    else:
+        try:
+            mtime = cache_db_path.stat().st_mtime
+            age_hours = (time.time() - mtime) / 3600.0
+            if age_hours > 24.0:
+                reasons.append(f"Headline cache is stale ({age_hours:.1f} hours old, threshold 24h)")
+        except Exception:
+            pass
+
+    # Status classification: unhealthy if graph broken or hash mismatch; degraded if warnings exist; otherwise healthy
+    if not integrity or graph_hash != GOLDEN_HASH:
+        status_code = "unhealthy"
+    elif reasons:
+        status_code = "degraded"
+    else:
+        status_code = "healthy"
 
     gpu_name = None
     if _HAS_GPU:
@@ -690,7 +860,7 @@ async def health():
     comtrade_data = load_comtrade_data()
 
     return HealthResponse(
-        status="healthy" if integrity else "degraded",
+        status=status_code,
         mode="slm" if SLM_AVAILABLE else "fast",
         data_vintage=str(comtrade_data.get("data_vintage", "2022 Full Year")),
         gpu_available=_HAS_GPU,
@@ -704,12 +874,158 @@ async def health():
         baseline_crore=float(SOURCED_HS8542_BASELINE_CRORE),
         usd_inr_rate=USD_INR_RATE,
         version="2.0.0",
+        reasons=reasons,
     )
+
+
+@app.get(
+    "/api/v1/headlines",
+    response_model=HeadlinesResponse,
+    tags=["Ingestion"],
+    summary="Fetch live or cached supply chain disruption headlines with resilient 4-tier fallback",
+    dependencies=[Depends(require_authenticated)],
+)
+async def get_headlines_endpoint(max_records: int = 8):
+    """
+    Retrieves supply chain disruption headlines using a 4-tier fallback chain:
+      1. GDELT 2.0 API (live)
+      2. Google News RSS (live fallback)
+      3. SQLite cached headlines (recent)
+      4. Static fallback cache (last resort)
+
+    Surfaces data provenance, vintage, staleness warnings, and source statuses (including Twitter).
+    """
+    res = fetch_headlines_resilient(max_records=max_records)
+    tw_status = _fetch_twitter()
+
+    tier = res.get("fallback_tier", "UNKNOWN")
+    sources_status = {
+        "gdelt": "active" if tier == "GDELT_LIVE" else "fallback_triggered",
+        "rss": "active" if tier in ("GDELT_LIVE", "RSS_LIVE") else "fallback_triggered",
+        "sqlite": "available",
+        "twitter": {
+            "status": tw_status.get("status", "not_configured"),
+            "message": tw_status.get("message", "Twitter credentials not configured (COUNTERVERSE_TWITTER_BEARER_TOKEN missing)"),
+        },
+    }
+
+    articles = res.get("articles", [])
+
+    return HeadlinesResponse(
+        success=bool(res.get("success", True)),
+        fallback_tier=tier,
+        data_vintage=res.get("data_vintage", "UNKNOWN"),
+        is_stale=bool(res.get("is_stale", False)),
+        staleness_warning=res.get("staleness_warning"),
+        citation=res.get("citation"),
+        total_headlines=len(articles),
+        articles=articles,
+        sources_status=sources_status,
+    )
+
+# ════════════════════════════════════════════════════════════════
+# DECISION SUPPORT REPORT ENDPOINT
+# ════════════════════════════════════════════════════════════════
+
+class ReportRequest(BaseModel):
+    """Request body for /generate-report."""
+    headline: str = Field(..., min_length=5, max_length=500, description="News headline text")
+    oem: str = Field(default="Maruti Suzuki", description="Target OEM")
+    engine: str = Field(default="fast", description="Inference engine: 'fast' or 'slm'")
+    mc_samples: Optional[int] = Field(default=10000, ge=100, le=500000, description="Monte Carlo sample count")
+
+    model_config = {"extra": "ignore"}
+
+class ReportResponse(BaseModel):
+    """Response for /generate-report containing decision support report."""
+    explanation: str
+    estimated_impact: str
+    recommended_action: str
+    risk_score: float
+    risk_breakdown: Dict[str, Any]
+    mc_stats: Dict[str, Any]
+    pcar: Dict[str, Any]  # Kept for backward compatibility (carries recommendation)
+    pcar_metrics: Optional[Dict[str, Any]] = None  # Financial PCaR exposure metrics
+    recommendation: Optional[Dict[str, Any]] = None  # Cost-adjusted decision directive
+    metric_version: Optional[str] = "2.0.0"
+    assumptions: Optional[Dict[str, Any]] = None
+    report_url: str
+
+@app.post("/api/v1/generate-report", response_model=ReportResponse, dependencies=[Depends(require_authenticated)])
+async def generate_report_endpoint(req: ReportRequest):
+    """Generate executive decision support report running the full server-side pipeline."""
+    # 1. Sanitize headline
+    clean_headline, _ = sanitize_headline(req.headline)
+
+    # 2. Extract signal
+    engine_used = req.engine
+    if req.engine == "slm" and SLM_AVAILABLE:
+        try:
+            signal = extract_signal(
+                clean_headline,
+                engine="slm",
+            )
+        except Exception as e:
+            logger.warning(f"SLM inference failed: {e}. Falling back to fast.")
+            signal = (
+                extract_signal_fast(clean_headline)
+                if extract_signal_fast
+                else _fallback_signal(clean_headline)
+            )
+            engine_used = "fast (fallback)"
+    elif extract_signal_fast:
+        signal = extract_signal_fast(clean_headline)
+        engine_used = "fast"
+    else:
+        signal = _fallback_signal(clean_headline)
+        engine_used = "fallback"
+
+    # 3. GraphRAG grounding
+    grounding = ground_entities(signal)
+
+    # 4. Deterministic risk scoring
+    risk_result = calculate_deterministic_risk_score(signal)
+    risk_score = risk_result.get("risk_score", 0.5)
+
+    risk_label = classify_risk_band(risk_score)
+
+    # 5. Monte Carlo simulation
+    probabilities = simulate_causal_impact(signal)
+    samples = req.mc_samples if req.mc_samples else 10000
+    mc_result = run_monte_carlo(probabilities, n_samples=samples)
+
+    # 6. PCaR calculation for selected OEM
+    macro_pcar = calculate_pcar(mc_result, company_name="Entire Indian Automotive Industry")
+    company = req.oem if req.oem else "Maruti Suzuki"
+    if company in ("Macro (aggregate)", "Entire Indian Automotive Industry"):
+        pcar_metrics = _sanitize_pcar(macro_pcar)
+    else:
+        try:
+            company_pcar = calculate_pcar_by_company(company, macro_pcar)
+            pcar_metrics = _sanitize_pcar(company_pcar)
+        except (ValueError, KeyError):
+            pcar_metrics = _sanitize_pcar(calculate_pcar(mc_result, company_name=company))
+
+    pipeline_result = {
+        "headline": clean_headline,
+        "engine_used": engine_used,
+        "target_oem": company,
+        "signal": signal,
+        "grounding": grounding,
+        "risk_result": risk_result,
+        "risk_score": risk_score,
+        "risk_label": risk_label,
+        "mc_result": mc_result,
+        "pcar_metrics": pcar_metrics,
+    }
+
+    report = generate_report(pipeline_result)
+    return ReportResponse(**report)
+
 
 
 # ── Auth token endpoint ──────────────────────────────────────────
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -718,14 +1034,16 @@ class TokenResponse(BaseModel):
 @app.post("/api/v1/token", response_model=TokenResponse, tags=["Auth"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
-    Obtain a JWT Bearer token.
-    Default credentials (dev mode): username=admin, password=changeme.
-    Set COUNTERVERSE_ADMIN_PASSWORD env var to change.
+    Obtain a JWT Bearer token with user roles.
+    Default credentials (dev mode):
+      - admin / changeme (roles: admin, officer, analyst)
+      - officer / officerpass (roles: officer)
+      - analyst / analystpass (roles: analyst)
     """
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    token = create_access_token(data={"sub": form_data.username})
+    token = create_access_token(data={"sub": user["username"], "roles": user.get("roles", [])})
     return TokenResponse(access_token=token, token_type="bearer")
 
 
@@ -736,13 +1054,13 @@ CURRENCY_RATES = {
     "EUR": 1.0 / (USD_INR_RATE * 1.08),  # approximate EUR/INR via USD/EUR 1.08
 }
 
-@app.get("/api/v1/currencies", tags=["Utilities"])
+@app.get("/api/v1/currencies", tags=["Utilities"], dependencies=[Depends(require_authenticated)])
 async def get_supported_currencies():
     """Returns supported output currencies for PCaR and their INR conversion rates."""
     return {"supported": list(CURRENCY_RATES.keys()), "base": "INR"}
 
 
-@app.get("/api/v1/backtest/siam", tags=["Model Validation"])
+@app.get("/api/v1/backtest/siam", tags=["Model Validation"], dependencies=[Depends(require_analyst)])
 async def get_siam_backtest():
     """
     Returns dynamically computed SIAM 2021 historical benchmark backtest results.
@@ -762,6 +1080,24 @@ async def get_siam_backtest():
     except Exception as e:
         logger.error(f"Failed to compute SIAM backtest on the fly: {e}")
         raise HTTPException(status_code=500, detail=f"SIAM backtest computation failed: {str(e)}")
+
+
+# ── Live Web Scraping Endpoints ──────────────────────────────────
+@app.get("/api/v1/live-news", tags=["News Ingestion"], dependencies=[Depends(require_authenticated)])
+@app.get("/api/v1/scrape-news", tags=["News Ingestion"], dependencies=[Depends(require_authenticated)])
+async def get_live_news_endpoint(max_total: int = 6):
+    """
+    Live web scraping endpoint:
+    Scrapes real-time supply chain disruption news from Google News RSS & GDELT 2.0,
+    evaluates disruption scores, and returns structured headlines for UI ingestion.
+    """
+    try:
+        from src.news_scraper import scrape_live_supply_chain_news
+        res = scrape_live_supply_chain_news(max_total=max_total)
+        return res
+    except Exception as e:
+        logger.error(f"Live news scrape failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Live news scrape failed: {str(e)}")
 
 
 
@@ -800,3 +1136,101 @@ def _safe_dict(d: Any) -> dict:
     if isinstance(d, dict):
         return {k: v for k, v in d.items() if not hasattr(v, '__array__') or isinstance(v, (int, float, str, bool, list))}
     return {"raw": str(d)}
+
+
+# ════════════════════════════════════════════════════════════════
+# DECISION MODE QUEUE AND ACTIONS STORE (Phase 6)
+# ════════════════════════════════════════════════════════════════
+
+_DECISION_QUEUE_FILE = _PROJECT_ROOT / "data" / "decision_queue.json"
+
+def _load_decision_queue() -> List[Dict[str, Any]]:
+    if not _DECISION_QUEUE_FILE.exists():
+        return []
+    try:
+        with open(_DECISION_QUEUE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Error loading decision queue: {e}")
+        return []
+
+def _save_decision_queue(queue: List[Dict[str, Any]]) -> None:
+    _DECISION_QUEUE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(_DECISION_QUEUE_FILE, "w", encoding="utf-8") as f:
+        json.dump(queue, f, indent=2, ensure_ascii=False)
+
+
+@app.get("/api/v1/decision/events", tags=["Decision Mode"], dependencies=[Depends(require_authenticated)])
+async def get_decision_events():
+    """
+    Returns the ranked decision event queue for procurement and supply-chain officers.
+    Includes human-in-the-loop authorization policy, risk bands, exposure ranges, and audit trails.
+    """
+    queue = _load_decision_queue()
+    return {
+        "success": True,
+        "policy": "Never auto-execute purchases or supplier changes; recommendations require human officer approval.",
+        "total_events": len(queue),
+        "events": queue,
+    }
+
+
+@app.post("/api/v1/decision/action", response_model=DecisionActionResponse, tags=["Decision Mode"], dependencies=[Depends(require_officer)])
+async def record_decision_action(req: DecisionActionRequest):
+    """
+    Executes a procurement officer workflow action on a queued disruption event:
+    - acknowledge: Officer confirms receipt and triage of threat
+    - assign: Delegates event to a specialist desk or officer
+    - comment: Adds operational annotations or supplier communications
+    - resolve: Final sign-off and approval of mitigation plan
+    All actions are timestamped and appended to the persistent audit log.
+    """
+    queue = _load_decision_queue()
+    target_event = None
+    for evt in queue:
+        if evt.get("id") == req.event_id:
+            target_event = evt
+            break
+
+    if not target_event:
+        raise HTTPException(status_code=404, detail=f"Event '{req.event_id}' not found in decision queue.")
+
+    now_utc = datetime.now(timezone.utc).isoformat()
+    action_type = req.action.lower().strip()
+
+    if "audit_trail" not in target_event:
+        target_event["audit_trail"] = []
+
+    if action_type == "acknowledge":
+        target_event["status"] = "ACKNOWLEDGED"
+        msg = f"Event {req.event_id} acknowledged by {req.officer}."
+    elif action_type == "assign":
+        target_event["assigned_to"] = req.officer
+        target_event["status"] = "IN_REVIEW"
+        msg = f"Event {req.event_id} assigned to {req.officer}."
+    elif action_type == "comment":
+        msg = f"Comment added to {req.event_id} by {req.officer}."
+    elif action_type == "resolve":
+        target_event["status"] = "RESOLVED"
+        msg = f"Event {req.event_id} approved and resolved by {req.officer}."
+    else:
+        raise HTTPException(status_code=400, detail=f"Invalid action '{req.action}'. Supported: acknowledge, assign, comment, resolve.")
+
+    target_event["audit_trail"].append({
+        "action": action_type,
+        "actor": req.officer,
+        "timestamp": now_utc,
+        "notes": req.notes or msg,
+    })
+
+    _save_decision_queue(queue)
+
+    return DecisionActionResponse(
+        success=True,
+        event_id=req.event_id,
+        status=target_event["status"],
+        assigned_to=target_event.get("assigned_to"),
+        audit_trail=target_event["audit_trail"],
+        message=msg,
+    )
+

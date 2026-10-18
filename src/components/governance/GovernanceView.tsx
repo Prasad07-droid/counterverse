@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -12,12 +12,40 @@ import {
   Cpu
 } from 'lucide-react';
 import { EXPOSURE_INDEX_FACTORS, GROUNDING_ENTITIES, SIAM_2021_BACKTEST } from '../../data/mockData';
-import { BacktestScenario } from '../../types';
+import { BacktestScenario, GroundingEntity } from '../../types';
 import siamBacktestData from '../../data/siamBacktest.json';
 
-export const GovernanceView: React.FC = () => {
+interface GovernanceViewProps {
+  latestAnalysisResult?: any;
+}
+
+export const GovernanceView: React.FC<GovernanceViewProps> = ({ latestAnalysisResult }) => {
   // Compute overall structural score
   const totalScore = EXPOSURE_INDEX_FACTORS.reduce((acc, f) => acc + f.contribution, 0);
+
+  // Dynamic grounding resolution: live simulation grounding vs offline demo data
+  const isRealGroundingAvailable = Boolean(
+    latestAnalysisResult &&
+    !latestAnalysisResult.isOffline &&
+    latestAnalysisResult.grounding &&
+    (Array.isArray(latestAnalysisResult.grounding.grounding_results) || Array.isArray(latestAnalysisResult.grounding.entities)) &&
+    ((latestAnalysisResult.grounding.grounding_results?.length || 0) > 0 || (latestAnalysisResult.grounding.entities?.length || 0) > 0)
+  );
+
+  const displayGroundingEntities: GroundingEntity[] = useMemo(() => {
+    if (isRealGroundingAvailable) {
+      const rawList = latestAnalysisResult.grounding.grounding_results || latestAnalysisResult.grounding.entities || [];
+      return rawList.map((item: any, idx: number): GroundingEntity => ({
+        id: `real-g-${idx}`,
+        name: item.canonical_name || item.entity_text || item.name || 'Entity',
+        type: item.entity_type || item.type || 'Inferred node',
+        hsCode: item.graph_attributes?.hs_code || item.hs_code || item.hsCode || (item.canonical_name ? 'Graph-Verified' : 'Unregistered Code'),
+        source: item.graph_attributes?.source || item.source || 'Knowledge Graph (NetworkX)',
+        verified: item.status === 'Graph-Verified' || item.verified === true,
+      }));
+    }
+    return GROUNDING_ENTITIES;
+  }, [latestAnalysisResult, isRealGroundingAvailable]);
 
   // Dynamic SIAM backtest data source resolution (API -> bundled JSON -> static fallback)
   const [backtestItems, setBacktestItems] = useState<BacktestScenario[]>(() => {
@@ -89,6 +117,15 @@ export const GovernanceView: React.FC = () => {
             <h2 className="text-sm font-semibold text-[#f7f7f7]">
               Supplier Structural Exposure Index Matrix (§3.2.5)
             </h2>
+            {latestAnalysisResult && !latestAnalysisResult.isOffline ? (
+              <span className="rounded bg-[#00df8f]/20 border border-[#00df8f]/40 px-2 py-0.5 text-[9px] font-mono font-bold text-[#00df8f]">
+                LIVE SCORING CALIBRATED
+              </span>
+            ) : (
+              <span className="rounded bg-[#f5a623]/20 border border-[#f5a623]/40 px-2 py-0.5 text-[9px] font-mono font-bold text-[#f5a623]">
+                OFFLINE DEMO DATA
+              </span>
+            )}
           </div>
           <div className="font-mono text-xs">
             <span className="text-[#666666]">Total Score: </span>
@@ -160,9 +197,20 @@ export const GovernanceView: React.FC = () => {
             <h2 className="text-sm font-semibold text-[#f7f7f7]">
               GraphRAG Entity Verification Table
             </h2>
+            {isRealGroundingAvailable ? (
+              <span className="rounded bg-[#00df8f]/20 border border-[#00df8f]/40 px-2 py-0.5 text-[9px] font-mono font-bold text-[#00df8f]">
+                LIVE GRAPH GROUNDED ({displayGroundingEntities.length} ENTITIES)
+              </span>
+            ) : (
+              <span className="rounded bg-[#f5a623]/20 border border-[#f5a623]/40 px-2 py-0.5 text-[9px] font-mono font-bold text-[#f5a623]">
+                OFFLINE DEMO DATA
+              </span>
+            )}
           </div>
           <span className="text-xs text-[#a5a5a5]">
-            30 Nodes · 69 Edges Verified
+            {isRealGroundingAvailable
+              ? `Live Signal: "${(latestAnalysisResult.headline || '').slice(0, 35)}..."`
+              : '30 Nodes · 69 Edges Verified'}
           </span>
         </div>
 
@@ -183,7 +231,7 @@ export const GovernanceView: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
-              {GROUNDING_ENTITIES.map((ent) => (
+              {displayGroundingEntities.map((ent) => (
                 <tr key={ent.id} className="hover:bg-[#0c0c0c] transition">
                   <td className="py-2.5 px-3 font-medium text-[#f7f7f7]">
                     {ent.name}

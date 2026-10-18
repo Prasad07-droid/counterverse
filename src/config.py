@@ -2,13 +2,25 @@
 """
 Centralized Configuration Management for CounterVerse
 =====================================================
-Uses pydantic-settings for validated, type-safe configuration with
-environment variable overrides and .env file support.
+Uses pydantic-settings (with robust manual fallback) for validated, type-safe
+configuration, environment variable overrides (COUNTERVERSE_*), and .env file support.
+
+Architecture & Canonical Sources:
+---------------------------------
+This module acts as the centralized environment binding and configuration registry.
+Pipeline modules maintain explicit domain defaults to ensure headless and standalone execution:
+  - Risk Thresholds: src.module_c_causal (RISK_THRESHOLD_HIGH=0.60, RISK_THRESHOLD_MEDIUM=0.45)
+  - Financial Baselines: src.data_sources (SOURCED_HS8542_BASELINE_CRORE=133814.34, USD_INR_RATE=83.0)
+  - Monte Carlo Defaults: src.module_d_mc (mc_n_samples=10000, mc_random_seed=42)
+  - Auth & Security: src.auth (DEFAULT_JWT_SECRET, DEFAULT_ADMIN_PASSWORD)
+
+Settings defined in this file provide the runtime environment variable mapping, validation,
+and advisory defaults across the full stack.
 
 Priority order (highest → lowest):
   1. Environment variables (prefixed COUNTERVERSE_)
   2. .env file in project root
-  3. Defaults defined below
+  3. Defaults defined below (aligned with pipeline module constants)
 """
 
 import os

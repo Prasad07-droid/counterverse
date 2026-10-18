@@ -29,8 +29,8 @@ flowchart LR
     G --> C["⚖️ Module C: Risk Engine<br/>Deterministic 5-Factor<br/>AlMahri Formula"]
     C --> D["🎲 Module D: Monte Carlo<br/>10,000 Draws<br/>(Stochastic Sampling)"]
     D --> E["💰 Module E: PCaR<br/>₹ Crore VaR<br/>(Balance Sheet)"]
-    E --> F["📊 Streamlit Dashboard<br/>6 Interactive Views"]
-    E --> API["⚡ FastAPI Backend<br/>/api/v1/*"]
+    E --> F["📊 React Dashboard<br/>3 Interactive Views<br/>(Streamlit wrapper in app/)"]
+    E --> API["⚡ FastAPI Backend<br/>/api/v1/* (11+ endpoints)"]
 
     style A fill:#1e293b,color:#e2e8f0
     style B fill:#7c3aed,color:#fff
@@ -38,7 +38,7 @@ flowchart LR
     style C fill:#dc2626,color:#fff
     style D fill:#f59e0b,color:#1e293b
     style E fill:#10b981,color:#fff
-    style F fill:#ff4b4b,color:#fff
+    style F fill:#00c8ff,color:#fff
     style API fill:#009688,color:#fff
 ```
 
@@ -49,12 +49,14 @@ flowchart LR
 | Layer | Technology | Purpose |
 |---|---|---|
 | **SLM Inference** | Qwen2.5-0.5B-Instruct, PyTorch bf16 | Headline → structured disruption signal |
-| **Entity Grounding** | NetworkX DiGraph (30 nodes, 69 edges) | graph-grounded entity verification |
+| **Entity Grounding** | NetworkX DiGraph (30 nodes, 69 edges) | Graph-grounded entity verification |
 | **Risk Scoring** | Deterministic 5-factor weighted formula | AlMahri et al. (2026) Section 3.2.5 |
 | **Stochastic Engine** | NumPy Monte Carlo (10K draws) | Production drop distribution |
 | **Financial Engine** | UN Comtrade HS 8542/8112 baselines | Procurement Cost at Risk (PCaR) in ₹ Crore |
-| **Dashboard** | Streamlit + Plotly | 6-view executive decision interface |
-| **REST API** | FastAPI + Pydantic | Headless enterprise integration |
+| **Dashboard** | React 18 + Vite + TailwindCSS | 3-view executive decision interface (Executive War Room, Impact & PCaR, Model Governance) |
+| **Iframe Wrapper** | Streamlit | Optional wrapper in `app/dashboard.py` |
+| **REST API** | FastAPI + Pydantic (11+ endpoints) | Headless enterprise integration & report generation |
+| **Report Generation** | Raw PDF 1.4 server-side generator | Management decision support report (`/static/reports/*.pdf`) |
 | **News Ingestion** | GDELT 2.0 + RSS + SQLite cache | Resilient multi-source headline feed |
 | **Persistence** | JSON + SQLite | Graph overlays & headline cache |
 
@@ -76,66 +78,83 @@ flowchart LR
 
 ## Quickstart
 
-### 1. Clone & Setup Environment
+Follow these steps to run CounterVerse on a clean machine:
+
+### 1. Python Environment Setup
 
 ```bash
+# Clone repository
 git clone <repository-url>
 cd "sem 7"
 
-# Create Python 3.11+ virtual environment
-py -3.11 -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # Linux/Mac
+# Create and activate virtual environment (Python 3.10+ recommended)
+python -m venv .venv
+.venv\Scripts\activate          # Windows PowerShell / CMD
+# source .venv/bin/activate     # Linux / macOS
 
-# Install PyTorch with CUDA (Windows RTX 3050 Ti)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-
-# Install project dependencies
+# Install Python dependencies (CPU or CUDA)
 pip install -r requirements-local.txt
+
+# (Optional: for NVIDIA GPU CUDA acceleration)
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 ```
 
-### 2. Configure Environment
+### 2. Frontend Dependencies & Build
 
 ```bash
+# Install Node dependencies
+npm install
+
+# Compile TypeScript and bundle frontend assets
+npm run build
+```
+
+### 3. Configure Environment Variables
+
+```bash
+# Copy example environment configuration (zero credentials required)
 cp .env.example .env
-# Edit .env with your API keys (all optional — zero keys required for basic operation)
 ```
+*Note: All API keys (Comtrade, HuggingFace, Twitter) are completely optional. The platform automatically engages built-in trade baselines, NetworkX graph topologies, and offline headline feeds if keys are not provided.*
 
-### 3. Verify Installation
+### 4. Run Automated Test Suite
 
 ```bash
-python scripts/check_gpu.py        # Verify CUDA & VRAM
-python test_grounding.py           # Verify graph-grounded entity verification
-pytest tests/ -v                   # Run full test suite
+# Execute test suite (130+ tests verifying Golden graph hash, RBAC, PCaR math, and PDF output)
+pytest tests/ -v
 ```
 
-### 4. Launch Dashboard
+### 5. Launch Backend & Connect Frontend
 
+**Option A: Running Locally**
 ```bash
-streamlit run app/dashboard.py
-# Opens at http://localhost:8501
-```
-
-### 5. Launch REST API (Optional)
-
-```bash
+# Terminal 1 — Start FastAPI REST Backend (port 8000)
 uvicorn api.main:app --host 0.0.0.0 --port 8000
-# OpenAPI docs at http://localhost:8000/docs
+
+# Terminal 2 — Start React/Vite Frontend (port 5173)
+# (Ensure VITE_API_URL=http://localhost:8000 in your .env)
+npm run dev
+```
+*Access the interface at `http://localhost:5173`. The War Room header will display the green **Live API** badge.*
+
+**Option B: Running via Docker Compose**
+```bash
+# Orchestrates FastAPI backend and Streamlit wrapper with health checks
+docker compose up --build
+
+# Backend API:   http://localhost:8000/docs
+# Web Interface: http://localhost:8501
 ```
 
-### 6. Docker Launch (Optional)
+### 6. Persistent State Backup & Restore
 
 ```bash
-docker compose up --build
-# Dashboard: http://localhost:8501
-# API:       http://localhost:8000/docs
-```
+# Create timestamped archive of databases, overlays, and reports
+python scripts/backup.py
 
-### Run with live backend
-To connect the frontend to the live FastAPI backend instead of offline static demo data:
-1. Start the API server: `uvicorn api.main:app --host 0.0.0.0 --port 8000`
-2. Create `.env` from `.env.example` with `VITE_API_URL=http://localhost:8000`
-3. Start the frontend: `npm run dev` (the UI will display the green **Live API** telemetry badge).
+# Restore platform state from latest archive
+python scripts/restore.py
+```
 
 ---
 
@@ -144,24 +163,31 @@ To connect the frontend to the live FastAPI backend instead of offline static de
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/v1/analyze-headline` | Full pipeline: SLM → graph-grounded verification → Risk Score → Directive |
+| `POST` | `/api/v1/signal` | Structured signal extraction from unstructured disruption headline |
+| `POST` | `/api/v1/simulate` | Causal scoring & Monte Carlo propagation for extracted signal |
 | `POST` | `/api/v1/simulate-risk` | Monte Carlo simulation with custom parameters |
-| `POST` | `/api/v1/calculate-pcar` | PCaR for predefined OEM or custom BOM |
-| `GET`  | `/api/v1/health` | System status, GPU availability, graph integrity |
+| `POST` | `/api/v1/calculate-pcar` | PCaR financial metrics for predefined OEM or macro scope |
+| `POST` | `/api/v1/calculate-custom-bom` | Enterprise PCaR computed from custom Bill of Materials |
+| `POST` | `/api/v1/generate-report` | Server-side executive decision support report generation (raw PDF 1.4) |
+| `GET`  | `/api/v1/backtest/siam` | SIAM 2021 historical benchmark backtest calibration data |
+| `GET`  | `/api/v1/live-news` | Live web scraping for real-time supply chain disruptions |
+| `GET`  | `/api/v1/currencies` | Supported multi-currency exchange rates (INR, USD, EUR, JPY) |
+| `POST` | `/api/v1/token` | OAuth2 authentication token endpoint |
+| `GET`  | `/api/v1/health` | System status, GPU availability, graph integrity, baseline vintage |
 
-See interactive docs at `http://localhost:8000/docs` after launching the API.
+See interactive OpenAPI docs at `http://localhost:8000/docs` after launching the API.
 
 ---
 
-## Dashboard Views
+## Dashboard Views (React / Vite Frontend)
 
-| View | Description |
-|---|---|
-| **01 — Decision Room** | Headline analysis, graph-grounded entity verification, risk score, CSCO directive |
-| **02 — Scenarios** | 10 pre-calibrated benchmark scenarios |
-| **03 — Supply Chain** | Interactive 30-node supply chain graph |
-| **04 — Impact & PCaR** | Multi-OEM financial risk allocation & Monte Carlo histograms |
-| **05 — Validation** | SIAM 2021 backtest + Table 5 pipeline benchmark (Macro F1: 0.933) |
-| **06 — Governance** | Parameter audit, 16 model limitations, viva defense guide |
+| View | Component | Description |
+|---|---|---|
+| **01 — Executive War Room** | `ExecutiveWarRoom.tsx` | Live disruption signal ingestion, web scraper, graph entity grounding, causal propagation, stochastic drop, and CSCO directives. |
+| **02 — Impact & PCaR Analysis** | `PCARView.tsx` | Enterprise Bill of Materials (BOM) upload, multi-OEM exposure allocation, multi-currency conversion, and Monte Carlo curtailment histograms. |
+| **03 — Model Governance & Audit** | `GovernanceView.tsx` | 5-factor weight transparency, SIAM 2021 backtest calibration, model assumptions, and audit disclosure. |
+
+*(Note: The repository also retains an optional Streamlit iframe wrapper in `app/dashboard.py`).*
 
 ---
 

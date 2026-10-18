@@ -129,3 +129,32 @@ export interface ParsedBOM {
   parsedAt: string;
   errorMessage?: string;
 }
+
+export type AppMode = 'decision' | 'analyst';
+
+export interface DecisionAuditItem {
+  action: string;
+  actor: string;
+  timestamp: string;
+  notes?: string;
+}
+
+export interface DecisionQueueEvent {
+  id: string;
+  headline: string;
+  risk_band: 'Critical' | 'High' | 'Medium' | 'Low';
+  risk_score: number;
+  component: string;
+  oem: string;
+  p95_exposure_crore: number;
+  p95_exposure_range: string;
+  recommended_action: string;
+  net_benefit_crore: number;
+  cost_crore: number;
+  stale_warning?: string | null;
+  unverified_warning?: string | null;
+  status: 'PENDING' | 'ACKNOWLEDGED' | 'IN_REVIEW' | 'RESOLVED';
+  assigned_to?: string | null;
+  audit_trail: DecisionAuditItem[];
+}
+

@@ -10,11 +10,13 @@ import {
   BarChart3,
   Layers,
   ArrowDownRight,
-  Info
+  Info,
+  Loader2
 } from 'lucide-react';
 import { OEMKey, OEMProfile, Currency, ParsedBOM } from '../../types';
 import { OEM_PROFILES, CURRENCY_CONFIGS, MACRO_BASELINE_CRORE } from '../../data/mockData';
 import { simulateMonteCarlo, formatCurrencyValue, formatPercentage } from '../../utils/formatters';
+import { postCalculatePcar } from '../../api/client';
 
 interface FinancialExposureViewProps {
   selectedOEM: OEMProfile;
@@ -35,6 +37,32 @@ export const FinancialExposureView: React.FC<FinancialExposureViewProps> = ({
   const [sampleSize, setSampleSize] = useState<number>(10000);
   const [activeSeed, setActiveSeed] = useState<number>(simulationSeed);
   const [currency, setCurrency] = useState<Currency>('INR');
+
+  // Backend PCaR Comparison State
+  const [backendPcar, setBackendPcar] = useState<any | null>(null);
+  const [isLoadingBackend, setIsLoadingBackend] = useState<boolean>(false);
+  const [backendError, setBackendError] = useState<string | null>(null);
+
+  const handleCompareWithBackend = async () => {
+    setIsLoadingBackend(true);
+    setBackendError(null);
+    try {
+      const res = await postCalculatePcar({
+        company: selectedOEM.name,
+        risk_score: 0.65,
+        mc_samples: sampleSize,
+      });
+      if (res) {
+        setBackendPcar(res);
+      } else {
+        setBackendError('Backend PCaR endpoint returned null or offline');
+      }
+    } catch (err: any) {
+      setBackendError(err?.message || 'Failed to fetch backend PCaR');
+    } finally {
+      setIsLoadingBackend(false);
+    }
+  };
 
   // Custom BOM state
   const [bomFile, setBomFile] = useState<ParsedBOM | null>(null);
@@ -142,13 +170,135 @@ export const FinancialExposureView: React.FC<FinancialExposureViewProps> = ({
 
           <button
             onClick={handleRecalculate}
-            className="flex items-center gap-1.5 rounded-md border border-[#222222] bg-[#ffffff] px-3.5 py-1.5 text-xs font-bold text-black hover:bg-[#eaeaea] transition shadow-md"
+            className="flex items-center gap-1.5 rounded-md border border-[#222222] bg-[#ffffff] px-3.5 py-1.5 text-xs font-bold text-black hover:bg-[#eaeaea] transition shadow-md cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5 text-black" />
             <span>Recalculate Exposure</span>
           </button>
+
+          <button
+            onClick={handleCompareWithBackend}
+            disabled={isLoadingBackend}
+            className="flex items-center gap-1.5 rounded-md border border-[#00df8f]/50 bg-[#00df8f]/10 px-3.5 py-1.5 text-xs font-bold text-[#00df8f] hover:bg-[#00df8f]/20 transition shadow-md disabled:opacity-50 cursor-pointer"
+          >
+            {isLoadingBackend ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-[#00df8f]" />
+            ) : (
+              <CheckCircle2 className="h-3.5 w-3.5 text-[#00df8f]" />
+            )}
+            <span>Compare with Backend</span>
+          </button>
         </div>
       </div>
+
+      {/* Backend Comparison Banner / Panel */}
+      {backendPcar && (
+        <section
+          aria-label="Backend PCaR Comparison"
+          className="rounded-lg border border-[#00df8f]/40 bg-[#06120e] p-5 shadow-lg space-y-4"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#00df8f]/20 pb-3 gap-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-[#00df8f]" />
+              <h2 className="text-sm font-bold text-[#f7f7f7]">
+                Backend PCaR Engine Comparison ({backendPcar.company_name})
+              </h2>
+              <span className="rounded bg-[#00df8f]/20 border border-[#00df8f]/40 px-2 py-0.5 text-[9px] font-mono font-bold text-[#00df8f]">
+                FASTAPI LIVE PCAR
+              </span>
+            </div>
+            <div className="text-xs font-mono text-[#a5a5a5]">
+              Metric Version: <strong className="text-[#00df8f]">{backendPcar.metric_version || '2.0.0'}</strong> · Compute Time: {backendPcar.pipeline_time_ms}ms
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Local Illustrative Estimate */}
+            <div className="rounded-lg border border-[#f5a623]/30 bg-[#0c0c0c] p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-wider text-[#f5a623] uppercase">
+                  LOCAL FRONTEND SLIDER ESTIMATE
+                </span>
+                <span className="rounded bg-[#f5a623]/20 border border-[#f5a623]/40 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#f5a623]">
+                  Illustrative UI
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 font-mono pt-1">
+                <div>
+                  <span className="text-[10px] text-[#666666] block">95% PCaR:</span>
+                  <span className="text-base font-bold text-[#f5a623]">
+                    {formatCurrencyValue(simulationResult.pcarCrores, currency)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#666666] block">Mean Loss:</span>
+                  <span className="text-base font-bold text-[#f7f7f7]">
+                    {formatCurrencyValue(simulationResult.meanLossCrores, currency)}
+                  </span>
+                </div>
+              </div>
+              <p className="text-[10px] text-[#a5a5a5] pt-1">
+                Parameters: Curtailment {curtailmentPct}%, Recovery {recoveryDays}d, Import Dependency {dependencyPct}%
+              </p>
+            </div>
+
+            {/* Backend PCaR Result */}
+            <div className="rounded-lg border border-[#00df8f]/30 bg-[#06120e] p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-wider text-[#00df8f] uppercase">
+                  BACKEND PCAR ENGINE (STOCHASTIC)
+                </span>
+                <span className="rounded bg-[#00df8f]/20 border border-[#00df8f]/40 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#00df8f]">
+                  Server Verified
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 font-mono pt-1">
+                <div>
+                  <span className="text-[10px] text-[#666666] block">95% PCaR:</span>
+                  <span className="text-base font-bold text-[#00df8f]">
+                    {formatCurrencyValue(backendPcar.pcar_95_crore, currency)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#666666] block">Mean Loss:</span>
+                  <span className="text-base font-bold text-[#f7f7f7]">
+                    {formatCurrencyValue(backendPcar.mean_loss_crore, currency)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#666666] block">P99 PCaR:</span>
+                  <span className="text-base font-bold text-[#00c8ff]">
+                    {formatCurrencyValue(backendPcar.pcar_99_crore, currency)}
+                  </span>
+                </div>
+              </div>
+              <div className="text-[10px] text-[#a5a5a5] pt-1 flex flex-col gap-0.5">
+                <span>
+                  Provenance: <strong className="text-[#00df8f]">{backendPcar.data_provenance?.source || 'UN Comtrade (HS 8542)'}</strong> · Baseline ₹{backendPcar.effective_base_crore} Cr
+                </span>
+                <span>
+                  Share: {backendPcar.market_share_pct}% · Dependency: {backendPcar.dependency_ratio_pct}% · Samples: {sampleSize.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {backendError && (
+        <div className="rounded border border-[#ee0000]/30 bg-[#ee0000]/10 p-3 text-xs text-[#ee0000] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{backendError}</span>
+          </div>
+          <button
+            onClick={() => setBackendError(null)}
+            className="text-[10px] underline hover:text-white cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Grid: Scenario Controls (Left) + Monte Carlo Chart (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -354,16 +504,28 @@ export const FinancialExposureView: React.FC<FinancialExposureViewProps> = ({
           {/* Metric Summary Footnote */}
           <div className="grid grid-cols-2 gap-3 border-t border-[#1a1a1a] pt-3 text-xs">
             <div className="rounded bg-[#0c0c0c] p-2.5 border border-[#1f1f1f]">
-              <span className="text-[#666666] block text-[11px]">95% Procurement Cost-at-Risk:</span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[#666666] block text-[11px]">95% Procurement Cost-at-Risk:</span>
+                <span className="rounded bg-[#f5a623]/20 border border-[#f5a623]/40 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#f5a623]">
+                  Local illustrative estimate
+                </span>
+              </div>
               <span className="font-mono text-base font-bold text-[#00c8ff]">
                 {formatCurrencyValue(simulationResult.pcarCrores, currency)}
               </span>
+              <p className="text-[10px] text-[#a5a5a5] mt-1">Interactive slider-driven projection</p>
             </div>
             <div className="rounded bg-[#0c0c0c] p-2.5 border border-[#1f1f1f]">
-              <span className="text-[#666666] block text-[11px]">Expected Baseline Loss:</span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[#666666] block text-[11px]">Expected Baseline Loss:</span>
+                <span className="rounded bg-[#f5a623]/20 border border-[#f5a623]/40 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#f5a623]">
+                  Local illustrative estimate
+                </span>
+              </div>
               <span className="font-mono text-base font-bold text-[#f7f7f7]">
                 {formatCurrencyValue(simulationResult.meanLossCrores, currency)}
               </span>
+              <p className="text-[10px] text-[#a5a5a5] mt-1">Interactive slider-driven projection</p>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ based on the Monte Carlo production drop distribution and calibration constants.
 """
 
 import time
+from typing import Optional
 import numpy as np
 import logging
 
@@ -13,6 +14,34 @@ logger = logging.getLogger(__name__)
 
 # Sourced from UN Comtrade (India Imports HS 8542, 2022 Full Year: $16.12B USD @ 83.0 INR/USD = ₹1,33,814.34 Crore)
 DEFAULT_COMTRADE_HS8542_BASELINE_CRORE = 133814.34
+
+METRIC_VERSION = "2.0.0"
+
+# UN Comtrade Sourced Data Provenance Metadata
+COMTRADE_DATA_PROVENANCE = {
+    "reporter": "India (699)",
+    "flow": "Imports",
+    "hs_code": "8542",
+    "period_vintage": "2022 Full Year",
+    "retrieval_date": "2026-09-05",
+    "storage_type": "static_cache",
+    "disclaimer": "Comtrade values are trade-data proxies, not OEM procurement spend. HS 8112 is a broad basket (gallium, germanium, hafnium, indium, niobium, rhenium, thallium), not pure gallium/germanium.",
+}
+
+# Standard PCaR Calculation & Scenario Modeling Assumptions
+PCAR_ASSUMPTIONS = {
+    "metric_version": METRIC_VERSION,
+    "pcar_definition": "PCaR(q) = q-th percentile of total stressed procurement exposure",
+    "formula": "drop_pct * effective_base_crore * spot_premium_multiplier U[1.3, 2.8]",
+    "spot_premium_distribution": "Uniform[1.3, 2.8] (spot market surge premium included)",
+    "extra_procurement_cost_definition": "Premium-only component: drop_pct * effective_base_crore * (spot_premium_multiplier - 1.0)",
+    "industry_baseline_crore": DEFAULT_COMTRADE_HS8542_BASELINE_CRORE,
+    "usd_inr_rate": 83.0,
+    "risk_score_interpretation": "Ordinal prioritization index [0.0, 1.0], not an empirical probability",
+    "mc_distribution_type": "Beta distribution parameterized by shock severity & duration (calibrated scenario assumptions, not econometrically fitted)",
+    "four_state_probabilities": "Model-assigned heuristic posteriors, not calibrated frequentist probabilities",
+    "data_vintage": "UN Comtrade 2022 Full Year (India Imports HS 8542)",
+}
 
 # Sourced OEM Profiles: SIAM FY2023-24 Passenger Vehicle Market Shares & Component Chain Dependencies
 # Formula: Company Base Spend = Industry Baseline × Market Share (%) × Chain Dependency Ratio (%)
@@ -61,6 +90,7 @@ def calculate_pcar(
     baseline_revenue_crore: float = DEFAULT_COMTRADE_HS8542_BASELINE_CRORE,
     company_name: str = "Maruti Suzuki",
     baseline_output_value_crore: float = None,
+    random_seed: Optional[int] = None,
 ) -> dict:
     """
     Calculates Procurement Cost-at-Risk (PCaR) metrics based on simulated production drop samples
@@ -79,14 +109,13 @@ def calculate_pcar(
         baseline_output_value_crore: Optional annual output-value baseline for the selected
                                      scope. When omitted, lost-output-value keys are returned
                                      as None rather than inferred from procurement spend.
+        random_seed: Optional integer seed for reproducible spot premium draws.
+                     If None, uses mc_samples['random_seed'] if available.
 
     Returns:
         A dictionary of company-allocated financial risk metrics in Crore INR.
     """
     logger.info(f"Calculating PCaR metrics for enterprise: {company_name}...")
-    
-    # Simulate processing time
-    time.sleep(0.1)
     
     # Handle dict or MonteCarloResult input gracefully
     if isinstance(mc_samples, dict) and "samples" in mc_samples:
@@ -103,8 +132,16 @@ def calculate_pcar(
     # Convert percentage drop to fraction
     drop_fractions = samples_array / 100.0
     
+    # Resolve seed isolation via local RandomState
+    if random_seed is not None:
+        rng = np.random.RandomState(random_seed)
+    elif isinstance(mc_samples, dict) and mc_samples.get("random_seed") is not None:
+        rng = np.random.RandomState(mc_samples["random_seed"])
+    else:
+        rng = np.random.RandomState()
+
     # Generate stochastic Spot Premium Multiplier (between 1.3 and 2.8)
-    premium_multiplier_samples = np.random.uniform(low=1.3, high=2.8, size=len(samples_array))
+    premium_multiplier_samples = rng.uniform(low=1.3, high=2.8, size=len(samples_array))
     
     # Existing protected metric: total stressed procurement exposure.
     loss_samples = drop_fractions * effective_base_crore * premium_multiplier_samples
@@ -162,6 +199,9 @@ def calculate_pcar(
             else "not_calculated_missing_output_value_baseline"
         ),
         "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+        "data_provenance": dict(COMTRADE_DATA_PROVENANCE),
+        "metric_version": METRIC_VERSION,
+        "assumptions": dict(PCAR_ASSUMPTIONS),
         "_loss_samples": loss_samples,
         "_extra_procurement_cost_samples": extra_procurement_cost_samples,
         "_lost_output_value_samples": lost_output_value_samples,
@@ -330,6 +370,9 @@ def calculate_pcar_by_company(
         "pcar_99_crore": float(round(pcar_99, 2)),
         "worst_case_loss_crore": float(round(worst_case, 2)),
         "allocation_formula": "Industry_Baseline (₹1,33,814 Cr) × Market_Share% × Chain_Dependency% × Production_Drop% × Premium_Multiplier",
+        "data_provenance": macro_pcar_result.get("data_provenance", dict(COMTRADE_DATA_PROVENANCE)),
+        "metric_version": METRIC_VERSION,
+        "assumptions": macro_pcar_result.get("assumptions", dict(PCAR_ASSUMPTIONS)),
         "macro_reference": {
             "macro_mean_loss_crore": float(round(macro_pcar_result.get("mean_loss_crore", 0.0), 2)),
             "macro_pcar_95_crore": float(round(macro_pcar_result.get("pcar_95_crore", 0.0), 2)),
@@ -425,6 +468,7 @@ def calculate_pcar_custom_bom(
     company_name: str = "Custom Enterprise",
     ground_against_graph: bool = True,
     baseline_output_value_crore: float = None,
+    random_seed: Optional[int] = None,
 ) -> dict:
     """
     Calculates Procurement Cost-at-Risk using a custom Bill of Materials.
@@ -446,6 +490,8 @@ def calculate_pcar_custom_bom(
         ground_against_graph: Whether to verify components against the graph.
         baseline_output_value_crore: Optional output-value baseline. Lost-output
                                      metrics remain None when it is omitted.
+        random_seed: Optional integer seed for reproducible spot premium draws.
+                     If None, uses mc_samples['random_seed'] if available.
 
     Returns:
         dict with PCaR metrics plus component-level grounding results.
@@ -486,7 +532,16 @@ def calculate_pcar_custom_bom(
 
     # Monte Carlo loss calculation (same formula as calculate_pcar)
     drop_fractions = samples_array / 100.0
-    premium_multiplier_samples = np.random.uniform(low=1.3, high=2.8, size=len(samples_array))
+
+    # Resolve seed isolation via local RandomState
+    if random_seed is not None:
+        rng = np.random.RandomState(random_seed)
+    elif isinstance(mc_samples, dict) and mc_samples.get("random_seed") is not None:
+        rng = np.random.RandomState(mc_samples["random_seed"])
+    else:
+        rng = np.random.RandomState()
+
+    premium_multiplier_samples = rng.uniform(low=1.3, high=2.8, size=len(samples_array))
     loss_samples = drop_fractions * total_baseline_crore * premium_multiplier_samples
     extra_procurement_cost_samples = (
         drop_fractions * total_baseline_crore * (premium_multiplier_samples - 1.0)
@@ -556,6 +611,9 @@ def calculate_pcar_custom_bom(
         "grounding_results": grounding_results,
         "component_grounding": grounding_results,
         "allocation_formula": "BOM_Baseline × Production_Drop% × Premium_Multiplier U[1.3, 2.8]",
+        "data_provenance": dict(COMTRADE_DATA_PROVENANCE),
+        "metric_version": METRIC_VERSION,
+        "assumptions": dict(PCAR_ASSUMPTIONS),
         "_loss_samples": loss_samples,
         "_extra_procurement_cost_samples": extra_procurement_cost_samples,
         "_lost_output_value_samples": lost_output_value_samples,

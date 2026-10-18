@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Menu } from 'lucide-react';
-import { NavView, OEMKey, ExtractionEngine } from '../../types';
+import { NavView, OEMKey, ExtractionEngine, AppMode } from '../../types';
 import { OEM_PROFILES } from '../../data/mockData';
 import { Sidebar } from './Sidebar';
 import { TopScopeBar } from './TopScopeBar';
@@ -15,6 +15,8 @@ interface ShellProps {
   onSelectEngine: (engine: ExtractionEngine) => void;
   simulationSeed: number;
   onResetSeed: () => void;
+  appMode?: AppMode;
+  onToggleMode?: (mode: AppMode) => void;
   children: React.ReactNode;
 }
 
@@ -27,6 +29,8 @@ export const Shell: React.FC<ShellProps> = ({
   onSelectEngine,
   simulationSeed,
   onResetSeed,
+  appMode,
+  onToggleMode,
   children,
 }) => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -74,7 +78,11 @@ export const Shell: React.FC<ShellProps> = ({
         </div>
 
         {/* Sticky Top Scope Bar */}
-        <TopScopeBar selectedOEM={selectedOEM} />
+        <TopScopeBar
+          selectedOEM={selectedOEM}
+          appMode={appMode}
+          onToggleMode={onToggleMode}
+        />
 
         {/* Viewport Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">

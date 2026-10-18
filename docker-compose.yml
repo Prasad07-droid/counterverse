@@ -1,19 +1,67 @@
 # ══════════════════════════════════════════════════════════════
 # CounterVerse — Docker Compose v2 Configuration
 # ══════════════════════════════════════════════════════════════
-# Services:
-#   neo4j     - Graph database (bolt://neo4j:7687)
-#   redis     - Cache / session store  (redis://redis:6379)
-#   api       - FastAPI backend (port 8000)
-#   dashboard - Streamlit UI (port 8501)
+# Default launch (FastAPI + Streamlit iframe UI):
+#   docker compose up --build
 #
-# Start: docker compose up --build
-# Stop:  docker compose down -v
+# Optional external infrastructure profile (Neo4j + Redis):
+#   docker compose --profile external-infra up --build
+#
+# Stop:
+#   docker compose down -v
 
 services:
 
-  # ── Neo4j Graph Database ──────────────────────────────────────
+  # ── FastAPI Backend ───────────────────────────────────────────
+  api:
+    build: .
+    container_name: counterverse-api
+    ports:
+      - "8000:8000"
+      - "9090:9090"   # Prometheus metrics
+    environment:
+      - COUNTERVERSE_API_HOST=0.0.0.0
+      - COUNTERVERSE_API_PORT=8000
+      - ENVIRONMENT=development
+    volumes:
+      - ./data:/app/data
+      - ./static:/app/static
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # ── Dashboard (Streamlit Embedding Vite React UI) ─────────────
+  dashboard:
+    build: .
+    container_name: counterverse-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - COUNTERVERSE_STREAMLIT_PORT=8501
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./data:/app/data
+      - ./static:/app/static
+    depends_on:
+      api:
+        condition: service_healthy
+    command: >
+      streamlit run app/dashboard.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+      --browser.gatherUsageStats=false
+    restart: unless-stopped
+
+  # ── Optional: Neo4j Graph Database ────────────────────────────
+  # (Optional infrastructure: active pipeline uses NetworkX + JSON overlays)
   neo4j:
+    profiles: ["external-infra"]
     image: neo4j:5-community
     container_name: counterverse-neo4j
     environment:
@@ -31,8 +79,10 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ── Redis Cache ───────────────────────────────────────────────
+  # ── Optional: Redis Cache ─────────────────────────────────────
+  # (Optional infrastructure: active pipeline uses SQLite headline caching)
   redis:
+    profiles: ["external-infra"]
     image: redis:7-alpine
     container_name: counterverse-redis
     ports:
@@ -46,60 +96,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ── FastAPI Backend ───────────────────────────────────────────
-  api:
-    build: .
-    container_name: counterverse-api
-    ports:
-      - "8000:8000"
-      - "9090:9090"   # Prometheus metrics
-    environment:
-      - COUNTERVERSE_API_HOST=0.0.0.0
-      - COUNTERVERSE_API_PORT=8000
-      - COUNTERVERSE_NEO4J_URI=bolt://neo4j:7687
-      - COUNTERVERSE_NEO4J_USER=neo4j
-      - COUNTERVERSE_NEO4J_PASSWORD=password
-      - COUNTERVERSE_REDIS_URL=redis://redis:6379
-    volumes:
-      - ./data:/app/data
-    depends_on:
-      neo4j:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-
-  # ── Streamlit Dashboard (removed) ───────────────────────────────────────
-  # dashboard:
-  #   build: .
-  #   container_name: counterverse-dashboard
-  #   ports:
-  #     - "8501:8501"
-  #   environment:
-  #     - COUNTERVERSE_STREAMLIT_PORT=8501
-  #     - COUNTERVERSE_NEO4J_URI=bolt://neo4j:7687
-  #     - COUNTERVERSE_NEO4J_USER=neo4j
-  #     - COUNTERVERSE_NEO4J_PASSWORD=password
-  #     - COUNTERVERSE_REDIS_URL=redis://redis:6379
-  #   volumes:
-  #     - ./data:/app/data
-  #   depends_on:
-  #     - api
-  #   command: >
-  #     streamlit run app/dashboard.py
-  #     --server.port=8501
-  #     --server.address=0.0.0.0
-  #     --server.headless=true
-  #     --browser.gatherUsageStats=false
-  #   restart: unless-stopped
-
 volumes:
   neo4j_data:
   redis_data:
-

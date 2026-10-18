@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavView, OEMKey, ExtractionEngine } from './types';
+import { NavView, OEMKey, ExtractionEngine, AppMode } from './types';
 import { OEM_PROFILES } from './data/mockData';
 import { Shell } from './components/layout/Shell';
 import { ExecutiveWarRoom } from './components/war-room/ExecutiveWarRoom';
@@ -11,6 +11,8 @@ export const App: React.FC = () => {
   const [selectedOEMKey, setSelectedOEMKey] = useState<OEMKey>('maruti');
   const [extractionEngine, setExtractionEngine] = useState<ExtractionEngine>('fast');
   const [simulationSeed, setSimulationSeed] = useState<number>(42);
+  const [latestAnalysisResult, setLatestAnalysisResult] = useState<any | null>(null);
+  const [appMode, setAppMode] = useState<AppMode>('decision');
 
   const selectedOEM = OEM_PROFILES[selectedOEMKey];
 
@@ -24,8 +26,18 @@ export const App: React.FC = () => {
       onSelectEngine={setExtractionEngine}
       simulationSeed={simulationSeed}
       onResetSeed={() => setSimulationSeed((s) => s + 1)}
+      appMode={appMode}
+      onToggleMode={setAppMode}
     >
-      {currentView === 'war-room' && <ExecutiveWarRoom selectedOEM={selectedOEM} />}
+      {currentView === 'war-room' && (
+        <ExecutiveWarRoom
+          selectedOEM={selectedOEM}
+          onAnalysisComplete={setLatestAnalysisResult}
+          latestAnalysisResult={latestAnalysisResult}
+          appMode={appMode}
+          onToggleMode={setAppMode}
+        />
+      )}
       {currentView === 'financial-exposure' && (
         <FinancialExposureView
           selectedOEM={selectedOEM}
@@ -33,7 +45,9 @@ export const App: React.FC = () => {
           simulationSeed={simulationSeed}
         />
       )}
-      {currentView === 'governance' && <GovernanceView />}
+      {currentView === 'governance' && (
+        <GovernanceView latestAnalysisResult={latestAnalysisResult} />
+      )}
     </Shell>
   );
 };

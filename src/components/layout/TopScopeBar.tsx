@@ -1,14 +1,20 @@
 import React from 'react';
 import { Lock, ArrowRight, Database } from 'lucide-react';
-import { OEMProfile } from '../../types';
+import { OEMProfile, AppMode } from '../../types';
 import { formatCurrencyValue } from '../../utils/formatters';
 import { MACRO_BASELINE_CRORE } from '../../data/mockData';
 
 interface TopScopeBarProps {
   selectedOEM: OEMProfile;
+  appMode?: AppMode;
+  onToggleMode?: (mode: AppMode) => void;
 }
 
-export const TopScopeBar: React.FC<TopScopeBarProps> = ({ selectedOEM }) => {
+export const TopScopeBar: React.FC<TopScopeBarProps> = ({
+  selectedOEM,
+  appMode = 'decision',
+  onToggleMode,
+}) => {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-[#222222] bg-[#070707]/90 backdrop-blur-md px-4 py-2.5 sm:px-6">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between text-xs overflow-x-auto no-scrollbar">
@@ -32,6 +38,34 @@ export const TopScopeBar: React.FC<TopScopeBarProps> = ({ selectedOEM }) => {
             <ArrowRight className="h-3 w-3 text-[#666666]" />
             <span className="font-semibold text-[#f7f7f7]">{selectedOEM.name}</span>
           </div>
+        </div>
+
+        {/* Center: Mode Toggle (Phase 6) */}
+        <div className="flex items-center rounded border border-[#222222] bg-[#0c0c0c] p-0.5 text-[11px] font-sans">
+          <button
+            type="button"
+            onClick={() => onToggleMode && onToggleMode('decision')}
+            title="Procurement & Supply-Chain Officer: Triage, approvals, net-benefit matrix, human sign-off"
+            className={`flex items-center gap-1.5 rounded px-3 py-1 font-semibold transition cursor-pointer ${
+              appMode === 'decision'
+                ? 'bg-[#00df8f] text-black shadow-sm font-bold'
+                : 'text-[#a5a5a5] hover:text-[#f7f7f7]'
+            }`}
+          >
+            <span>🛡️ Decision Mode (Officer)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onToggleMode && onToggleMode('analyst')}
+            title="Quantitative Analyst: Factor decomposition, seed isolation, distributions, reproducibility bundle"
+            className={`flex items-center gap-1.5 rounded px-3 py-1 font-semibold transition cursor-pointer ${
+              appMode === 'analyst'
+                ? 'bg-[#00c8ff] text-black shadow-sm font-bold'
+                : 'text-[#a5a5a5] hover:text-[#f7f7f7]'
+            }`}
+          >
+            <span>🔬 Analyst Mode (Quant)</span>
+          </button>
         </div>
 
         {/* Right: Baselines */}

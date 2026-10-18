@@ -34,4 +34,7 @@ data/processed/grounding_graph_custom.json
 
 # Local documents
 *.pdf
+.coverage
+scratch/
+data/backups/
 

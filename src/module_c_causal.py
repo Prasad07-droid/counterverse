@@ -31,6 +31,21 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
+# Centralized Risk Score Threshold Constants (Section 3.2.5 & 3.2.6)
+# Used as single source of truth across module_c, module_i_report, and api/main
+RISK_THRESHOLD_HIGH: float = 0.60
+RISK_THRESHOLD_MEDIUM: float = 0.45
+
+
+def classify_risk_band(risk_score: float) -> str:
+    """Classifies risk_score into ordinal risk band: HIGH, MEDIUM, or LOW."""
+    if risk_score >= RISK_THRESHOLD_HIGH:
+        return "HIGH"
+    elif risk_score >= RISK_THRESHOLD_MEDIUM:
+        return "MEDIUM"
+    return "LOW"
+
+
 NODE_TO_GRAPH_ID = {
     "Raw Material Supplier": "gallium_supplier",
     "Port/Logistics": "busan_port",
@@ -333,10 +348,10 @@ def calculate_deterministic_risk_score(signal: Dict[str, Any]) -> Dict[str, Any]
     risk_score = round(min(max(raw_risk_score, 0.0), 1.0), 3)
 
     # Threshold classification (Section 3.2.5 & 3.2.6)
-    if risk_score >= 0.60:
+    if risk_score >= RISK_THRESHOLD_HIGH:
         risk_level = "HIGH"
         recommended_action = "Replace Supplier / Qualify Dual-Sourcing Immediately (CSCO Directive)"
-    elif risk_score >= 0.45:
+    elif risk_score >= RISK_THRESHOLD_MEDIUM:
         risk_level = "MEDIUM"
         recommended_action = "Increase Safety Stock & Active Weekly Monitoring"
     else:
@@ -393,22 +408,22 @@ def simulate_causal_impact(signal: dict) -> dict:
     r = risk_meta["risk_score"]
 
     # Ground Bayesian posterior marginals directly in the deterministic risk score
-    if r >= 0.60:
+    if r >= RISK_THRESHOLD_HIGH:
         # High Risk: Dominant probability in High (>15%) drop
-        p_high = round(0.50 + 0.35 * ((r - 0.60) / 0.40), 2)
-        p_med = round(0.28 - 0.10 * ((r - 0.60) / 0.40), 2)
-        p_low = round(0.14 - 0.08 * ((r - 0.60) / 0.40), 2)
+        p_high = round(0.50 + 0.35 * ((r - RISK_THRESHOLD_HIGH) / (1.0 - RISK_THRESHOLD_HIGH)), 2)
+        p_med = round(0.28 - 0.10 * ((r - RISK_THRESHOLD_HIGH) / (1.0 - RISK_THRESHOLD_HIGH)), 2)
+        p_low = round(0.14 - 0.08 * ((r - RISK_THRESHOLD_HIGH) / (1.0 - RISK_THRESHOLD_HIGH)), 2)
         p_none = max(round(1.0 - (p_high + p_med + p_low), 2), 0.02)
-    elif r >= 0.45:
+    elif r >= RISK_THRESHOLD_MEDIUM:
         # Medium Risk: Peak probability in Medium (5-15%) drop
-        norm = (r - 0.45) / 0.15
+        norm = (r - RISK_THRESHOLD_MEDIUM) / (RISK_THRESHOLD_HIGH - RISK_THRESHOLD_MEDIUM)
         p_high = round(0.15 + 0.20 * norm, 2)
         p_med = round(0.48 + 0.05 * norm, 2)
         p_low = round(0.25 - 0.12 * norm, 2)
         p_none = max(round(1.0 - (p_high + p_med + p_low), 2), 0.04)
     else:
         # Low Risk: Peak in Low (<5%) and None
-        norm = r / 0.45
+        norm = r / RISK_THRESHOLD_MEDIUM
         p_high = round(0.02 + 0.06 * norm, 2)
         p_med = round(0.12 + 0.16 * norm, 2)
         p_low = round(0.48 + 0.04 * norm, 2)
@@ -492,8 +507,8 @@ def compute_cost_adjusted_recommendation(
     
     # Threshold-only recommendation for comparison
     threshold_rec = (
-        "Qualify Dual Source" if risk_score >= 0.60
-        else "Buffer Inventory" if risk_score >= 0.45
+        "Qualify Dual Source" if risk_score >= RISK_THRESHOLD_HIGH
+        else "Buffer Inventory" if risk_score >= RISK_THRESHOLD_MEDIUM
         else "Monitor & Maintain"
     )
     

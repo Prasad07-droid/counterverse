@@ -96,6 +96,21 @@ def calculate_disruption_score(title: str, description: str = "") -> Dict[str, A
     }
 
 
+def _infer_chokepoint_and_vector(title: str, text: str = "") -> tuple[str, str]:
+    t = f"{title} {text}".lower()
+    if any(k in t for k in ["gallium", "germanium", "lithium", "cobalt", "raw material", "mineral", "mining"]):
+        return "Raw Material Supplier", "Export restriction"
+    if any(k in t for k in ["tsmc", "fab", "wafer", "foundry", "lithography", "semiconductor fab", "cleanroom"]):
+        return "Tier-1 Supplier A", "Semiconductor fab shutdown"
+    if any(k in t for k in ["port", "dock", "berth", "container", "vessel", "shipping", "red sea", "suez", "shanghai"]):
+        return "Shanghai Port", "Maritime disruption"
+    if any(k in t for k in ["strike", "worker", "union", "labour", "walkout"]):
+        return "Tier-2 Fabricator", "Labour strike"
+    if any(k in t for k in ["ecu", "microcontroller", "mcu", "chip", "semiconductor", "automotive"]):
+        return "Tier-2 Fabricator", "Component allocation"
+    return "Global Supply Node", "Supply chain disruption"
+
+
 def scrape_google_news_rss(query: str, max_items: int = 6) -> List[Dict[str, Any]]:
     """
     Scrapes real-time headlines directly from Google News RSS feed for given query.
@@ -105,20 +120,30 @@ def scrape_google_news_rss(query: str, max_items: int = 6) -> List[Dict[str, Any
     rss_url = f"https://news.google.com/rss/search?q={encoded_query}&hl=en-IN&gl=IN&ceid=IN:en"
     
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8"
     }
     
     articles = []
+    content = ""
     try:
-        req = urllib.request.Request(rss_url, headers=headers)
-        with urllib.request.urlopen(req, timeout=5.0) as resp:
-            content = resp.read().decode("utf-8", errors="replace")
+        try:
+            import requests
+            resp = requests.get(rss_url, headers=headers, timeout=7.0)
+            if resp.status_code == 200:
+                content = resp.text
+        except Exception:
+            pass
+
+        if not content:
+            req = urllib.request.Request(rss_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=7.0) as resp:
+                content = resp.read().decode("utf-8", errors="replace")
 
         # Parse <item> elements using regex
         item_blocks = re.findall(r'<item>(.*?)</item>', content, re.DOTALL)
         
-        for item in item_blocks[:max_items]:
+        for idx, item in enumerate(item_blocks[:max_items]):
             title_match = re.search(r'<title>(.*?)</title>', item, re.DOTALL)
             link_match = re.search(r'<link>(.*?)</link>', item, re.DOTALL)
             pubdate_match = re.search(r'<pubDate>(.*?)</pubDate>', item, re.DOTALL)
@@ -143,15 +168,35 @@ def scrape_google_news_rss(query: str, max_items: int = 6) -> List[Dict[str, Any
 
             if clean_title:
                 eval_meta = calculate_disruption_score(clean_title, clean_desc)
+                score = eval_meta.get("disruption_score", 60)
+                # Map to UI severity levels
+                if score >= 80:
+                    ui_severity = "CRITICAL"
+                elif score >= 60:
+                    ui_severity = "SEVERE"
+                else:
+                    ui_severity = "MODERATE"
+
+                choke_point, vector = _infer_chokepoint_and_vector(clean_title, clean_desc)
+
                 articles.append({
+                    "id": f"gn-{int(datetime.now(timezone.utc).timestamp())}-{idx}",
                     "title": clean_title,
                     "description": clean_desc,
                     "source": source_name,
                     "url": link,
                     "pub_date": pub_date,
+                    "pubDate": pub_date[:16] if len(pub_date) > 16 else pub_date,
                     "query_topic": query,
+                    "topic": query.split()[0].title() if query else "Supply Chain",
                     "scraper_engine": "Google News RSS Live",
-                    **eval_meta
+                    "disruption_score": score,
+                    "disruptionScore": score,
+                    "severity": ui_severity,
+                    "severity_level": eval_meta.get("severity_level", 2),
+                    "matched_keywords": eval_meta.get("matched_keywords", []),
+                    "chokePoint": choke_point,
+                    "vector": vector,
                 })
     except Exception as e:
         logger.warning(f"Google News RSS scrape failed for query '{query}': {e}")
@@ -168,19 +213,31 @@ def scrape_gdelt_live(max_items: int = 6) -> List[Dict[str, Any]]:
         gdelt_res = fetch_live_gdelt_headlines(max_records=max_items)
         if gdelt_res and gdelt_res.get("success"):
             articles = []
-            for a in gdelt_res.get("articles", []):
+            for idx, a in enumerate(gdelt_res.get("articles", [])):
                 t = a.get("title", "")
                 if t:
                     eval_meta = calculate_disruption_score(t)
+                    score = eval_meta.get("disruption_score", 60)
+                    ui_severity = "CRITICAL" if score >= 80 else ("SEVERE" if score >= 60 else "MODERATE")
+                    choke_point, vector = _infer_chokepoint_and_vector(t)
                     articles.append({
+                        "id": f"gdelt-{int(datetime.now(timezone.utc).timestamp())}-{idx}",
                         "title": t,
                         "description": f"Live geopolitical event intelligence from {a.get('domain', 'global web')}",
                         "source": a.get("domain", "GDELT Live Wire"),
                         "url": a.get("url", ""),
                         "pub_date": a.get("seendate", "Today"),
+                        "pubDate": a.get("seendate", "Today"),
                         "query_topic": "GDELT Real-Time Ingest",
+                        "topic": "Geopolitical Ingest",
                         "scraper_engine": "GDELT Document 2.0 API",
-                        **eval_meta
+                        "disruption_score": score,
+                        "disruptionScore": score,
+                        "severity": ui_severity,
+                        "severity_level": eval_meta.get("severity_level", 2),
+                        "matched_keywords": eval_meta.get("matched_keywords", []),
+                        "chokePoint": choke_point,
+                        "vector": vector,
                     })
             return articles
     except Exception as e:
@@ -291,10 +348,29 @@ def scrape_live_supply_chain_news(max_total: int = 10) -> Dict[str, Any]:
             norm_title = re.sub(r'[^a-zA-Z0-9]', '', archive_item["title"].lower())
             if norm_title not in seen_titles:
                 seen_titles.add(norm_title)
-                unique_articles.append(archive_item)
+                unique_articles.append(dict(archive_item))
+
+    # Normalize fields for frontend ScrapedNewsArticle interface
+    for idx, item in enumerate(unique_articles):
+        if "id" not in item:
+            item["id"] = f"feed-{idx}"
+        if "disruptionScore" not in item:
+            item["disruptionScore"] = item.get("disruption_score", 70)
+        if "pubDate" not in item:
+            item["pubDate"] = item.get("pub_date", "Live Wire")
+        if "topic" not in item:
+            item["topic"] = item.get("query_topic", "Supply Chain")
+        if "chokePoint" not in item:
+            choke, vec = _infer_chokepoint_and_vector(item.get("title", ""), item.get("description", ""))
+            item["chokePoint"] = choke
+            if "vector" not in item:
+                item["vector"] = vec
+        if "severity" not in item or item["severity"] not in ["CRITICAL", "SEVERE", "MODERATE"]:
+            sc = item.get("disruptionScore", 70)
+            item["severity"] = "CRITICAL" if sc >= 80 else ("SEVERE" if sc >= 60 else "MODERATE")
 
     # 5. Sort by disruption score descending
-    unique_articles.sort(key=lambda x: x.get("disruption_score", 0), reverse=True)
+    unique_articles.sort(key=lambda x: x.get("disruptionScore", x.get("disruption_score", 0)), reverse=True)
     top_articles = unique_articles[:max_total]
 
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")

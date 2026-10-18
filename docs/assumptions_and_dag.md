@@ -70,7 +70,13 @@ This section documents whether any input variable feeding the Bayesian priors or
 ### Sensitivity Analysis (±20% perturbation on each asserted constant)
 
 Scores computed via formula: $\text{Risk} = 0.35 \cdot \text{EB} + 0.25 \cdot \text{DR} + 0.20 \cdot \text{DC} + 0.10 \cdot \text{TC} + 0.10 \cdot \text{ED}$  
-With DR fixed at 0.560 (China ICs, Comtrade-measured), baseline score is 0.752 (HIGH).
+
+> **Baseline Reconciliation Note:**
+> - **Fallback Component Baseline (0.752):** Uses fallback baseline constants $\text{TC}=0.75$, $\text{ED}=0.50$ with $\text{EB}=0.85$, $\text{DC}=0.95$, $\text{DR}=0.560$ (China ICs):  
+>   $0.35(0.85) + 0.25(0.560) + 0.20(0.95) + 0.10(0.75) + 0.10(0.50) = 0.7525 \approx 0.752$.
+> - **Severity-2 China IC Branch Baseline (`data/sensitivity_results.json`, 0.7825):** Evaluates canonical Integrated Circuit lookup values ($\text{TC}=0.80$, $\text{ED}=0.75$):  
+>   $0.35(0.85) + 0.25(0.560) + 0.20(0.95) + 0.10(0.80) + 0.10(0.75) = 0.7825$.  
+> Both evaluate firmly in the `HIGH` risk band ($\ge 0.60$). Neither score changes classification under $\pm 20\%$ perturbations.
 
 | Variable Perturbed | Direction | New Score | Classification Change? |
 |---|---|---|---|
@@ -82,6 +88,10 @@ With DR fixed at 0.560 (China ICs, Comtrade-measured), baseline score is 0.752 (
 | TC (0.75 baseline) | -20% → 0.60 | 0.738 (HIGH) | No |
 | ED (0.50 baseline) | +20% → 0.60 | 0.762 (HIGH) | No |
 | ED (0.50 baseline) | -20% → 0.40 | 0.742 (HIGH) | No |
+
+### SIAM 2021 Benchmark Targets Reconciliation
+- **Data Source Metric (`37.46%`, `src/data_sources.py:467`):** Historical YoY Passenger Vehicle (PV) production drop for September 2021 as disclosed in SIAM monthly press releases.
+- **Model Calibration Target (`41.2%`, `tests/golden/pipeline_outputs.json`, `src/data/siamBacktest.json`):** Corresponds to the modeled P95 tail curtailment drop (simulated P95 mass at -41.24%), against which the dashboard and backtest evaluate whether actual disruption falls within modeled bounds. Neither value is modified in code.
 
 **Finding:** A ±20% perturbation on any single asserted constant is **not** sufficient to flip the classification from HIGH to MEDIUM. All perturbed scores remain $\ge 0.693$, solidly maintaining the HIGH risk classification ($\ge 0.60$).
 

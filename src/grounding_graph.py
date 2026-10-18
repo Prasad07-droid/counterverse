@@ -311,6 +311,7 @@ def get_grounding_graph() -> nx.DiGraph:
     global _GROUNDING_GRAPH
     if _GROUNDING_GRAPH is None:
         _GROUNDING_GRAPH = build_grounding_graph()
+        load_graph_overlay(_GROUNDING_GRAPH)
     return _GROUNDING_GRAPH
 
 
@@ -767,13 +768,15 @@ def load_graph_overlay(G: Optional[nx.DiGraph] = None, path: Optional[str] = Non
 
     added = 0
 
-    for node_data in overlay.get("custom_nodes", []):
+    for node_item in overlay.get("custom_nodes", []):
+        node_data = dict(node_item)
         name = node_data.pop("name", None)
         if name and not G.has_node(name):
             G.add_node(name, **node_data)
             added += 1
 
-    for edge_data in overlay.get("custom_edges", []):
+    for edge_item in overlay.get("custom_edges", []):
+        edge_data = dict(edge_item)
         src = edge_data.pop("source", None)
         dst = edge_data.pop("target", None)
         if src and dst and not G.has_edge(src, dst):
