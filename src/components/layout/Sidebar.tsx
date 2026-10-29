@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               <div>
                 <h1 className="text-base font-bold tracking-tight text-[#f7f7f7]">
-                  CounterVerse
+                  Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
                 </h1>
                 <p className="text-[10px] font-semibold tracking-wider text-[#666666] uppercase">
                   SUPPLY CHAIN INTELLIGENCE

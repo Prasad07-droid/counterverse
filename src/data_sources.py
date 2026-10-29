@@ -1,5 +1,5 @@
 """
-Data Sources & Ground Truth Benchmarks for CounterVerse
+Data Sources & Ground Truth Benchmarks for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 Scope: Gallium/Germanium (HS 8112) → Semiconductor/ICs (HS 8542) → Indian Automotive ECU → OEM Impact
 
 Deliberately locks data scope to this single critical component chain.
@@ -386,7 +386,7 @@ def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Di
     }
     encoded_url = f"{GDELT_BASE_URL}?{urllib.parse.urlencode(params)}"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/1.0",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/1.0",
         "Accept": "application/json"
     }
     
@@ -648,7 +648,7 @@ def fetch_rss_headlines(max_records: int = 8) -> Dict[str, Any]:
         try:
             url = feed["url_template"].format(query=RSS_QUERY)
             req = urllib.request.Request(url, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/1.0",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/1.0",
                 "Accept": "application/xml, text/xml",
             })
             with urllib.request.urlopen(req, timeout=8.0) as resp:
@@ -756,7 +756,7 @@ def fetch_headlines_resilient(max_records: int = 8) -> Dict[str, Any]:
             "success": True,
             "data_vintage": f"SQLITE_CACHE (UTC: {now_utc})",
             "fetch_timestamp_utc": now_utc,
-            "citation": "CounterVerse SQLite Headline Cache",
+            "citation": "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing SQLite Headline Cache",
             "articles": cached,
             "query": GDELT_SCOPED_QUERY,
             "message": f"Served {len(cached)} headlines from SQLite cache.",

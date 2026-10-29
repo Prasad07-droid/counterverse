@@ -2,7 +2,7 @@ import streamlit as st
 
 # ── Page config: wide layout, no sidebar ──
 st.set_page_config(
-    page_title="CounterVerse — Supply Chain Intelligence",
+    page_title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Supply Chain Intelligence",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed",

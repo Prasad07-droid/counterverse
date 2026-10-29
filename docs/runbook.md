@@ -1,7 +1,7 @@
-# CounterVerse Operational Runbook
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Operational Runbook
 ====================================
 
-This document establishes operational procedures, mitigation workflows, and disaster-recovery runbooks for the CounterVerse automotive semiconductor disruption simulation platform.
+This document establishes operational procedures, mitigation workflows, and disaster-recovery runbooks for the Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing automotive semiconductor disruption simulation platform.
 
 ---
 
@@ -11,7 +11,7 @@ This document establishes operational procedures, mitigation workflows, and disa
 - Live headline ingestion fails due to upstream API rate limits, HTTP 500s, or DNS timeout from `api.gdeltproject.org`.
 
 ### Automated System Behavior
-CounterVerse executes a resilient 4-tier fallback hierarchy ([`src/data_sources.py`](file:///c:/Users/Dattaprasad/Videos/sem%207/src/data_sources.py)):
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing executes a resilient 4-tier fallback hierarchy ([`src/data_sources.py`](file:///c:/Users/Dattaprasad/Videos/sem%207/src/data_sources.py)):
 1. **Tier 1 (GDELT 2.0 API):** Primary live query with 6-second timeout.
 2. **Tier 2 (Google News RSS):** Automatically triggered on Tier 1 failure (`RSS_LIVE`).
 3. **Tier 3 (SQLite Cache):** Pulls cached headlines from `data/processed/headline_cache.db` with an explicit `is_stale: true` flag and human-readable staleness warning.

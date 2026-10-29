@@ -195,7 +195,7 @@ def write_tornado_plot(rows: Iterable[dict], output_path: Path) -> None:
     ax.axvline(0.0, color="#111827", linewidth=1)
     ax.set_yticks(y_pos, labels)
     ax.set_xlabel("Change in risk score from baseline")
-    ax.set_title("CounterVerse one-at-a-time sensitivity tornado")
+    ax.set_title("Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing one-at-a-time sensitivity tornado")
     ax.legend()
     ax.grid(axis="x", alpha=0.2)
     fig.tight_layout()

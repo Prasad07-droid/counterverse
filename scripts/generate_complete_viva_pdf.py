@@ -1,6 +1,6 @@
 """
 Script: generate_complete_viva_pdf.py
-Generates the Complete Master Viva Q&A Guide for CounterVerse in Hinglish.
+Generates the Complete Master Viva Q&A Guide for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing in Hinglish.
 Covers every single possible viva/interview question across 6 structured A4 pages.
 Uses pure Python PDF 1.4 compiler (Zero external dependencies).
 """
@@ -11,7 +11,7 @@ import sys
 def build_complete_viva_pdf():
     output_dir = os.path.join(os.getcwd(), "static", "reports")
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "CounterVerse_Complete_Viva_Master_Guide.pdf")
+    output_path = os.path.join(output_dir, "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Complete_Viva_Master_Guide.pdf")
 
     # 6 Full Pages of Structured Viva Content in Hinglish
     pages_data = [
@@ -23,7 +23,7 @@ def build_complete_viva_pdf():
                 {
                     "q": "Q1: Project ka 1-line elevator pitch kya hai?",
                     "ans": [
-                        "Ans: CounterVerse ek AI-powered supply chain risk quantification system hai jo unstructured news",
+                        "Ans: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing ek AI-powered supply chain risk quantification system hai jo unstructured news",
                         "headlines ko graph verification, deterministic 5-factor scoring, aur Monte Carlo simulation ke",
                         "through specific Indian automotive OEMs (Maruti, Tata, etc.) ke Procurement Cost at Risk (PCaR in Cr) me convert karta hai."
                     ]
@@ -45,10 +45,10 @@ def build_complete_viva_pdf():
                     ]
                 },
                 {
-                    "q": "Q4: CounterVerse Google Alerts ya traditional NLP tools se alag kaise hai?",
+                    "q": "Q4: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Google Alerts ya traditional NLP tools se alag kaise hai?",
                     "ans": [
                         "Ans: Traditional NLP sirf keyword alert deta hai ('China export ban'). Usse ye pata nahi chalta ki kya sach me",
-                        "Indian auto supply chain hit hogi aur kitna financial loss hoga. CounterVerse entity grounding karta hai,",
+                        "Indian auto supply chain hit hogi aur kitna financial loss hoga. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing entity grounding karta hai,",
                         "real UN Comtrade trade flows model karta hai, aur CFO/CSCO ko balance-sheet Value-at-Risk (INR Cr) deta hai."
                     ]
                 },
@@ -400,7 +400,7 @@ def build_complete_viva_pdf():
             current_y -= 6
 
         # Footer
-        footer_text = f"CounterVerse Complete Viva Master Guide | Page {page_idx} of 6 | Academic Defense Ready"
+        footer_text = f"Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Complete Viva Master Guide | Page {page_idx} of 6 | Academic Defense Ready"
         stream_lines.append("ET")
         stream_lines.append("0.3 w")
         stream_lines.append("45 42 m 550 42 l S")

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-CounterVerse v2.0 — Extended Integration Test Suite
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing v2.0 — Extended Integration Test Suite
 ====================================================
 New tests added for all Phase-2 upgrades:
   - Extra config (ESG weights, languages, Neo4j vars)

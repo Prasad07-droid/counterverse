@@ -1,4 +1,4 @@
-# CounterVerse — Quantitative Metric Definitions & Modeling Assumptions
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Quantitative Metric Definitions & Modeling Assumptions
 
 **Document Version:** 2.0.0 (Audited)  
 **Target Domain:** Indian Automotive Microcontroller / Integrated Circuit Supply Chain (HS 8542 / HS 8112)  
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Purpose
 
-This document provides formal, code-aligned mathematical definitions and scenario modeling assumptions for all quantitative metrics emitted by CounterVerse (FastAPI backend, React/Vite dashboard, and Streamlit decision-support interfaces).
+This document provides formal, code-aligned mathematical definitions and scenario modeling assumptions for all quantitative metrics emitted by Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing (FastAPI backend, React/Vite dashboard, and Streamlit decision-support interfaces).
 
 All formulas documented below reflect the **active repository code** in [`src/module_c_causal.py`](file:///c:/Users/Dattaprasad/Videos/sem%207/src/module_c_causal.py), [`src/module_d_mc.py`](file:///c:/Users/Dattaprasad/Videos/sem%207/src/module_d_mc.py), [`src/module_e_pcar.py`](file:///c:/Users/Dattaprasad/Videos/sem%207/src/module_e_pcar.py), and [`src/module_i_report.py`](file:///c:/Users/Dattaprasad/Videos/sem%207/src/module_i_report.py).
 
@@ -44,7 +44,7 @@ with:
 
 ## 3. Premium Decomposition (`extra_procurement_cost_*`)
 
-To maintain complete transparency between baseline disrupted value and emergency spot surcharge, CounterVerse computes an additive decomposition:
+To maintain complete transparency between baseline disrupted value and emergency spot surcharge, Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing computes an additive decomposition:
 
 $$\mathbf{L}_{\text{extra}, i} = \left(\frac{D_i}{100}\right) \times B_{\text{effective}} \times (M_i - 1.0)$$
 
@@ -62,7 +62,7 @@ $$\text{Quantile}_{0.95}(\mathbf{L}_{\text{extra}})$$
 
 ### 4.1 Strict Independence from Procurement Exposure
 
-Lost output value (finished vehicle revenue lost due to curtailed assembly) is an order of magnitude larger than component procurement spend. CounterVerse enforces strict mathematical independence between procurement cost and lost vehicle output:
+Lost output value (finished vehicle revenue lost due to curtailed assembly) is an order of magnitude larger than component procurement spend. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing enforces strict mathematical independence between procurement cost and lost vehicle output:
 
 $$\mathbf{L}_{\text{output}, i} = \left(\frac{D_i}{100}\right) \times B_{\text{output}} \times \alpha_{\text{market\_share}}$$
 
@@ -74,7 +74,7 @@ If the caller does **not** provide an explicit `baseline_output_value_crore`:
 - `lost_output_value_p99_crore = None`
 - `lost_output_value_status = "not_calculated_missing_output_value_baseline"`
 
-CounterVerse **never** infers lost vehicle turnover from component trade data.
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing **never** infers lost vehicle turnover from component trade data.
 
 ---
 
@@ -91,7 +91,7 @@ Adapted from AlMahri et al. (2026), Section 3.2.5:
 
 $$R = 0.35 \cdot E_B + 0.25 \cdot D_R + 0.20 \cdot C_D + 0.10 \cdot T_C + 0.10 \cdot E_D$$
 
-| Factor Symbol | Factor Name | Weight | Definition in CounterVerse |
+| Factor Symbol | Factor Name | Weight | Definition in Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing |
 | :--- | :--- | :---: | :--- |
 | $E_B$ | Exposure Breadth | 0.35 | Geographical & supplier concentration of the affected node |
 | $D_R$ | Dependency Ratio | 0.25 | Share of Tier-1 / OEM systems dependent on this node |

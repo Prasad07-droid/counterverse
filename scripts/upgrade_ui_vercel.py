@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Upgrade CounterVerse Dashboard to Vercel-grade UI/UX Design System.
+Upgrade Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Dashboard to Vercel-grade UI/UX Design System.
 Ensures UTF-8 encoding without BOM, preserving all emojis and test compatibility.
 """
 from pathlib import Path
@@ -648,10 +648,10 @@ def main():
     new_content = content[:start] + VERCEL_INLINE_CSS.strip() + content[end:]
     
     # Also ensure page title has Vercel-like sleekness
-    # e.g., CounterVerse · Enterprise Supply Chain Intelligence
+    # e.g., Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing · Enterprise Supply Chain Intelligence
     new_content = new_content.replace(
-        'page_title="CounterVerse · Decision Intelligence"',
-        'page_title="CounterVerse · Supply Chain Intelligence"'
+        'page_title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing · Decision Intelligence"',
+        'page_title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing · Supply Chain Intelligence"'
     )
     
     # Save back cleanly as UTF-8

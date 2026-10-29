@@ -64,7 +64,7 @@ export const Shell: React.FC<ShellProps> = ({
                 <polygon points="12 4 21 20 3 20" />
               </svg>
             </div>
-            <span className="font-bold text-sm text-[#f7f7f7] tracking-tight">CounterVerse</span>
+            <span className="font-bold text-sm text-[#f7f7f7] tracking-tight">Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing</span>
           </div>
 
           <button

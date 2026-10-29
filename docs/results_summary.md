@@ -46,17 +46,17 @@ These thresholds were defined based on AlMahri et al. (2026) reported results BE
 
 ---
 
-## Baseline Comparison: Naive Keyword Classifier vs. CounterVerse Pipeline
+## Baseline Comparison: Naive Keyword Classifier vs. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Pipeline
 
 | System | Precision | Recall | F1 Score | Specificity |
 |---|---|---|---|---|
 | Naive Keyword Classifier | 1.000 | 0.455 | 0.625 | 100.0% |
-| CounterVerse Stage 1 (Phase 0 Baseline) | 0.733 | 1.000 | 0.846 | 0.0% |
-| CounterVerse Full Pipeline (Phase 0 Baseline) | 0.684 | 1.000 | 0.812 | 0.0% (raw SLM) |
-| **CounterVerse Stage 1 (Phase 6 Post-Upgrade)** | **1.000** | **1.000** | **1.000** | **100.0%** |
-| **CounterVerse Full Pipeline (Phase 6 Post-Upgrade)** | **0.877** | **1.000** | **0.933** | **100.0%** |
+| Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Stage 1 (Phase 0 Baseline) | 0.733 | 1.000 | 0.846 | 0.0% |
+| Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Full Pipeline (Phase 0 Baseline) | 0.684 | 1.000 | 0.812 | 0.0% (raw SLM) |
+| **Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Stage 1 (Phase 6 Post-Upgrade)** | **1.000** | **1.000** | **1.000** | **100.0%** |
+| **Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Full Pipeline (Phase 6 Post-Upgrade)** | **0.877** | **1.000** | **0.933** | **100.0%** |
 
-The hardened CounterVerse pipeline decisively outperforms the naive keyword baseline across all dimensions. While the naive keyword classifier achieves high precision on trivial strings, it suffers from a catastrophic **54.5% False Negative rate** (Recall: 0.455; missing 6 of 11 disruptions, including Red Sea maritime reroutes, Shanghai port congestions, and Kyushu silicon wafer floods) because multi-tier supply chain disruptions use specialized industry phrasing. In contrast, CounterVerse achieves **100% Recall** while maintaining **100% Specificity** and **0.933 Pipeline Macro F1**.
+The hardened Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing pipeline decisively outperforms the naive keyword baseline across all dimensions. While the naive keyword classifier achieves high precision on trivial strings, it suffers from a catastrophic **54.5% False Negative rate** (Recall: 0.455; missing 6 of 11 disruptions, including Red Sea maritime reroutes, Shanghai port congestions, and Kyushu silicon wafer floods) because multi-tier supply chain disruptions use specialized industry phrasing. In contrast, Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing achieves **100% Recall** while maintaining **100% Specificity** and **0.933 Pipeline Macro F1**.
 
 ---
 

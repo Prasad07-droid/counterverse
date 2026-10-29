@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════
-# CounterVerse — Docker Compose v2 Configuration
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Docker Compose v2 Configuration
 # ══════════════════════════════════════════════════════════════
 # Default launch (FastAPI + Streamlit iframe UI):
 #   docker compose up --build

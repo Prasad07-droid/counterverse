@@ -1,4 +1,4 @@
-# CounterVerse — Minimal CI / Lightweight Test Requirements
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Minimal CI / Lightweight Test Requirements
 # CPU-only, fast installation on standard Linux CI runners (GitHub Actions)
 
 fastapi>=0.115.0

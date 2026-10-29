@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-OAuth2 + JWT authentication and Role-Based Access Control (RBAC) module for CounterVerse FastAPI.
+OAuth2 + JWT authentication and Role-Based Access Control (RBAC) module for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing FastAPI.
 ==================================================================================================
 
 Provides:

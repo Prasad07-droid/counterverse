@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-CounterVerse FastAPI REST Backend
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing FastAPI REST Backend
 =================================
-Provides headless access to the full CounterVerse pipeline for
+Provides headless access to the full Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing pipeline for
 enterprise integration, CI/CD, and automated supply chain monitoring.
 
 Endpoints:
@@ -344,7 +344,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="CounterVerse API",
+    title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing API",
     description=(
         "Causal AI supply chain disruption simulator for Indian automotive semiconductors. "
         "Headline → GraphRAG → Risk Score → Monte Carlo → Procurement Cost at Risk (PCaR). "

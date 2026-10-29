@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════
-# CounterVerse — Multi-Stage Production Dockerfile (v2)
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Multi-Stage Production Dockerfile (v2)
 # ══════════════════════════════════════════════════════════════
 # Stage 1 (builder): install all Python dependencies
 # Stage 2 (runtime): lean runtime image with no build tooling

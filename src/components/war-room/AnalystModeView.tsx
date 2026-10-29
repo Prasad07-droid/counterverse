@@ -81,7 +81,7 @@ export const AnalystModeView: React.FC<AnalystModeViewProps> = ({
       exported_at_utc: new Date().toISOString(),
       architecture_standard: 'AlMahri et al. (2026) adapted Causal DAG',
       model_metadata: {
-        engine: 'CounterVerse Causal DAG Engine v2.0.0',
+        engine: 'Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Causal DAG Engine v2.0.0',
         graph_integrity_hash: '31f67108669b9208',
         graph_nodes: 30,
         graph_edges: 69,

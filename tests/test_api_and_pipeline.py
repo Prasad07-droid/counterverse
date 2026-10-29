@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-CounterVerse v1.0 — Integration Test Suite
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing v1.0 — Integration Test Suite
 ==========================================
 Tests all 6 phases of the production transformation:
   Phase 1: Config loading

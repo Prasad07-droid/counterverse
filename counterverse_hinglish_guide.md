@@ -1,10 +1,10 @@
-﻿# 🔥 CounterVerse — Complete Hinglish Study Guide (Viva Ready!)
+# 🔥 Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Complete Hinglish Study Guide (Viva Ready!)
 
 ---
 
 ## 🏗️ SYSTEM KYA HAI? (Big Picture)
 
-**CounterVerse** ek **Causal AI system** hai jo **Indian Automotive Semiconductor supply chain** ki disruptions predict karta hai.
+**Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing** ek **Causal AI system** hai jo **Indian Automotive Semiconductor supply chain** ki disruptions predict karta hai.
 
 > **Simple words mein:** Koi news headline aao jaise *Taiwan mein earthquake aya* — system batata hai kitna financial loss hoga aur kya karna chahiye.
 
@@ -220,7 +220,7 @@ System prediction: ~35-40%
 
 ## ❓ CROSS QUESTIONS & ANSWERS (Viva Ready!)
 
-**Q1: System ka naam CounterVerse kyun?**
+**Q1: System ka naam Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing kyun?**
 Counter = disruption counter karna. Verse = universe of scenarios — multiple what-if scenarios simulate karta hai.
 
 **Q2: Monte Carlo mein seed=42 kyun?**

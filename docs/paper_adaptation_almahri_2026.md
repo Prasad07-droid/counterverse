@@ -1,4 +1,4 @@
-# Adaptation of AlMahri et al. (2026) to CounterVerse
+# Adaptation of AlMahri et al. (2026) to Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 
 ## Reference Paper
 > **Sara AlMahri, Liming Xu, and Alexandra Brintrup (2026)**  
@@ -10,7 +10,7 @@
 
 ## Architectural Scope & Boundary Decisions
 
-| Paper Component | Paper Approach | Our Adaptation (CounterVerse) | Rationale |
+| Paper Component | Paper Approach | Our Adaptation (Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing) | Rationale |
 | :--- | :--- | :--- | :--- |
 | **Stage Structure** | 4 Stages: Detection → Filtering → Risk Assessment → Action Planning | Mapped directly: SLM Ingestion (B) → Causal Assessment (C) → Monte Carlo (D) → PCaR Mitigation (E) | Preserves conceptual pipeline integrity |
 | **Knowledge Graph** | Neo4j multi-tier global graph (6,596 nodes, 23,888 edges) | Focused Indian Automotive Supply Chain Causal Graph (30 nodes, 69 edges) | Verified Tier-4 supplier graph for Indian OEMs is out of scope; our graph models key Tier-1/2 automotive and semiconductor flows |

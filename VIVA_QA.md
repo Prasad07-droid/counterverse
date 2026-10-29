@@ -1,8 +1,8 @@
-# CounterVerse Viva / Reviewer Q&A
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Viva / Reviewer Q&A
 
 These answers describe the current repository, not an aspirational production system.
 
-## 1. Is CounterVerse a forecast of future supply-chain losses?
+## 1. Is Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing a forecast of future supply-chain losses?
 
 No. It is a scenario simulator. `src/module_d_mc.py` samples calibrated stress distributions conditional on a supplied scenario; it does not fit or extrapolate a time-series forecasting model. The dashboard labels this explicitly as “Scenario simulator — not a forecast.”
 
@@ -32,7 +32,7 @@ No. The code uses a discrete lookup: raw material 1.00; IC/wafer/microcontroller
 
 ## 8. Does HS 8112 measure only gallium and germanium?
 
-No. HS 8112 is a broad tariff basket that includes several other metals and related articles, waste, and scrap. CounterVerse uses its aggregate value only as an upstream stress proxy, not as a measured gallium/germanium procurement total.
+No. HS 8112 is a broad tariff basket that includes several other metals and related articles, waste, and scrap. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing uses its aggregate value only as an upstream stress proxy, not as a measured gallium/germanium procurement total.
 
 ## 9. Are automotive microcontrollers made from gallium or germanium?
 

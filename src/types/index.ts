@@ -1,4 +1,4 @@
-// Core Types for CounterVerse Enterprise Dashboard
+// Core Types for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Enterprise Dashboard
 
 export type NavView = 'war-room' | 'financial-exposure' | 'governance';
 

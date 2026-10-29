@@ -1,4 +1,4 @@
-# CounterVerse — Causal AI Supply Chain Disruption Simulator
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Causal AI Supply Chain Disruption Simulator
 
 > **Scenario-based causal simulation** for Indian automotive semiconductor supply chains.  
 > Headline intelligence → graph-grounded entity verification → deterministic risk scoring → Monte Carlo → Procurement Cost at Risk (PCaR).
@@ -12,7 +12,7 @@
 
 ## What It Does
 
-CounterVerse transforms unstructured news headlines into **quantified financial supply chain risk estimates** for the Indian automotive semiconductor corridor:
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing transforms unstructured news headlines into **quantified financial supply chain risk estimates** for the Indian automotive semiconductor corridor:
 
 **Gallium/Germanium (HS 8112) → Semiconductor ICs (HS 8542) → Automotive ECU Assembly → Indian OEM Vehicle Production**
 
@@ -78,7 +78,7 @@ flowchart LR
 
 ## Quickstart
 
-Follow these steps to run CounterVerse on a clean machine:
+Follow these steps to run Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing on a clean machine:
 
 ### 1. Python Environment Setup
 

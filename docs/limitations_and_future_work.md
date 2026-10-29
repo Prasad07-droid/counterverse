@@ -1,4 +1,4 @@
-# CounterVerse: Model Limitations, Real-World Deployment Risks & Enterprise Roadmap
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing: Model Limitations, Real-World Deployment Risks & Enterprise Roadmap
 
 > **Document Type:** Academic Defense, Model Governance Framework & Executive Slide Deck Specification  
 > **Target Audience:** Academic Evaluators, Capstone Defense Committee, Industry Reviewers, Chief Supply Chain Officers (CSCO)  
@@ -8,7 +8,7 @@
 
 ## Executive Abstract
 
-CounterVerse demonstrates a proof-of-concept multi-agent architecture coupling **Autonomous Natural Language Processing (SLMs)**, **Causal Bayesian/Graph Propagation (BFS/DAG)**, and **Stochastic Financial Risk Modeling (Monte Carlo PCaR)** to simulate supply chain disruptions. 
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing demonstrates a proof-of-concept multi-agent architecture coupling **Autonomous Natural Language Processing (SLMs)**, **Causal Bayesian/Graph Propagation (BFS/DAG)**, and **Stochastic Financial Risk Modeling (Monte Carlo PCaR)** to simulate supply chain disruptions. 
 
 While the internal pipeline achieves computational consistency and replicates historical benchmarks within calibration tolerances ($\le \pm 5.0\text{pp}$), **a major chasm exists between a stylized simulation sandbox and live industrial deployment**.
 
@@ -24,7 +24,7 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  SLIDE TITLE: CounterVerse: Simulation Validity vs. Real-World Deployment Risks                     │
+│  SLIDE TITLE: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing: Simulation Validity vs. Real-World Deployment Risks                     │
 │  SUBTITLE: Deconstructing Model Boundaries & the Roadmap to Enterprise Production                    │
 ├──────────────────────────────────────────────────┬───────────────────────────────────────────────────┤
 │  CATEGORY 1: SIMULATION VALIDITY                 │  CATEGORY 2: REAL-WORLD DEPLOYMENT RISKS          │
@@ -52,7 +52,7 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 #### 1. Graph Mesh vs. Clean 4-Tier Chain Oversimplification
 * **The Reality:** Real global supply chains are not linear 4-tier acyclic trees. They form dense, cyclic bipartite meshes featuring multi-sourcing (e.g., dual-sourcing automotive microcontrollers from TSMC/Taiwan and Samsung/Korea), cross-tier lateral transshipments, and substitutable intermediate components.
-* **The Simulation Bound:** CounterVerse uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM. The separate 30-node/69-edge verification graph also contains three explicit simplifications:
+* **The Simulation Bound:** Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM. The separate 30-node/69-edge verification graph also contains three explicit simplifications:
   - NXP is headquartered in the Netherlands, while the current graph models its headquarters country as USA for scope simplification.
   - OEM-to-component edges are asymmetric: Tata Motors and Hyundai India have direct `Integrated Circuits` edges, while Maruti Suzuki and Mahindra are linked through ECU/sensor nodes. This is a modeling choice, not evidence of different real procurement structures.
   - China Minmetals is included as a Chinese metals/mining actor, but its use as a gallium-supply representative requires source verification (`TODO_SOURCE` in `HUMAN_TODO.md`).

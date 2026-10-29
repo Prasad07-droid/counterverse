@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Refine CounterVerse dashboard components with Vercel aesthetic touches:
+Refine Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing dashboard components with Vercel aesthetic touches:
 - Vercel brand mark (▲ / minimalist monochrome mark)
 - Clean Vercel scope bar
 - Streamlined Plotly theme backgrounds to match #000000 canvas
@@ -19,7 +19,7 @@ def refine():
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="color: #f97316; font-size: 1.4rem;">⚡</span>
             <div>
-                <div style="color: #ffffff; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em;">CounterVerse</div>
+                <div style="color: #ffffff; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em;">Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing</div>
                 <div style="color: #94a3b8; font-size: 0.70rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;">Decision Intelligence</div>
             </div>
         </div>
@@ -34,7 +34,7 @@ def refine():
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 28px; height: 28px; background: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000000; font-weight: 900; font-size: 14px; box-shadow: 0 0 14px rgba(255,255,255,0.25);">▲</div>
             <div>
-                <div style="color: #ededed; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.03em;">CounterVerse</div>
+                <div style="color: #ededed; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.03em;">Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing</div>
                 <div style="color: #707070; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">Supply Chain Intelligence</div>
             </div>
         </div>

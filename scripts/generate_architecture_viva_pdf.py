@@ -1,6 +1,6 @@
 """
 Script: generate_architecture_viva_pdf.py
-Generates a complete, beautifully formatted PDF Guide for CounterVerse Architecture
+Generates a complete, beautifully formatted PDF Guide for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Architecture
 and Viva Q&A in Hinglish. Uses pure Python PDF generation (no external libraries).
 """
 
@@ -10,7 +10,7 @@ import sys
 def build_pdf():
     output_dir = os.path.join(os.getcwd(), "static", "reports")
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "CounterVerse_Architecture_Viva_Guide.pdf")
+    output_path = os.path.join(output_dir, "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Architecture_Viva_Guide.pdf")
 
     # Content structure
     pages_data = [
@@ -92,7 +92,7 @@ def build_pdf():
                     "heading": "8. SIAM 2021 Chip Crisis Empirical Calibration",
                     "lines": [
                         "Historical Event: Sept 2021 passenger vehicle production dropped -37.46% YoY (SIAM audited report).",
-                        "CounterVerse Model: Posterior Mean drop = -28.24%, P95 tail drop = -41.24%.",
+                        "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Model: Posterior Mean drop = -28.24%, P95 tail drop = -41.24%.",
                         "Ground truth falls squarely between Mean and P95 tail (-9.22% vs Mean, +3.78% vs P95)."
                     ]
                 }
@@ -104,9 +104,9 @@ def build_pdf():
             "subtitle": "Essential Questions & Answers - Page 3",
             "sections": [
                 {
-                    "heading": "Q1: CounterVerse traditional tools se alag kaise hai?",
+                    "heading": "Q1: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing traditional tools se alag kaise hai?",
                     "lines": [
-                        "Ans: Traditional alerts sirf news dete hain. CounterVerse use NetworkX graph se verify karta hai,",
+                        "Ans: Traditional alerts sirf news dete hain. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing use NetworkX graph se verify karta hai,",
                         "5-factor deterministic formula se risk score nikalta hai, aur Monte Carlo se real balance-sheet",
                         "PCaR (INR Crore me loss) quantify karta hai specific automakers (Maruti, Tata, etc.) ke liye."
                     ]
@@ -209,7 +209,7 @@ def build_pdf():
             current_y -= 8
 
         # Footer
-        footer_text = f"CounterVerse Architecture & Viva Guide | Page {page_idx} of 3 | Pure Python Rendered"
+        footer_text = f"Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Architecture & Viva Guide | Page {page_idx} of 3 | Pure Python Rendered"
         stream_lines.append("ET")
         stream_lines.append("0.2 w")
         stream_lines.append("50 45 m 545 45 l S")

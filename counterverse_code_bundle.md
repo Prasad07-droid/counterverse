@@ -1,6 +1,6 @@
-﻿# CounterVerse -- Complete Source Code Bundle
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing -- Complete Source Code Bundle
 
-> Comprehensive single-file source code bundle for **CounterVerse**: Causal AI Supply Chain Disruption Simulator for the Indian Automotive Semiconductor Ecosystem.
+> Comprehensive single-file source code bundle for **Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing**: Causal AI Supply Chain Disruption Simulator for the Indian Automotive Semiconductor Ecosystem.
 
 ## TABLE OF CONTENTS
 1. [PROJECT TREE](#project-tree)
@@ -170,8 +170,8 @@ counterverse/
 |   +-- vite-env.d.ts (158 bytes)
 |-- static/
 |   +-- reports/
-|       |-- CounterVerse_Architecture_Viva_Guide.pdf (8363 bytes)
-|       |-- CounterVerse_Complete_Viva_Master_Guide.pdf (19818 bytes)
+|       |-- Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Architecture_Viva_Guide.pdf (8363 bytes)
+|       |-- Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Complete_Viva_Master_Guide.pdf (19818 bytes)
 |       |-- counterverse_decision_report_20261007_063914.pdf (1806 bytes)
 |       |-- counterverse_decision_report_20261007_075259.pdf (11416 bytes)
 |       |-- counterverse_decision_report_20261007_075300.pdf (12032 bytes)
@@ -200,7 +200,7 @@ counterverse/
 |-- .env.example (2570 bytes)
 |-- .gitignore (569 bytes)
 |-- counterverse_code_bundle.md (860594 bytes)
-|-- CounterVerse_Complete_Viva_Guide_Hinglish.pdf (1259689 bytes)
+|-- Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Complete_Viva_Guide_Hinglish.pdf (1259689 bytes)
 |-- docker-compose.yml (3672 bytes)
 |-- Dockerfile (2617 bytes)
 |-- HUMAN_TODO.md (2094 bytes)
@@ -226,7 +226,7 @@ counterverse/
 
 ===== FILE: requirements.txt =====
 ```text
-# CounterVerse — Cloud Deployment Requirements
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Cloud Deployment Requirements
 # Lightweight: dashboard only embeds the Vite UI via iframe
 streamlit>=1.30.0
 
@@ -566,7 +566,7 @@ export default {
 ===== FILE: docker-compose.yml =====
 ```yaml
 # ══════════════════════════════════════════════════════════════
-# CounterVerse — Docker Compose v2 Configuration
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Docker Compose v2 Configuration
 # ══════════════════════════════════════════════════════════════
 # Services:
 #   neo4j     - Graph database (bolt://neo4j:7687)
@@ -676,7 +676,7 @@ volumes:
 ===== FILE: Dockerfile =====
 ```text
 # ══════════════════════════════════════════════════════════════
-# CounterVerse — Multi-Stage Production Dockerfile (v2)
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Multi-Stage Production Dockerfile (v2)
 # ══════════════════════════════════════════════════════════════
 # Stage 1 (builder): install all Python dependencies
 # Stage 2 (runtime): lean runtime image with no build tooling
@@ -750,7 +750,7 @@ CMD bash -c "\
 
 ===== FILE: .env.example =====
 ```text
-# CounterVerse — Environment Variables (v2)
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Environment Variables (v2)
 # Copy to .env and fill values. Never commit .env to git.
 # All variables are prefixed COUNTERVERSE_ and are optional.
 
@@ -1263,7 +1263,7 @@ VRAM >4 GB one pass; paid runtime API; forecasting claims; no public data+fallba
 
 ===== FILE: .github/workflows/ci.yml =====
 ```yaml
-name: CounterVerse CI/CD
+name: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing CI/CD
 
 on:
   push:
@@ -1394,7 +1394,7 @@ font = "sans serif"
 ===== FILE: api/__init__.py =====
 ```python
 # -*- coding: utf-8 -*-
-"""FastAPI REST Backend for CounterVerse — api package."""
+"""FastAPI REST Backend for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — api package."""
 
 ```
 
@@ -1402,9 +1402,9 @@ font = "sans serif"
 ```python
 # -*- coding: utf-8 -*-
 """
-CounterVerse FastAPI REST Backend
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing FastAPI REST Backend
 =================================
-Provides headless access to the full CounterVerse pipeline for
+Provides headless access to the full Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing pipeline for
 enterprise integration, CI/CD, and automated supply chain monitoring.
 
 Endpoints:
@@ -1676,7 +1676,7 @@ class HealthResponse(BaseModel):
 # ════════════════════════════════════════════════════════════════
 
 app = FastAPI(
-    title="CounterVerse API",
+    title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing API",
     description=(
         "Causal AI supply chain disruption simulator for Indian automotive semiconductors. "
         "Headline → GraphRAG → Risk Score → Monte Carlo → Procurement Cost at Risk (PCaR). "
@@ -2445,7 +2445,7 @@ def scrape_web_disruption_news(max_total: int = 10) -> List[Dict]:
 ```python
 # -*- coding: utf-8 -*-
 """
-Real-Time Web Scraper for Supply Chain Intelligence (CounterVerse).
+Real-Time Web Scraper for Supply Chain Intelligence (Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing).
 Scrapes live news from Google News RSS, GDELT 2.0, and trade feeds.
 Extracts, cleans, evaluates disruption risk, and auto-selects top signals for simulation.
 """
@@ -2769,7 +2769,7 @@ def auto_extract_top_disruption_headline() -> str:
 ===== FILE: src/data_sources.py =====
 ```python
 """
-Data Sources & Ground Truth Benchmarks for CounterVerse
+Data Sources & Ground Truth Benchmarks for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 Scope: Gallium/Germanium (HS 8112) → Semiconductor/ICs (HS 8542) → Indian Automotive ECU → OEM Impact
 
 Deliberately locks data scope to this single critical component chain.
@@ -3156,7 +3156,7 @@ def fetch_live_gdelt_headlines(max_records: int = 8, max_retries: int = 3) -> Di
     }
     encoded_url = f"{GDELT_BASE_URL}?{urllib.parse.urlencode(params)}"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/1.0",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/1.0",
         "Accept": "application/json"
     }
     
@@ -3418,7 +3418,7 @@ def fetch_rss_headlines(max_records: int = 8) -> Dict[str, Any]:
         try:
             url = feed["url_template"].format(query=RSS_QUERY)
             req = urllib.request.Request(url, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/1.0",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/1.0",
                 "Accept": "application/xml, text/xml",
             })
             with urllib.request.urlopen(req, timeout=8.0) as resp:
@@ -3526,7 +3526,7 @@ def fetch_headlines_resilient(max_records: int = 8) -> Dict[str, Any]:
             "success": True,
             "data_vintage": f"SQLITE_CACHE (UTC: {now_utc})",
             "fetch_timestamp_utc": now_utc,
-            "citation": "CounterVerse SQLite Headline Cache",
+            "citation": "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing SQLite Headline Cache",
             "articles": cached,
             "query": GDELT_SCOPED_QUERY,
             "message": f"Served {len(cached)} headlines from SQLite cache.",
@@ -5443,7 +5443,7 @@ PARTNER_NAMES = {
 def fetch_year_data(hs_code, year, max_retries=3):
     """Fetches UN Comtrade data with exponential backoff (max 3 attempts: 1s, 2s, 4s)."""
     url = f"https://comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=699&period={year}&cmdCode={hs_code}&flowCode=M"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/1.0"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/1.0"}
     req = urllib.request.Request(url, headers=headers)
     backoff_delays = [1.0, 2.0, 4.0]
 
@@ -5701,7 +5701,7 @@ if __name__ == "__main__":
 ===== FILE: scripts/baseline_classifier.py =====
 ```python
 """
-Naive Keyword Classifier Baseline for CounterVerse
+Naive Keyword Classifier Baseline for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 Provides a pure heuristic keyword-counting baseline to benchmark against the Agentic SLM pipeline.
 """
 
@@ -7114,7 +7114,7 @@ from src.module_e_pcar import (
 # FIXED ENGLISH TEMPLATES & MODEL ASSUMPTION CONSTANTS
 # ════════════════════════════════════════════════════════════════
 
-REPORT_TITLE = "CounterVerse Decision Support Report"
+REPORT_TITLE = "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Decision Support Report"
 PIPELINE_VERSION = "2.0.0"
 
 GENERIC_DISRUPTION_NOTE = "Event type is generic; classification may be incomplete. Review the headline."
@@ -7138,7 +7138,7 @@ CONFIDENCE_LIMITS_TEXT = (
     "benchmark is small (N = 15, single annotator); not company accounting."
 )
 
-FOOTER_TEXT = "Scenario estimate generated by CounterVerse. Not an audited financial forecast or company accounting."
+FOOTER_TEXT = "Scenario estimate generated by Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing. Not an audited financial forecast or company accounting."
 
 FACTOR_METADATA = [
     {
@@ -8059,7 +8059,7 @@ def generate_report(signal_or_result: Dict[str, Any]) -> Dict[str, Any]:
 ```python
 # -*- coding: utf-8 -*-
 """
-Centralized Configuration Management for CounterVerse
+Centralized Configuration Management for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 =====================================================
 Uses pydantic-settings for validated, type-safe configuration with
 environment variable overrides and .env file support.
@@ -8235,7 +8235,7 @@ else:
 ```python
 # -*- coding: utf-8 -*-
 """
-Additional configuration extensions for CounterVerse.
+Additional configuration extensions for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing.
 These values are loaded via the main config (src/config.py) fallback class.
 """
 import os
@@ -8267,7 +8267,7 @@ UI_GLASSMORPHISM = os.getenv("COUNTERVERSE_UI_GLASSMORPHISM", "true").lower() ==
 ```python
 # -*- coding: utf-8 -*-
 """
-OAuth2 + JWT authentication module for CounterVerse FastAPI.
+OAuth2 + JWT authentication module for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing FastAPI.
 
 Environment variables:
   COUNTERVERSE_JWT_SECRET      - signing secret (change in production!)
@@ -8364,7 +8364,7 @@ except ImportError:
 ===== FILE: src/metrics.py =====
 ```python
 # -*- coding: utf-8 -*-
-# Prometheus metrics + Slack/Teams alerting for CounterVerse
+# Prometheus metrics + Slack/Teams alerting for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 import os
 import logging
 import time
@@ -8426,7 +8426,7 @@ def alert_slack(message: str, level: str = "info") -> bool:
         import requests
         resp = requests.post(
             _SLACK_WEBHOOK,
-            json={"text": "[" + tag + "] CounterVerse: " + message},
+            json={"text": "[" + tag + "] Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing: " + message},
             timeout=5,
         )
         return resp.status_code == 200
@@ -8443,8 +8443,8 @@ def alert_teams(message: str, level: str = "info") -> bool:
         "@type": "MessageCard",
         "@context": "http://schema.org/extensions",
         "themeColor": colors.get(level, "0076D7"),
-        "summary": "CounterVerse Alert",
-        "sections": [{"activityTitle": "CounterVerse [" + level.upper() + "]", "text": message}],
+        "summary": "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Alert",
+        "sections": [{"activityTitle": "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing [" + level.upper() + "]", "text": message}],
     }
     try:
         import requests
@@ -8468,7 +8468,7 @@ import streamlit as st
 
 # ── Page config: wide layout, no sidebar ──
 st.set_page_config(
-    page_title="CounterVerse — Supply Chain Intelligence",
+    page_title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Supply Chain Intelligence",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -8541,7 +8541,7 @@ st.markdown(
 ===== FILE: app/assets/style.css =====
 ```css
 /* ==========================================================================
-   CounterVerse — Vercel-Grade Design System & Telemetry HUD
+   Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Vercel-Grade Design System & Telemetry HUD
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -9039,7 +9039,7 @@ div[data-testid="stTextArea"] label {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><polygon points='12 3 21 20 3 20'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CounterVerse — Supply Chain Intelligence</title>
+    <title>Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Supply Chain Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -9227,7 +9227,7 @@ export async function postReport(payload: { headline: string; oem?: string; engi
 
 ===== FILE: src/types/index.ts =====
 ```typescript
-// Core Types for CounterVerse Enterprise Dashboard
+// Core Types for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Enterprise Dashboard
 
 export type NavView = 'war-room' | 'financial-exposure' | 'governance';
 
@@ -9998,7 +9998,7 @@ export function simulateMonteCarlo(
 ```typescript
 /**
  * src/utils/generatePdfReport.ts
- * Generates a valid PDF-1.4 document Blob for CounterVerse Decision Support Reports.
+ * Generates a valid PDF-1.4 document Blob for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Decision Support Reports.
  * Works completely in-browser without external heavy PDF dependencies.
  */
 
@@ -10175,7 +10175,7 @@ export function createClientPdfBlob(data: ReportData): Blob {
     '30 272 Td',
     '(HS Code Reference: 8542 (Electronic Integrated Circuits) & 8112 (Gallium/Germanium).) Tj',
     '30 258 Td',
-    '(Model Hash: 8f4a13d7890b9e83   |   Audited by: CounterVerse Enterprise Engine v2.0) Tj',
+    '(Model Hash: 8f4a13d7890b9e83   |   Audited by: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Enterprise Engine v2.0) Tj',
     'ET',
 
     // Footer
@@ -10185,7 +10185,7 @@ export function createClientPdfBlob(data: ReportData): Blob {
     '/F2 8 Tf',
     '0.5 0.5 0.5 rg',
     '30 65 Td',
-    '(Confidential - CounterVerse Supply Chain Intelligence Platform - All Rights Reserved) Tj',
+    '(Confidential - Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Supply Chain Intelligence Platform - All Rights Reserved) Tj',
     '460 65 Td',
     '(Page 1 of 1) Tj',
     'ET',
@@ -10298,7 +10298,7 @@ export const Shell: React.FC<ShellProps> = ({
                 <polygon points="12 4 21 20 3 20" />
               </svg>
             </div>
-            <span className="font-bold text-sm text-[#f7f7f7] tracking-tight">CounterVerse</span>
+            <span className="font-bold text-sm text-[#f7f7f7] tracking-tight">Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing</span>
           </div>
 
           <button
@@ -10427,7 +10427,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               <div>
                 <h1 className="text-base font-bold tracking-tight text-[#f7f7f7]">
-                  CounterVerse
+                  Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
                 </h1>
                 <p className="text-[10px] font-semibold tracking-wider text-[#666666] uppercase">
                   SUPPLY CHAIN INTELLIGENCE
@@ -12956,7 +12956,7 @@ body {
 ```python
 # -*- coding: utf-8 -*-
 """
-CounterVerse v1.0 — Integration Test Suite
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing v1.0 — Integration Test Suite
 ==========================================
 Tests all 6 phases of the production transformation:
   Phase 1: Config loading
@@ -14293,7 +14293,7 @@ if __name__ == "__main__":
 ```python
 # -*- coding: utf-8 -*-
 """
-CounterVerse v2.0 — Extended Integration Test Suite
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing v2.0 — Extended Integration Test Suite
 ====================================================
 New tests added for all Phase-2 upgrades:
   - Extra config (ESG weights, languages, Neo4j vars)
@@ -15611,7 +15611,7 @@ if __name__ == "__main__":
 
 The script compares three extraction modes on ``data/labeled/test``:
 1. naive regex/keyword baseline,
-2. CounterVerse fast extractor,
+2. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing fast extractor,
 3. Qwen SLM when CUDA is available and ``--include-qwen`` is requested.
 
 It reports binary disruption metrics with deterministic bootstrap 95% intervals.
@@ -16096,7 +16096,7 @@ def write_tornado_plot(rows: Iterable[dict], output_path: Path) -> None:
     ax.axvline(0.0, color="#111827", linewidth=1)
     ax.set_yticks(y_pos, labels)
     ax.set_xlabel("Change in risk score from baseline")
-    ax.set_title("CounterVerse one-at-a-time sensitivity tornado")
+    ax.set_title("Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing one-at-a-time sensitivity tornado")
     ax.legend()
     ax.grid(axis="x", alpha=0.2)
     fig.tight_layout()
@@ -17048,7 +17048,7 @@ if __name__ == "__main__":
 ```python
 # -*- coding: utf-8 -*-
 """
-Upgrade CounterVerse Dashboard to Vercel-grade UI/UX Design System.
+Upgrade Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Dashboard to Vercel-grade UI/UX Design System.
 Ensures UTF-8 encoding without BOM, preserving all emojis and test compatibility.
 """
 from pathlib import Path
@@ -17696,10 +17696,10 @@ def main():
     new_content = content[:start] + VERCEL_INLINE_CSS.strip() + content[end:]
     
     # Also ensure page title has Vercel-like sleekness
-    # e.g., CounterVerse · Enterprise Supply Chain Intelligence
+    # e.g., Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing · Enterprise Supply Chain Intelligence
     new_content = new_content.replace(
-        'page_title="CounterVerse · Decision Intelligence"',
-        'page_title="CounterVerse · Supply Chain Intelligence"'
+        'page_title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing · Decision Intelligence"',
+        'page_title="Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing · Supply Chain Intelligence"'
     )
     
     # Save back cleanly as UTF-8
@@ -17716,7 +17716,7 @@ if __name__ == "__main__":
 ```python
 # -*- coding: utf-8 -*-
 """
-Refine CounterVerse dashboard components with Vercel aesthetic touches:
+Refine Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing dashboard components with Vercel aesthetic touches:
 - Vercel brand mark (▲ / minimalist monochrome mark)
 - Clean Vercel scope bar
 - Streamlined Plotly theme backgrounds to match #000000 canvas
@@ -17735,7 +17735,7 @@ def refine():
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="color: #f97316; font-size: 1.4rem;">⚡</span>
             <div>
-                <div style="color: #ffffff; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em;">CounterVerse</div>
+                <div style="color: #ffffff; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em;">Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing</div>
                 <div style="color: #94a3b8; font-size: 0.70rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;">Decision Intelligence</div>
             </div>
         </div>
@@ -17750,7 +17750,7 @@ def refine():
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 28px; height: 28px; background: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #000000; font-weight: 900; font-size: 14px; box-shadow: 0 0 14px rgba(255,255,255,0.25);">▲</div>
             <div>
-                <div style="color: #ededed; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.03em;">CounterVerse</div>
+                <div style="color: #ededed; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.03em;">Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing</div>
                 <div style="color: #707070; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">Supply Chain Intelligence</div>
             </div>
         </div>
@@ -17797,7 +17797,7 @@ if __name__ == "__main__":
 ```python
 """
 Script: generate_architecture_viva_pdf.py
-Generates a complete, beautifully formatted PDF Guide for CounterVerse Architecture
+Generates a complete, beautifully formatted PDF Guide for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Architecture
 and Viva Q&A in Hinglish. Uses pure Python PDF generation (no external libraries).
 """
 
@@ -17807,7 +17807,7 @@ import sys
 def build_pdf():
     output_dir = os.path.join(os.getcwd(), "static", "reports")
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "CounterVerse_Architecture_Viva_Guide.pdf")
+    output_path = os.path.join(output_dir, "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Architecture_Viva_Guide.pdf")
 
     # Content structure
     pages_data = [
@@ -17889,7 +17889,7 @@ def build_pdf():
                     "heading": "8. SIAM 2021 Chip Crisis Empirical Calibration",
                     "lines": [
                         "Historical Event: Sept 2021 passenger vehicle production dropped -37.46% YoY (SIAM audited report).",
-                        "CounterVerse Model: Posterior Mean drop = -28.24%, P95 tail drop = -41.24%.",
+                        "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Model: Posterior Mean drop = -28.24%, P95 tail drop = -41.24%.",
                         "Ground truth falls squarely between Mean and P95 tail (-9.22% vs Mean, +3.78% vs P95)."
                     ]
                 }
@@ -17901,9 +17901,9 @@ def build_pdf():
             "subtitle": "Essential Questions & Answers - Page 3",
             "sections": [
                 {
-                    "heading": "Q1: CounterVerse traditional tools se alag kaise hai?",
+                    "heading": "Q1: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing traditional tools se alag kaise hai?",
                     "lines": [
-                        "Ans: Traditional alerts sirf news dete hain. CounterVerse use NetworkX graph se verify karta hai,",
+                        "Ans: Traditional alerts sirf news dete hain. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing use NetworkX graph se verify karta hai,",
                         "5-factor deterministic formula se risk score nikalta hai, aur Monte Carlo se real balance-sheet",
                         "PCaR (INR Crore me loss) quantify karta hai specific automakers (Maruti, Tata, etc.) ke liye."
                     ]
@@ -18006,7 +18006,7 @@ def build_pdf():
             current_y -= 8
 
         # Footer
-        footer_text = f"CounterVerse Architecture & Viva Guide | Page {page_idx} of 3 | Pure Python Rendered"
+        footer_text = f"Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Architecture & Viva Guide | Page {page_idx} of 3 | Pure Python Rendered"
         stream_lines.append("ET")
         stream_lines.append("0.2 w")
         stream_lines.append("50 45 m 545 45 l S")
@@ -18068,7 +18068,7 @@ if __name__ == "__main__":
 ```python
 """
 Script: generate_complete_viva_pdf.py
-Generates the Complete Master Viva Q&A Guide for CounterVerse in Hinglish.
+Generates the Complete Master Viva Q&A Guide for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing in Hinglish.
 Covers every single possible viva/interview question across 6 structured A4 pages.
 Uses pure Python PDF 1.4 compiler (Zero external dependencies).
 """
@@ -18079,7 +18079,7 @@ import sys
 def build_complete_viva_pdf():
     output_dir = os.path.join(os.getcwd(), "static", "reports")
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "CounterVerse_Complete_Viva_Master_Guide.pdf")
+    output_path = os.path.join(output_dir, "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing_Complete_Viva_Master_Guide.pdf")
 
     # 6 Full Pages of Structured Viva Content in Hinglish
     pages_data = [
@@ -18091,7 +18091,7 @@ def build_complete_viva_pdf():
                 {
                     "q": "Q1: Project ka 1-line elevator pitch kya hai?",
                     "ans": [
-                        "Ans: CounterVerse ek AI-powered supply chain risk quantification system hai jo unstructured news",
+                        "Ans: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing ek AI-powered supply chain risk quantification system hai jo unstructured news",
                         "headlines ko graph verification, deterministic 5-factor scoring, aur Monte Carlo simulation ke",
                         "through specific Indian automotive OEMs (Maruti, Tata, etc.) ke Procurement Cost at Risk (PCaR in Cr) me convert karta hai."
                     ]
@@ -18113,10 +18113,10 @@ def build_complete_viva_pdf():
                     ]
                 },
                 {
-                    "q": "Q4: CounterVerse Google Alerts ya traditional NLP tools se alag kaise hai?",
+                    "q": "Q4: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Google Alerts ya traditional NLP tools se alag kaise hai?",
                     "ans": [
                         "Ans: Traditional NLP sirf keyword alert deta hai ('China export ban'). Usse ye pata nahi chalta ki kya sach me",
-                        "Indian auto supply chain hit hogi aur kitna financial loss hoga. CounterVerse entity grounding karta hai,",
+                        "Indian auto supply chain hit hogi aur kitna financial loss hoga. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing entity grounding karta hai,",
                         "real UN Comtrade trade flows model karta hai, aur CFO/CSCO ko balance-sheet Value-at-Risk (INR Cr) deta hai."
                     ]
                 },
@@ -18468,7 +18468,7 @@ def build_complete_viva_pdf():
             current_y -= 6
 
         # Footer
-        footer_text = f"CounterVerse Complete Viva Master Guide | Page {page_idx} of 6 | Academic Defense Ready"
+        footer_text = f"Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Complete Viva Master Guide | Page {page_idx} of 6 | Academic Defense Ready"
         stream_lines.append("ET")
         stream_lines.append("0.3 w")
         stream_lines.append("45 42 m 550 42 l S")
@@ -18874,7 +18874,7 @@ for h in new_headlines:
 
 ===== FILE: README.md =====
 ```markdown
-# CounterVerse — Causal AI Supply Chain Disruption Simulator
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Causal AI Supply Chain Disruption Simulator
 
 > **Scenario-based causal simulation** for Indian automotive semiconductor supply chains.  
 > Headline intelligence → graph-grounded entity verification → deterministic risk scoring → Monte Carlo → Procurement Cost at Risk (PCaR).
@@ -18888,7 +18888,7 @@ for h in new_headlines:
 
 ## What It Does
 
-CounterVerse transforms unstructured news headlines into **quantified financial supply chain risk estimates** for the Indian automotive semiconductor corridor:
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing transforms unstructured news headlines into **quantified financial supply chain risk estimates** for the Indian automotive semiconductor corridor:
 
 **Gallium/Germanium (HS 8112) → Semiconductor ICs (HS 8542) → Automotive ECU Assembly → Indian OEM Vehicle Production**
 
@@ -19356,7 +19356,7 @@ All parameters are strictly bounded: $0 \le \text{severity\_pct} \le 100$ and $1
 
 ===== FILE: docs/paper_adaptation_almahri_2026.md =====
 ```markdown
-# Adaptation of AlMahri et al. (2026) to CounterVerse
+# Adaptation of AlMahri et al. (2026) to Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 
 ## Reference Paper
 > **Sara AlMahri, Liming Xu, and Alexandra Brintrup (2026)**  
@@ -19368,7 +19368,7 @@ All parameters are strictly bounded: $0 \le \text{severity\_pct} \le 100$ and $1
 
 ## Architectural Scope & Boundary Decisions
 
-| Paper Component | Paper Approach | Our Adaptation (CounterVerse) | Rationale |
+| Paper Component | Paper Approach | Our Adaptation (Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing) | Rationale |
 | :--- | :--- | :--- | :--- |
 | **Stage Structure** | 4 Stages: Detection → Filtering → Risk Assessment → Action Planning | Mapped directly: SLM Ingestion (B) → Causal Assessment (C) → Monte Carlo (D) → PCaR Mitigation (E) | Preserves conceptual pipeline integrity |
 | **Knowledge Graph** | Neo4j multi-tier global graph (6,596 nodes, 23,888 edges) | Focused Indian Automotive Supply Chain Causal Graph (30 nodes, 69 edges) | Verified Tier-4 supplier graph for Indian OEMs is out of scope; our graph models key Tier-1/2 automotive and semiconductor flows |
@@ -19728,17 +19728,17 @@ These thresholds were defined based on AlMahri et al. (2026) reported results BE
 
 ---
 
-## Baseline Comparison: Naive Keyword Classifier vs. CounterVerse Pipeline
+## Baseline Comparison: Naive Keyword Classifier vs. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Pipeline
 
 | System | Precision | Recall | F1 Score | Specificity |
 |---|---|---|---|---|
 | Naive Keyword Classifier | 1.000 | 0.455 | 0.625 | 100.0% |
-| CounterVerse Stage 1 (Phase 0 Baseline) | 0.733 | 1.000 | 0.846 | 0.0% |
-| CounterVerse Full Pipeline (Phase 0 Baseline) | 0.684 | 1.000 | 0.812 | 0.0% (raw SLM) |
-| **CounterVerse Stage 1 (Phase 6 Post-Upgrade)** | **1.000** | **1.000** | **1.000** | **100.0%** |
-| **CounterVerse Full Pipeline (Phase 6 Post-Upgrade)** | **0.877** | **1.000** | **0.933** | **100.0%** |
+| Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Stage 1 (Phase 0 Baseline) | 0.733 | 1.000 | 0.846 | 0.0% |
+| Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Full Pipeline (Phase 0 Baseline) | 0.684 | 1.000 | 0.812 | 0.0% (raw SLM) |
+| **Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Stage 1 (Phase 6 Post-Upgrade)** | **1.000** | **1.000** | **1.000** | **100.0%** |
+| **Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Full Pipeline (Phase 6 Post-Upgrade)** | **0.877** | **1.000** | **0.933** | **100.0%** |
 
-The hardened CounterVerse pipeline decisively outperforms the naive keyword baseline across all dimensions. While the naive keyword classifier achieves high precision on trivial strings, it suffers from a catastrophic **54.5% False Negative rate** (Recall: 0.455; missing 6 of 11 disruptions, including Red Sea maritime reroutes, Shanghai port congestions, and Kyushu silicon wafer floods) because multi-tier supply chain disruptions use specialized industry phrasing. In contrast, CounterVerse achieves **100% Recall** while maintaining **100% Specificity** and **0.933 Pipeline Macro F1**.
+The hardened Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing pipeline decisively outperforms the naive keyword baseline across all dimensions. While the naive keyword classifier achieves high precision on trivial strings, it suffers from a catastrophic **54.5% False Negative rate** (Recall: 0.455; missing 6 of 11 disruptions, including Red Sea maritime reroutes, Shanghai port congestions, and Kyushu silicon wafer floods) because multi-tier supply chain disruptions use specialized industry phrasing. In contrast, Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing achieves **100% Recall** while maintaining **100% Specificity** and **0.933 Pipeline Macro F1**.
 
 ---
 
@@ -19772,7 +19772,7 @@ This system does **not** report statistical forecasts of future IIP.
 
 ===== FILE: docs/security_considerations.md =====
 ```markdown
-# Security Considerations — CounterVerse
+# Security Considerations — Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 
 ## Covered in This Implementation
 
@@ -19825,7 +19825,7 @@ This system does **not** report statistical forecasts of future IIP.
 
 ===== FILE: docs/limitations_and_future_work.md =====
 ```markdown
-# CounterVerse: Model Limitations, Real-World Deployment Risks & Enterprise Roadmap
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing: Model Limitations, Real-World Deployment Risks & Enterprise Roadmap
 
 > **Document Type:** Academic Defense, Model Governance Framework & Executive Slide Deck Specification  
 > **Target Audience:** Academic Evaluators, Capstone Defense Committee, Industry Reviewers, Chief Supply Chain Officers (CSCO)  
@@ -19835,7 +19835,7 @@ This system does **not** report statistical forecasts of future IIP.
 
 ## Executive Abstract
 
-CounterVerse demonstrates a proof-of-concept multi-agent architecture coupling **Autonomous Natural Language Processing (SLMs)**, **Causal Bayesian/Graph Propagation (BFS/DAG)**, and **Stochastic Financial Risk Modeling (Monte Carlo PCaR)** to simulate supply chain disruptions. 
+Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing demonstrates a proof-of-concept multi-agent architecture coupling **Autonomous Natural Language Processing (SLMs)**, **Causal Bayesian/Graph Propagation (BFS/DAG)**, and **Stochastic Financial Risk Modeling (Monte Carlo PCaR)** to simulate supply chain disruptions. 
 
 While the internal pipeline achieves computational consistency and replicates historical benchmarks within calibration tolerances ($\le \pm 5.0\text{pp}$), **a major chasm exists between a stylized simulation sandbox and live industrial deployment**.
 
@@ -19851,7 +19851,7 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  SLIDE TITLE: CounterVerse: Simulation Validity vs. Real-World Deployment Risks                     │
+│  SLIDE TITLE: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing: Simulation Validity vs. Real-World Deployment Risks                     │
 │  SUBTITLE: Deconstructing Model Boundaries & the Roadmap to Enterprise Production                    │
 ├──────────────────────────────────────────────────┬───────────────────────────────────────────────────┤
 │  CATEGORY 1: SIMULATION VALIDITY                 │  CATEGORY 2: REAL-WORLD DEPLOYMENT RISKS          │
@@ -19879,7 +19879,7 @@ For every constraint, a concrete **Engineering Solution & Enterprise Fix** is sp
 
 #### 1. Graph Mesh vs. Clean 4-Tier Chain Oversimplification
 * **The Reality:** Real global supply chains are not linear 4-tier acyclic trees. They form dense, cyclic bipartite meshes featuring multi-sourcing (e.g., dual-sourcing automotive microcontrollers from TSMC/Taiwan and Samsung/Korea), cross-tier lateral transshipments, and substitutable intermediate components.
-* **The Simulation Bound:** CounterVerse uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM. The separate 30-node/69-edge verification graph also contains three explicit simplifications:
+* **The Simulation Bound:** Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing uses a locked 8-node, 9-edge DAG for Gallium $\rightarrow$ ICs $\rightarrow$ Indian ECU $\rightarrow$ OEM. The separate 30-node/69-edge verification graph also contains three explicit simplifications:
   - NXP is headquartered in the Netherlands, while the current graph models its headquarters country as USA for scope simplification.
   - OEM-to-component edges are asymmetric: Tata Motors and Hyundai India have direct `Integrated Circuits` edges, while Maruti Suzuki and Mahindra are linked through ECU/sensor nodes. This is a modeling choice, not evidence of different real procurement structures.
   - China Minmetals is included as a Chinese metals/mining actor, but its use as a gallium-supply representative requires source verification (`TODO_SOURCE` in `HUMAN_TODO.md`).

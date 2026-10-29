@@ -1,4 +1,4 @@
-# CounterVerse — Repository Truth & Baseline Audit (Phase 0)
+# Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing — Repository Truth & Baseline Audit (Phase 0)
 
 **Date:** 2026-10-18  
 **Branch:** `feature/report-v2`  

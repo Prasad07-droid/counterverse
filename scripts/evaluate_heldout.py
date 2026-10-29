@@ -2,7 +2,7 @@
 
 The script compares three extraction modes on ``data/labeled/test``:
 1. naive regex/keyword baseline,
-2. CounterVerse fast extractor,
+2. Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing fast extractor,
 3. Qwen SLM when CUDA is available and ``--include-qwen`` is requested.
 
 It reports binary disruption metrics with deterministic bootstrap 95% intervals.

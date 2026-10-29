@@ -59,11 +59,11 @@ def test_claims_audit_section():
 
 
 def test_deliberate_differences_and_viva_phrasing():
-    """Verify that CounterVerse's deliberate differences and viva phrasing are included."""
+    """Verify that Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing's deliberate differences and viva phrasing are included."""
     doc_path = Path(__file__).resolve().parents[1] / "docs" / "competitor_benchmark_resilinc.md"
     content = doc_path.read_text(encoding="utf-8")
 
-    assert "Where CounterVerse is Deliberately Different" in content
+    assert "Where Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing is Deliberately Different" in content
     assert "Narrow Scope" in content
     assert "Open, Audit-Transparent Formulas" in content or "Open Formula" in content
     assert "Deterministic AI Safety Separation" in content

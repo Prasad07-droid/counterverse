@@ -217,7 +217,7 @@ export const DecisionModeView: React.FC<DecisionModeViewProps> = ({
               Procurement Officer Decision Triage &amp; Human Approval Policy
             </h4>
             <p className="mt-1 text-xs text-[#a5a5a5] leading-relaxed">
-              <strong className="text-[#f5a623]">Never auto-execute purchases or supplier changes:</strong> CounterVerse recommendations provide decision support only. All PO allocation adjustments, dual-sourcing contracts, and buffer reserves require explicit human authorization and manual ERP approval.
+              <strong className="text-[#f5a623]">Never auto-execute purchases or supplier changes:</strong> Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing recommendations provide decision support only. All PO allocation adjustments, dual-sourcing contracts, and buffer reserves require explicit human authorization and manual ERP approval.
             </p>
           </div>
         </div>

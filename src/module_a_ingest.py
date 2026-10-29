@@ -30,7 +30,7 @@ def _fetch_gdelt(max_records: int = 8) -> List[Dict]:
         "sort": "datedesc"
     }
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/2.0",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/2.0",
         "Accept": "application/json"
     }
     try:

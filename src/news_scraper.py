@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Real-Time Web Scraper for Supply Chain Intelligence (CounterVerse).
+Real-Time Web Scraper for Supply Chain Intelligence (Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing).
 Scrapes live news from Google News RSS, GDELT 2.0, and trade feeds.
 Extracts, cleans, evaluates disruption risk, and auto-selects top signals for simulation.
 """

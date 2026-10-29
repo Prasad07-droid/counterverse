@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Centralized Configuration Management for CounterVerse
+Centralized Configuration Management for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 =====================================================
 Uses pydantic-settings (with robust manual fallback) for validated, type-safe
 configuration, environment variable overrides (COUNTERVERSE_*), and .env file support.

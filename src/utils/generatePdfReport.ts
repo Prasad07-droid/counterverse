@@ -183,7 +183,7 @@ export function createClientPdfBlob(data: ReportData): Blob {
     '30 272 Td',
     '(HS Code Reference: 8542 (Electronic Integrated Circuits) & 8112 (Gallium/Germanium).) Tj',
     '30 258 Td',
-    '(Model Hash: 8f4a13d7890b9e83   |   Audited by: CounterVerse Enterprise Engine v2.0) Tj',
+    '(Model Hash: 8f4a13d7890b9e83   |   Audited by: Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Enterprise Engine v2.0) Tj',
     'ET',
 
     // Footer
@@ -193,7 +193,7 @@ export function createClientPdfBlob(data: ReportData): Blob {
     '/F2 8 Tf',
     '0.5 0.5 0.5 rg',
     '30 65 Td',
-    '(Confidential - CounterVerse Supply Chain Intelligence Platform - All Rights Reserved) Tj',
+    '(Confidential - Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Supply Chain Intelligence Platform - All Rights Reserved) Tj',
     '460 65 Td',
     '(Page 1 of 1) Tj',
     'ET',

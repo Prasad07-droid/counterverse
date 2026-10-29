@@ -1,5 +1,5 @@
 """
-Naive Keyword Classifier Baseline for CounterVerse
+Naive Keyword Classifier Baseline for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 Provides a pure heuristic keyword-counting baseline to benchmark against the Agentic SLM pipeline.
 """
 

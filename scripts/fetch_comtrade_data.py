@@ -21,7 +21,7 @@ PARTNER_NAMES = {
 def fetch_year_data(hs_code, year, max_retries=3):
     """Fetches UN Comtrade data with exponential backoff (max 3 attempts: 1s, 2s, 4s)."""
     url = f"https://comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=699&period={year}&cmdCode={hs_code}&flowCode=M"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) CounterVerse/1.0"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing/1.0"}
     req = urllib.request.Request(url, headers=headers)
     backoff_delays = [1.0, 2.0, 4.0]
 

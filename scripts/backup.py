@@ -2,7 +2,7 @@
 """
 scripts/backup.py
 =================
-Automated backup utility for CounterVerse persistent state:
+Automated backup utility for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing persistent state:
   1. data/processed/headline_cache.db (SQLite headline cache)
   2. data/processed/grounding_graph_custom.json (Graph overlay)
   3. data/decision_queue.json (Officer actions and audit log)
@@ -31,7 +31,7 @@ BACKUP_TARGETS = [
 
 
 def create_backup(output_path: str = None) -> Path:
-    """Creates a tar.gz archive of existing CounterVerse state files."""
+    """Creates a tar.gz archive of existing Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing state files."""
     backup_dir = PROJECT_ROOT / "data" / "backups"
     backup_dir.mkdir(parents=True, exist_ok=True)
 
@@ -59,7 +59,7 @@ def create_backup(output_path: str = None) -> Path:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Backup CounterVerse persistent state.")
+    parser = argparse.ArgumentParser(description="Backup Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing persistent state.")
     parser.add_argument("--output", "-o", help="Target archive path (.tar.gz)", default=None)
     args = parser.parse_args()
 

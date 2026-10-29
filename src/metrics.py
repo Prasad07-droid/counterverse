@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Prometheus metrics + Slack/Teams alerting for CounterVerse
+# Prometheus metrics + Slack/Teams alerting for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing
 import os
 import logging
 import time
@@ -61,7 +61,7 @@ def alert_slack(message: str, level: str = "info") -> bool:
         import requests
         resp = requests.post(
             _SLACK_WEBHOOK,
-            json={"text": "[" + tag + "] CounterVerse: " + message},
+            json={"text": "[" + tag + "] Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing: " + message},
             timeout=5,
         )
         return resp.status_code == 200
@@ -78,8 +78,8 @@ def alert_teams(message: str, level: str = "info") -> bool:
         "@type": "MessageCard",
         "@context": "http://schema.org/extensions",
         "themeColor": colors.get(level, "0076D7"),
-        "summary": "CounterVerse Alert",
-        "sections": [{"activityTitle": "CounterVerse [" + level.upper() + "]", "text": message}],
+        "summary": "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing Alert",
+        "sections": [{"activityTitle": "Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing [" + level.upper() + "]", "text": message}],
     }
     try:
         import requests

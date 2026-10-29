@@ -2,7 +2,7 @@
 """
 scripts/restore.py
 ==================
-Automated restore utility for CounterVerse persistent state archives.
+Automated restore utility for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing persistent state archives.
 Extracts:
   - data/processed/headline_cache.db
   - data/processed/grounding_graph_custom.json
@@ -38,7 +38,7 @@ def find_latest_backup() -> Path:
 
 
 def restore_backup(archive_path: str = None) -> None:
-    """Restores files from a CounterVerse backup archive."""
+    """Restores files from a Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing backup archive."""
     if archive_path:
         src = Path(archive_path).resolve()
         if not src.exists():
@@ -46,7 +46,7 @@ def restore_backup(archive_path: str = None) -> None:
     else:
         src = find_latest_backup()
 
-    print(f"\n[*] Restoring CounterVerse state from archive:\n    {src}")
+    print(f"\n[*] Restoring Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing state from archive:\n    {src}")
 
     restored_count = 0
     with tarfile.open(src, "r:gz") as tar:
@@ -65,7 +65,7 @@ def restore_backup(archive_path: str = None) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Restore CounterVerse persistent state.")
+    parser = argparse.ArgumentParser(description="Restore Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing persistent state.")
     parser.add_argument("--archive", "-a", help="Path to backup archive (.tar.gz)", default=None)
     args = parser.parse_args()
 

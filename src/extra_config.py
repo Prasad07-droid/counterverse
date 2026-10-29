@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Additional configuration extensions for CounterVerse.
+Additional configuration extensions for Causal AI and Small Language Models for Supply Chain Disruption Forecasting and Procurement Cost at Risk Estimation for Indian Automotive Component Sourcing.
 These values are loaded via the main config (src/config.py) fallback class.
 """
 import os
